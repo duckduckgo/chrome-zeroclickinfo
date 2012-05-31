@@ -79,9 +79,7 @@ document.getElementsByName("btnG")[0].onclick = function(){
 
 function search(query)
 {
-  //document.getElementById('center_col').innerHTML = ' <div id="zeroclick_loader"> '+
-  //    '<img src="http://duckduckgo.com/l.gif" /> Loading ...' +
-  //    '</div>' + document.getElementById('center_col').innerHTML;
+    showLoader();
 
     var request = {query: query};
     chrome.extension.sendRequest(request, function(response){
@@ -90,6 +88,27 @@ function search(query)
     if (options.dev)
         console.log("query:", query);
  
+}
+
+function showLoader()
+{
+  if (!resultsLoaded()) {
+    setTimeout(showLoader, 100);
+    return;
+  }
+  
+  if (document.getElementById('zeroclick_loader') === null) {
+    document.getElementById('center_col').innerHTML = ' <div id="zeroclick_loader"> '+
+        '<img src="http://duckduckgo.com/l.gif" /> Loading ...' +
+        '</div>' + document.getElementById('center_col').innerHTML;
+  } else {
+    document.getElementById('zeroclick_loader').style.visibility = 'visible';
+  }
+ }
+
+function hideLoader()
+{
+  document.getElementById('zeroclick_loader').style.visibility = 'hidden';
 }
 
 function renderZeroClick(res, query) 
@@ -149,6 +168,8 @@ function createResultDiv()
 {
     var result = document.getElementById("center_col");
     var ddg_result = document.getElementById("ddg_zeroclick");
+    hideLoader();
+
     showZeroClick();
     if (ddg_result === null) {
         result.innerHTML = '<div id="ddg_zeroclick"></div>' + result.innerHTML;
