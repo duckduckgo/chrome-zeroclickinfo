@@ -395,7 +395,7 @@
                 "js/common.js",
                 "js/google.js"
             ],
-            "css": ["css/google.css"]
+            "css": ["css/common.css", "css/google.css"]
         },
         {
             "matches": [
@@ -406,7 +406,7 @@
                 "js/common.js",
                 "js/bing.js"
             ],
-            "css": ["css/bing.css"]
+            "css": ["css/common.css", "css/bing.css"]
         }
     ],
     "options_page": "html/options.html",
