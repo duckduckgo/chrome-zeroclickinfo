@@ -12,6 +12,9 @@
         "default_icon": "img/icon_16.png",
         "default_popup": "html/popup.html"
     },
+    "chrome_url_overrides" : {
+      "newtab": "html/newtab.html" 
+    },
     "commands": {
       "_execute_browser_action": {
         "suggested_key": {
