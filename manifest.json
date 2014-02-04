@@ -1,6 +1,6 @@
 {
     "name": "DuckDuckGo for Chrome",
-    "version": "42.5.15",
+    "version": "42.5.16.1",
     "description": "DuckDuckGo enhancements for Chrome.",
     "icons": {
         "16": "img/icon_16.png",
@@ -11,6 +11,9 @@
     "browser_action": {
         "default_icon": "img/icon_16.png",
         "default_popup": "html/popup.html"
+    },
+    "chrome_url_overrides" : {
+      "newtab": "html/newtab.html" 
     },
     "commands": {
       "_execute_browser_action": {
