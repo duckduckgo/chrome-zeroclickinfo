@@ -90,6 +90,6 @@ document.addEventListener('DOMContentLoaded', function(){
     restore_options();
 })
 
-document.addEventListener('click', function(){
+document.getElementById('save').addEventListener('click', function() {
     save_options();
 })
