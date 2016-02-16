@@ -16,29 +16,133 @@
 -->
 <!DOCTYPE html>
 <html>
-<head><title>DuckDuckGo for Chrome - Options</title></head>
-<script type="text/javascript" src="../js/options.js"></script>
+<head>
+    <title>DuckDuckGo for Chrome - Options</title>
+    <style type="text/css">
+    body {
+        margin: 0px;
+        height: 100%;
+        background-color: #EFEFEF;
+    }
+    
+    header {
+        height: 60px;
+        margin: 0px auto;
+        text-align: center;
+        background: #FF5722;
+        line-height: 60px;
+        box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.62);
+    }
+    
+    header h1 {
+        margin: 0px;
+        font-size: 3em;
+        color: #2D2D2D;
+    }
+    
+    #options {
+        width: 500px;
+        margin: 50px auto;
+        background: #4A4A4A;
+        text-align: center;
+        padding: 40px;
+        min-width: 400px;
+        box-shadow: 0px 2px 3px black;
+    }
+    
+    #options ul {
+        list-style-type: none;
+        text-align: left;
+        margin: 0px;
+        padding: 0px;
+    }
+    
+    #options ul li {
+        height: 30px;
+        margin: 5px 0px;
+        line-height: 30px;
+        color: white;
+    }
+    
+    button#save {
+        height: 30px;
+        width: 100px;
+        font-size: 15px;
+        background: #FF5722;
+        border: 1px solid #EC5120;
+        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.62);
+        text-transform: uppercase;
+        font-weight: bold;
+        color: white;
+        cursor: pointer;
+        outline: none;
+    }
+    
+    div#status {
+        width: 200px;
+        margin: 50px auto;
+        text-align: center;
+        font-size: 15px;
+    }
+    
+    button#save:hover {
+        box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.82);
+    }
+    
+    input[type="checkbox"] {
+        display: none;
+    }
+    
+    input[type="checkbox"]+label {
+        background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDE2IDE2IiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZmlsbD0iI0U1RTVFNSIgZD0iTTE0LDE2SDJjLTEuMSwwLTItMC45LTItMlYyYzAtMS4xLDAuOS0yLDItMmgxMmMxLjEsMCwyLDAuOSwyLDJ2MTJDMTYsMTUuMSwxNS4xLDE2LDE0LDE2eiIvPjwvc3ZnPg==) no-repeat;
+        background-size: 16px 16px;
+    }
+    
+    input[type="checkbox"]:checked + label {
+        background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTYgMTYiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDE2IDE2IiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBmaWxsLXJ1bGU9ImV2ZW5vZGQiIGNsaXAtcnVsZT0iZXZlbm9kZCIgZmlsbD0iIzY2NjY2NiIgZD0iTTE0LDE2SDJjLTEuMSwwLTItMC45LTItMlYyYzAtMS4xLDAuOS0yLDItMmgxMmMxLjEsMCwyLDAuOSwyLDJ2MTJDMTYsMTUuMSwxNS4xLDE2LDE0LDE2eiIvPjxwYXRoIGZpbGw9IiNGRkZGRkYiIGQ9Ik04LjQsMTAuOWwtMS42LDEuNmwtNC00bDEuNi0xLjZsMi40LDIuNGw0LjgtNC44bDEuNiwxLjZMOC40LDEwLjlMOC40LDEwLjl6Ii8+PC9zdmc+) no-repeat;
+    }
+    
+    ul li label {
+        padding-left: 24px;
+        padding-top: 0px;
+        vertical-margin: middle;
+        font-size: 13px;
+        cursor: pointer;
+    }
+    </style>
+</head>
 
 <body>
-
-  Answers on Google/Bing (on top of links)
-  <input type="checkbox" id="zeroclickinfo" checked="yes"></input>
-<br>
-  Show Answers in right panel on Google
-  <input type="checkbox" id="zeroclick_google_right" ></input>
-<br>
-  Remember last search in the popup
-  <input type="checkbox" id="lastsearch_enabled" checked="yes"></input>
-<br>
-  Use POST requests where possible
-  <input type="checkbox" id="use_post" ></input>
-<br>
-  Show debug information:
-  <input type="checkbox" id="dev" ></input>
-<br>
-
-
-<button>Save</button>
-  <div id="status"> </div>
+    <header>
+        <h1>DuckDuckGo Setting</h1>
+    </header>
+    <div id="options">
+        <ul>
+            <li>
+                <input type="checkbox" id="zeroclickinfo" checked="yes">
+                <label for="zeroclickinfo">Answers on Google/Bing (on top of links)</label>
+            </li>
+            <li>
+                <input type="checkbox" id="zeroclick_google_right"></input>
+                <label for="zeroclick_google_right">Show Answers in right panel on Google</label>
+            </li>
+            <li>
+                <input type="checkbox" id="lastsearch_enabled" checked="yes"></input>
+                <label for="lastsearch_enabled">Remember last search in the popup</label>
+            </li>
+            <li>
+                <input type="checkbox" id="use_post"></input>
+                <label for="use_post">Use POST requests where possible</label>
+            </li>
+            <li>
+                <input type="checkbox" id="dev"></input>
+                <label for="dev">Show debug information</label>
+            </li>
+        </ul>
+        <button id="save">Save</button>
+    </div>
+    <div id="status"></div>
+    <script type="text/javascript" src="../js/options.js"></script>
 </body>
+
 </html>
