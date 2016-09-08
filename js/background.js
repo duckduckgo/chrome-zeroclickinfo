@@ -74,7 +74,10 @@ function Background() {
     }
 
     if (request.atb) {
-      localStorage['atb'] = request.atb;
+      if (typeof localStorage['atb_set'] == "undefined") {
+        localStorage['atb'] = request.atb;
+        localStorage['atb_set'] = true;
+      }
     }
 
     return true;
