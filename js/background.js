@@ -68,6 +68,18 @@ function Background() {
         });
       }
     });
+
+    // Show search engine settings along with steps required to make DuckDuckGo
+    // the default for platforms where the override does not work.
+    if (os !== 'w') {
+      chrome.tabs.create({ url: 'chrome://settings/searchEngines' });
+      chrome.notifications.create({
+        type: "basic",
+        iconUrl: "./img/icon_128.png",
+        title: "One more step!",
+        message: "Click 'Make Default' next to DuckDuckGo in the list below."
+      });
+    }
   });
 
   chrome.extension.onMessage.addListener(function(request, sender, callback) {
