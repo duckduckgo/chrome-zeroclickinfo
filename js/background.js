@@ -84,7 +84,7 @@ function Background() {
 
     if (!localStorage['set_atb'] && request.atb) {
       localStorage['atb'] = request.atb;
-      localStorage['set_atb'] = true;
+      localStorage['set_atb'] = new Date().getTime();
     }
 
     return true;
@@ -120,17 +120,30 @@ chrome.contextMenus.create({
 // Add ATB param
 chrome.webRequest.onBeforeRequest.addListener(
     function (e) {
-      // Only change the URL if there is no ATB param specified.
-      if (e.url.indexOf('atb=') !== -1) {
-        return;
-      }
+      var atb = localStorage['atb'],
+          setATB = localStorage['set_atb'],
+          hasATB = e.url.indexOf('atb=') !== -1,
+          newURL = e.url;
 
       // Only change the URL if there is an ATB saved in localStorage
-      if (localStorage['atb'] === undefined) {
+      if (!atb) {
         return;
       }
 
-      var newURL = e.url + "&atb=" + localStorage['atb'];
+      newURL += '&atb=' + atb;
+
+      // only do this if set_atb is populated AND if it's a number (previous
+      // versions of the extension stored a true/false boolean in this field)
+      if (setATB && typeof setATB === 'number') {
+        var curDate = new Date().getTime(),
+            daysSince = Math.floor((curDate - setATB) / (1000*60*60*24));
+
+        if (daysSince >= 1) {
+          newURL += '&lsd=' + daysSince;
+          localStorage['set_atb'] = curDate;
+        }
+      }
+
       return {
         redirectUrl: newURL
       };
