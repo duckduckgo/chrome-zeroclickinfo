@@ -136,7 +136,7 @@ chrome.webRequest.onBeforeRequest.addListener(
       // versions of the extension stored a true/false boolean in this field)
       if (setATB && typeof setATB === 'number') {
         var curDate = new Date().getTime(),
-            daysSince = Math.floor((curDate - setATB) / (1000*60*60*24));
+            daysSince = Math.floor((curDate - setATB) / 86400000);
 
         if (daysSince >= 1) {
           newURL += '&lsd=' + daysSince;
