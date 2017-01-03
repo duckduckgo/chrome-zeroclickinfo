@@ -121,12 +121,15 @@ chrome.contextMenus.create({
 chrome.webRequest.onBeforeRequest.addListener(
     function (e) {
       var atb = localStorage['atb'],
-          setATB = localStorage['set_atb'],
+          setATB = parseInt(localStorage['set_atb']),
           hasATB = e.url.indexOf('atb=') !== -1,
           newURL = e.url;
 
-      // Only change the URL if there is an ATB saved in localStorage
-      if (!atb) {
+      // Don't change the atb param or add the lsd param if either:
+      // 1. They don't have an ATB param in localStorage
+      // 2. They already have an ATB param in the querystring
+      //    (likely from a previous opensearch.xml install)
+      if (!atb || hasATB) {
         return;
       }
 
@@ -134,7 +137,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 
       // only do this if set_atb is populated AND if it's a number (previous
       // versions of the extension stored a true/false boolean in this field)
-      if (setATB && typeof setATB === 'number') {
+      if (setATB && !isNaN(setATB)) {
         var curDate = new Date().getTime(),
             daysSince = Math.floor((curDate - setATB) / 86400000);
 
