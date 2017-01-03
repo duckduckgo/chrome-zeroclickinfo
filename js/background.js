@@ -84,7 +84,7 @@ function Background() {
 
     if (!localStorage['set_atb'] && request.atb) {
       localStorage['atb'] = request.atb;
-      localStorage['set_atb'] = true;
+      localStorage['set_atb'] = new Date().getTime();
     }
 
     return true;
@@ -120,17 +120,33 @@ chrome.contextMenus.create({
 // Add ATB param
 chrome.webRequest.onBeforeRequest.addListener(
     function (e) {
-      // Only change the URL if there is no ATB param specified.
-      if (e.url.indexOf('atb=') !== -1) {
+      var atb = localStorage['atb'],
+          setATB = parseInt(localStorage['set_atb']),
+          hasATB = e.url.indexOf('atb=') !== -1,
+          newURL = e.url;
+
+      // Don't change the atb param or add the lsd param if either:
+      // 1. They don't have an ATB param in localStorage
+      // 2. They already have an ATB param in the querystring
+      //    (likely from a previous opensearch.xml install)
+      if (!atb || hasATB) {
         return;
       }
 
-      // Only change the URL if there is an ATB saved in localStorage
-      if (localStorage['atb'] === undefined) {
-        return;
+      newURL += '&atb=' + atb;
+
+      // only do this if set_atb is populated AND if it's a number (previous
+      // versions of the extension stored a true/false boolean in this field)
+      if (setATB && !isNaN(setATB)) {
+        var curDate = new Date().getTime(),
+            daysSince = Math.floor((curDate - setATB) / 86400000);
+
+        if (daysSince >= 1) {
+          newURL += '&lsd=' + daysSince;
+          localStorage['set_atb'] = curDate;
+        }
       }
 
-      var newURL = e.url + "&atb=" + localStorage['atb'];
       return {
         redirectUrl: newURL
       };
