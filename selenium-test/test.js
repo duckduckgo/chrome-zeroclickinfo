@@ -250,9 +250,9 @@ function testFeelingDucky() {
     searchbar = wd.findElement({id:'search_form_input_homepage'});
     var reg_url = /^((duckduckgo\.com).)*$/;
 
-    //var feelducky = wd.findElement({id:'adv_ducky'});
+    var feelducky = wd.findElement(webdriver.By.css('label[for="adv_ducky"]'));
     wd.actions()
-    .click(wd.findElement({id:'adv_ducky'}))
+    .click(feelducky)
     .perform()
     .then(function() {
        searchbar.sendKeys('Philadelphia')
@@ -302,9 +302,9 @@ function main() {
     .then(function() {
          testExpandCollapse(false);
     })
-    /*.then(function() {
+    .then(function() {
          testFeelingDucky();
-    })*/
+    })
     .then(function() {
      //   testOptions();
     });
