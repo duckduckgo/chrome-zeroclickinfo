@@ -306,7 +306,7 @@ function main() {
          testFeelingDucky();
     })
     .then(function() {
-     //   testOptions();
+         testOptions();
     });
     
     tearDown();
