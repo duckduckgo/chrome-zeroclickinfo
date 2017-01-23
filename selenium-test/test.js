@@ -248,7 +248,7 @@ function testExpandCollapse(collapsed) {
 function testFeelingDucky() {
     search_btn = wd.findElement({id:'search_button_homepage'});
     searchbar = wd.findElement({id:'search_form_input_homepage'});
-    var reg_url = /^((duckduckgo\.com).)*$/;
+    var reg_url = /^((?!duckduckgo\.com).)*$/;
 
     var feelducky = wd.findElement(webdriver.By.css('label[for="adv_ducky"]'));
     wd.actions()
