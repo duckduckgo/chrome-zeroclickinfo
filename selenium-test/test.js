@@ -204,11 +204,20 @@ function testOptions() {
 }
 
 // Test "show meanings" option, checked and unchecked
-function testMeanings() {
-    var meanings = wd.findElement({id:'adv_meanings'});
+function testMeanings(checked) {
+    wd.manage().timeouts().implicitlyWait(100);
+    
+    var meanings = wd.findElement(webdriver.By.css('label[for="adv_meanings"]'));
+    var reg_url;
+    
+    if (checked) {
+        reg_url = /^((?!\&d\=1).)*$/;
+    } else {
+        reg_url = /^((\&d\=1).)*$/;
+        meanings.click();
+    }
     
     search_btn = wd.findElement({id:'search_button_homepage'});    
-    var reg_url =  /^((?!\&d\=1).)*$/;
  
     return testNewTabUrl(search_btn, "Meanings showing for DDG searches", reg_url);
 }
@@ -282,7 +291,10 @@ function main() {
         testMoreOptions();
     })
     .then(function() {
-        testMeanings();
+        testMeanings(true);
+    })
+    .then(function() {
+        testMeanings(false);
     })
     .then(function() {
         testExpandCollapse(true);
@@ -294,7 +306,7 @@ function main() {
          testFeelingDucky();
     })*/
     .then(function() {
-        testOptions();
+     //   testOptions();
     });
     
     tearDown();
