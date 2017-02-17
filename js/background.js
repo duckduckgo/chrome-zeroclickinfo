@@ -93,6 +93,52 @@ function Background() {
 
 var background = new Background();
 
+// Fetch and display search suggestions
+chrome.omnibox.onInputChanged.addListener((text, suggest) => {
+  function escapeXML(string) {
+    // Escape XML entities
+    // https://developer.chrome.com/extensions/omnibox#type-SuggestResult
+    return (string
+      .replace(`&`, `&amp;`)
+      .replace(`"`, `&quot;`)
+      .replace(`'`, `&apos;`)
+      .replace(`<`, `&lt;`)
+      .replace(`>`, `&gt;`)
+    );
+  }
+
+  const url = `https://duckduckgo.com/ac/?q=${encodeURIComponent(text)}&_=${+ new Date()}`;
+  const xhr = new XMLHttpRequest();
+
+  xhr.open('GET', url);
+
+  xhr.addEventListener('load', () => {
+    // Strip user input for more tolerant matching
+    text = escapeXML(text).toLowerCase().trim();
+
+    const suggestions = JSON.parse(xhr.responseText).map((suggestion) => {
+      // Emulate Chrome's inverse highlighting
+      let description = `<match>${escapeXML(suggestion.phrase).replace(text, `</match>${text}<match>`)}</match>`;
+
+      // Handle !bang
+      if (suggestion.snippet) {
+        const bang = suggestion.phrase.match(/^!\S+/).toString();
+
+        description = description.replace(bang, `<url>${bang}</url>`) + `<dim>${suggestion.snippet}</dim>`;
+      }
+
+      return {
+        content: suggestion.phrase,
+        description
+      };
+    });
+
+    suggest(suggestions);
+  });
+
+  xhr.send();
+});
+
 chrome.omnibox.onInputEntered.addListener(function(text) {
   chrome.tabs.query({
     'currentWindow': true,
