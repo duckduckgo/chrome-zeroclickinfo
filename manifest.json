@@ -28,7 +28,31 @@
     "omnibox": {"keyword": "d"},
     "options_page": "html/options.html",
     "background": {
-            "scripts": ["js/background.js"]
+            "scripts": [
+                "require.js",
+      "privacybadger/src/bootstrap.js",
+      "privacybadger/lib/punycode.js",
+      "privacybadger/lib/publicSuffixList.js",
+      "privacybadger/lib/basedomain.js",
+      "privacybadger/lib/sha1.js",
+      "privacybadger/lib/jsbn.js",
+      "privacybadger/lib/rsa.js",
+      "privacybadger/lib/underscore-min.js",
+      "privacybadger/data/surrogates.js",
+      "privacybadger/src/surrogates.js",
+      "privacybadger/src/multiDomainFirstParties.js",
+      "privacybadger/src/incognito.js",
+      "privacybadger/src/constants.js",
+      "privacybadger/src/storage.js",
+      "privacybadger/src/utils.js",
+      "privacybadger/src/htmlutils.js",
+      "privacybadger/src/webrequest.js",
+      "privacybadger/src/heuristicblocking.js",
+      "privacybadger/src/socialwidgetloader.js",
+      "privacybadger/src/migrations.js",
+       "privacybadger/src/background.js",
+
+                "js/background.js"]
     },
     "chrome_settings_overrides": {
       "search_provider": {
@@ -48,6 +72,9 @@
     ],
     "permissions": [
         "contextMenus",
+        "storage",
+        "cookeies",
+        "privacy",
         "webRequest",
         "webRequestBlocking",
         "*://*.duckduckgo.com/"
