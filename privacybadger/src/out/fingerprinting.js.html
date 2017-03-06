@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: fingerprinting.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: fingerprinting.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * This file is part of Privacy Badger &lt;https://www.eff.org/privacybadger>
+ * Copyright (C) 2015 Electronic Frontier Foundation
+ *
+ * Derived from Chameleon &lt;https://github.com/ghostwords/chameleon>
+ * Copyright (C) 2015 ghostwords
+ *
+ * Privacy Badger is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * Privacy Badger is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Privacy Badger.  If not, see &lt;http://www.gnu.org/licenses/>.
+ */
+
+function getFpPageScript() {
+
+  // code below is not a content script: no chrome.* APIs /////////////////////
+
+  // return a string
+  return "(" + function (ERROR) {
+
+    ERROR.stackTraceLimit = Infinity; // collect all frames
+
+    var event_id = document.currentScript.getAttribute('data-event-id');
+
+    // from Underscore v1.6.0
+    function debounce(func, wait, immediate) {
+      var timeout, args, context, timestamp, result;
+
+      var later = function () {
+        var last = Date.now() - timestamp;
+        if (last &lt; wait) {
+          timeout = setTimeout(later, wait - last);
+        } else {
+          timeout = null;
+          if (!immediate) {
+            result = func.apply(context, args);
+            context = args = null;
+          }
+        }
+      };
+
+      return function () {
+        context = this;
+        args = arguments;
+        timestamp = Date.now();
+        var callNow = immediate &amp;&amp; !timeout;
+        if (!timeout) {
+          timeout = setTimeout(later, wait);
+        }
+        if (callNow) {
+          result = func.apply(context, args);
+          context = args = null;
+        }
+
+        return result;
+      };
+    }
+
+    // messages the injected script
+    var send = (function () {
+      var messages = [];
+
+      // debounce sending queued messages
+      var _send = debounce(function () {
+        document.dispatchEvent(new CustomEvent(event_id, {
+          detail: messages
+        }));
+
+        // clear the queue 
+        messages = [];
+      }, 100);
+
+      return function (msg) {
+        // queue the message
+        messages.push(msg);
+
+        _send();
+      };
+    }());
+
+    // https://code.google.com/p/v8-wiki/wiki/JavaScriptStackTraceApi
+    /**
+     * Customize the stack trace
+     * @param structured If true, change to customized version
+     * @returns {*} Returns the stack trace
+     */
+    function getStackTrace(structured) {
+      var err = {},
+        origFormatter,
+        stack;
+
+      if (structured) {
+        origFormatter = ERROR.prepareStackTrace;
+        ERROR.prepareStackTrace = function (_, structuredStackTrace) {
+          return structuredStackTrace;
+        };
+      }
+
+      ERROR.captureStackTrace(err, getStackTrace);
+      stack = err.stack;
+
+      if (structured) {
+        ERROR.prepareStackTrace = origFormatter;
+      }
+
+      return stack;
+    }
+
+    /**
+     * Checks the stack trace for the originating URL
+     * @returns {String} The URL of the originating script (URL:Line number:Column number)
+     */
+    function getOriginatingScriptUrl() {
+      var trace = getStackTrace(true);
+
+      if (trace.length &lt; 2) {
+        return '';
+      }
+
+      // this script is at 0 and 1
+      var callSite = trace[2];
+
+      if (callSite.isEval()) {
+        // argh, getEvalOrigin returns a string ...
+        var eval_origin = callSite.getEvalOrigin(),
+          script_url_matches = eval_origin.match(/\((http.*:\d+:\d+)/);
+
+        return script_url_matches &amp;&amp; script_url_matches[1] || eval_origin;
+      } else {
+        return callSite.getFileName() + ':' + callSite.getLineNumber() + ':' + callSite.getColumnNumber();
+      }
+    }
+
+    /**
+     *  Strip away the line and column number (from stack trace urls)
+     * @param script_url The stack trace url to strip
+     * @returns {String} the pure URL
+     */
+    function stripLineAndColumnNumbers(script_url) {
+      return script_url.replace(/:\d+:\d+$/, '');
+    }
+
+    /**
+     * Monitor the writes in a canvas instance
+     * @param item special item objects
+     */
+    function trapInstanceMethod(item) {
+      var is_canvas_write = (
+        item.propName == 'fillText' || item.propName == 'strokeText'
+      );
+
+      item.obj[item.propName] = (function (orig) {
+
+        return function () {
+          var args = arguments;
+
+          if (is_canvas_write) {
+            // to avoid false positives,
+            // bail if the text being written is too short
+            if (!args[0] || args[0].length &lt; 5) {
+              return orig.apply(this, args);
+            }
+          }
+
+          var script_url = getOriginatingScriptUrl(),
+            msg = {
+              obj: item.objName,
+              prop: item.propName,
+              scriptUrl: stripLineAndColumnNumbers(script_url)
+            };
+
+          if (item.hasOwnProperty('extra')) {
+            msg.extra = item.extra.apply(this, args);
+          }
+
+          send(msg);
+
+          if (is_canvas_write) {
+            // optimization: one canvas write is enough,
+            // restore original write method
+            // to this CanvasRenderingContext2D object instance
+            this[item.propName] = orig;
+          }
+
+          return orig.apply(this, args);
+        };
+
+      }(item.obj[item.propName]));
+    }
+
+    var methods = [];
+
+    ['getImageData', 'fillText', 'strokeText'].forEach(function (method) {
+      var item = {
+        objName: 'CanvasRenderingContext2D.prototype',
+        propName: method,
+        obj: CanvasRenderingContext2D.prototype,
+        extra: function () {
+          return {
+            canvas: true
+          };
+        }
+      };
+
+      if (method == 'getImageData') {
+        item.extra = function () {
+          var args = arguments,
+            width = args[2],
+            height = args[3];
+
+          // "this" is a CanvasRenderingContext2D object
+          if (width === undefined) {
+            width = this.canvas.width;
+          }
+          if (height === undefined) {
+            height = this.canvas.height;
+          }
+
+          return {
+            canvas: true,
+            width: width,
+            height: height
+          };
+        };
+      }
+
+      methods.push(item);
+    });
+
+    methods.push({
+      objName: 'HTMLCanvasElement.prototype',
+      propName: 'toDataURL',
+      obj: HTMLCanvasElement.prototype,
+      extra: function () {
+        // "this" is a canvas element
+        return {
+          canvas: true,
+          width: this.width,
+          height: this.height
+        };
+      }
+    });
+
+    methods.forEach(trapInstanceMethod);
+
+  // save locally to keep from getting overwritten by site code
+  } + "(Error));";
+
+  // code above is not a content script: no chrome.* APIs /////////////////////
+
+}
+
+/**
+ * Executes a script in the page DOM context
+ *
+ * @param text The content of the script to insert
+ * @param data attributes to set in the inserted script tag
+ */
+function insertFpScript(text, data) {
+  var parent = document.documentElement,
+    script = document.createElement('script');
+
+  script.text = text;
+  script.async = false;
+
+  for (var key in data) {
+    script.setAttribute('data-' + key.replace('_', '-'), data[key]);
+  }
+
+  parent.insertBefore(script, parent.firstChild);
+  parent.removeChild(script);
+}
+
+/**
+ * Communicating to webrequest.js
+ */
+var event_id = Math.random();
+
+// listen for messages from the script we are about to insert
+document.addEventListener(event_id, function (e) {
+  // pass these on to the background page
+  chrome.runtime.sendMessage({
+    'fpReport': e.detail
+  });
+});
+
+insertFpScript(getFpPageScript(), {
+  event_id: event_id
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#active_site">active_site</a></li><li><a href="global.html#addOrigins">addOrigins</a></li><li><a href="global.html#adjustNoInitialBlockingLink">adjustNoInitialBlockingLink</a></li><li><a href="global.html#Badger">Badger</a></li><li><a href="global.html#buildSettingsDict">buildSettingsDict</a></li><li><a href="global.html#closeOverlay">closeOverlay</a></li><li><a href="global.html#CONTENT_SCRIPT_STYLESHEET_PATH">CONTENT_SCRIPT_STYLESHEET_PATH</a></li><li><a href="global.html#createReplacementButtonImage">createReplacementButtonImage</a></li><li><a href="global.html#deactive_site">deactive_site</a></li><li><a href="global.html#displayTooltip">displayTooltip</a></li><li><a href="global.html#event_id">event_id</a></li><li><a href="global.html#exportUserData">exportUserData</a></li><li><a href="global.html#filterTrackingDomains">filterTrackingDomains</a></li><li><a href="global.html#getOriginAction">getOriginAction</a></li><li><a href="global.html#getOrigins">getOrigins</a></li><li><a href="global.html#getOriginsArray">getOriginsArray</a></li><li><a href="global.html#getReplacementButtonUrl">getReplacementButtonUrl</a></li><li><a href="global.html#getScPageScript">getScPageScript</a></li><li><a href="global.html#getStylesheetLinkElement">getStylesheetLinkElement</a></li><li><a href="global.html#getTab">getTab</a></li><li><a href="global.html#getTopLevel">getTopLevel</a></li><li><a href="global.html#getTrackerData">getTrackerData</a></li><li><a href="global.html#hideNoInitialBlockingLink">hideNoInitialBlockingLink</a></li><li><a href="global.html#hideTooltip">hideTooltip</a></li><li><a href="global.html#importTrackerList">importTrackerList</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initialize">initialize</a></li><li><a href="global.html#insertCcScript">insertCcScript</a></li><li><a href="global.html#insertClsScript">insertClsScript</a></li><li><a href="global.html#insertFpScript">insertFpScript</a></li><li><a href="global.html#insertScScript">insertScScript</a></li><li><a href="global.html#loadFileChooser">loadFileChooser</a></li><li><a href="global.html#parseUserDataFile">parseUserDataFile</a></li><li><a href="global.html#refreshFilterPage">refreshFilterPage</a></li><li><a href="global.html#refreshOriginCache">refreshOriginCache</a></li><li><a href="global.html#refreshPopup">refreshPopup</a></li><li><a href="global.html#registerToggleHandlers">registerToggleHandlers</a></li><li><a href="global.html#removeOrigin">removeOrigin</a></li><li><a href="global.html#replaceButtonWithHtmlCodeAndUnblockTracker">replaceButtonWithHtmlCodeAndUnblockTracker</a></li><li><a href="global.html#replaceButtonWithIframeAndUnblockTracker">replaceButtonWithIframeAndUnblockTracker</a></li><li><a href="global.html#replaceIndividualButton">replaceIndividualButton</a></li><li><a href="global.html#replaceInitialTrackerButtonsHelper">replaceInitialTrackerButtonsHelper</a></li><li><a href="global.html#REPLACEMENT_BUTTONS_FOLDER_PATH">REPLACEMENT_BUTTONS_FOLDER_PATH</a></li><li><a href="global.html#replaceScriptsRecurse">replaceScriptsRecurse</a></li><li><a href="global.html#replaceSubsequentTrackerButtonsHelper">replaceSubsequentTrackerButtonsHelper</a></li><li><a href="global.html#require">require</a></li><li><a href="global.html#revertDomainControl">revertDomainControl</a></li><li><a href="global.html#send_error">send_error</a></li><li><a href="global.html#setTabToUrl">setTabToUrl</a></li><li><a href="global.html#showTrackingDomains">showTrackingDomains</a></li><li><a href="global.html#syncSettings">syncSettings</a></li><li><a href="global.html#syncSettingsDict">syncSettingsDict</a></li><li><a href="global.html#syncUISelections">syncUISelections</a></li><li><a href="global.html#toggleWebRTCIPProtection">toggleWebRTCIPProtection</a></li><li><a href="global.html#trackerInfo">trackerInfo</a></li><li><a href="global.html#unblockTracker">unblockTracker</a></li><li><a href="global.html#updateOrigin">updateOrigin</a></li><li><a href="global.html#updateShowCounter">updateShowCounter</a></li><li><a href="global.html#updateSocialWidgetReplacement">updateSocialWidgetReplacement</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue Feb 28 2017 16:09:49 GMT-0500 (EST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

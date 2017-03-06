@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: clobbercookie.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: clobbercookie.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/*
+ * This file is part of Privacy Badger &lt;https://www.eff.org/privacybadger>
+ * Copyright (C) 2014 Electronic Frontier Foundation
+ *
+ * Privacy Badger is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 3 as
+ * published by the Free Software Foundation.
+ *
+ * Privacy Badger is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Privacy Badger.  If not, see &lt;http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * Runs in page content context. Injects a script that deletes cookies.
+ * Communicates to webrequest.js to get orders if to delete cookies.
+ */
+
+
+function insertCcScript(text) {
+  var parent = document.documentElement,
+    script = document.createElement('script');
+
+  script.text = text;
+  script.async = false;
+
+  parent.insertBefore(script, parent.firstChild);
+  parent.removeChild(script);
+}
+
+chrome.runtime.sendMessage({checkLocation:document.location}, function(blocked) {
+  if (blocked) {
+    var code = '('+ function(){
+      var dummyCookie = "x=y";
+      document.__defineSetter__("cookie", function(/*value*/) { return dummyCookie; });
+      document.__defineGetter__("cookie", function() { return dummyCookie; });
+    } +')();';
+
+    insertCcScript(code);
+  }
+  return true;
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#active_site">active_site</a></li><li><a href="global.html#addOrigins">addOrigins</a></li><li><a href="global.html#adjustNoInitialBlockingLink">adjustNoInitialBlockingLink</a></li><li><a href="global.html#Badger">Badger</a></li><li><a href="global.html#buildSettingsDict">buildSettingsDict</a></li><li><a href="global.html#closeOverlay">closeOverlay</a></li><li><a href="global.html#CONTENT_SCRIPT_STYLESHEET_PATH">CONTENT_SCRIPT_STYLESHEET_PATH</a></li><li><a href="global.html#createReplacementButtonImage">createReplacementButtonImage</a></li><li><a href="global.html#deactive_site">deactive_site</a></li><li><a href="global.html#displayTooltip">displayTooltip</a></li><li><a href="global.html#event_id">event_id</a></li><li><a href="global.html#exportUserData">exportUserData</a></li><li><a href="global.html#filterTrackingDomains">filterTrackingDomains</a></li><li><a href="global.html#getOriginAction">getOriginAction</a></li><li><a href="global.html#getOrigins">getOrigins</a></li><li><a href="global.html#getOriginsArray">getOriginsArray</a></li><li><a href="global.html#getReplacementButtonUrl">getReplacementButtonUrl</a></li><li><a href="global.html#getScPageScript">getScPageScript</a></li><li><a href="global.html#getStylesheetLinkElement">getStylesheetLinkElement</a></li><li><a href="global.html#getTab">getTab</a></li><li><a href="global.html#getTopLevel">getTopLevel</a></li><li><a href="global.html#getTrackerData">getTrackerData</a></li><li><a href="global.html#hideNoInitialBlockingLink">hideNoInitialBlockingLink</a></li><li><a href="global.html#hideTooltip">hideTooltip</a></li><li><a href="global.html#importTrackerList">importTrackerList</a></li><li><a href="global.html#init">init</a></li><li><a href="global.html#initialize">initialize</a></li><li><a href="global.html#insertCcScript">insertCcScript</a></li><li><a href="global.html#insertClsScript">insertClsScript</a></li><li><a href="global.html#insertFpScript">insertFpScript</a></li><li><a href="global.html#insertScScript">insertScScript</a></li><li><a href="global.html#loadFileChooser">loadFileChooser</a></li><li><a href="global.html#parseUserDataFile">parseUserDataFile</a></li><li><a href="global.html#refreshFilterPage">refreshFilterPage</a></li><li><a href="global.html#refreshOriginCache">refreshOriginCache</a></li><li><a href="global.html#refreshPopup">refreshPopup</a></li><li><a href="global.html#registerToggleHandlers">registerToggleHandlers</a></li><li><a href="global.html#removeOrigin">removeOrigin</a></li><li><a href="global.html#replaceButtonWithHtmlCodeAndUnblockTracker">replaceButtonWithHtmlCodeAndUnblockTracker</a></li><li><a href="global.html#replaceButtonWithIframeAndUnblockTracker">replaceButtonWithIframeAndUnblockTracker</a></li><li><a href="global.html#replaceIndividualButton">replaceIndividualButton</a></li><li><a href="global.html#replaceInitialTrackerButtonsHelper">replaceInitialTrackerButtonsHelper</a></li><li><a href="global.html#REPLACEMENT_BUTTONS_FOLDER_PATH">REPLACEMENT_BUTTONS_FOLDER_PATH</a></li><li><a href="global.html#replaceScriptsRecurse">replaceScriptsRecurse</a></li><li><a href="global.html#replaceSubsequentTrackerButtonsHelper">replaceSubsequentTrackerButtonsHelper</a></li><li><a href="global.html#require">require</a></li><li><a href="global.html#revertDomainControl">revertDomainControl</a></li><li><a href="global.html#send_error">send_error</a></li><li><a href="global.html#setTabToUrl">setTabToUrl</a></li><li><a href="global.html#showTrackingDomains">showTrackingDomains</a></li><li><a href="global.html#syncSettings">syncSettings</a></li><li><a href="global.html#syncSettingsDict">syncSettingsDict</a></li><li><a href="global.html#syncUISelections">syncUISelections</a></li><li><a href="global.html#toggleWebRTCIPProtection">toggleWebRTCIPProtection</a></li><li><a href="global.html#trackerInfo">trackerInfo</a></li><li><a href="global.html#unblockTracker">unblockTracker</a></li><li><a href="global.html#updateOrigin">updateOrigin</a></li><li><a href="global.html#updateShowCounter">updateShowCounter</a></li><li><a href="global.html#updateSocialWidgetReplacement">updateSocialWidgetReplacement</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue Feb 28 2017 16:09:49 GMT-0500 (EST)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

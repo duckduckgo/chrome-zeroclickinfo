@@ -1,0 +1,55 @@
+*.py[cod]
+
+# C extensions
+*.so
+
+# Packages
+*.egg
+*.egg-info
+dist
+build
+eggs
+parts
+bin
+var
+sdist
+develop-eggs
+.installed.cfg
+lib64
+__pycache__
+
+# Chrome extensions
+*.crx
+
+# Firefox Extensions
+*.xpi
+
+# Dynamic libraries
+*.dylib
+
+# JSHydra
+buildtools/jshydra/mozilla/js
+
+#vim swap files
+*.sw*
+
+#zip files
+*.zip
+
+#Mac DS_Store
+*.DS_Store
+
+node_modules
+
+tests/selenium/.cache
+tests/.cache
+
+*.xpi
+.chrome-profile
+
+.idea
+
+web-ext-artifacts
+pkg
+release-utils/config.sh
+release-utils/xpi
