@@ -30,6 +30,7 @@
     "background": {
             "scripts": [
                 "require.js",
+
       "privacybadger/src/bootstrap.js",
       "privacybadger/lib/punycode.js",
       "privacybadger/lib/publicSuffixList.js",
@@ -50,7 +51,13 @@
       "privacybadger/src/heuristicblocking.js",
       "privacybadger/src/socialwidgetloader.js",
       "privacybadger/src/migrations.js",
-       "privacybadger/src/background.js",
+      "privacybadger/src/background.js",
+
+      "https/rules.js",
+      "https/storage.js",
+      "https/util.js",
+      "https/background.js",
+      "https/incognito-cache-clearing.js",
 
                 "js/background.js"]
     },
@@ -72,11 +79,15 @@
     ],
     "permissions": [
         "contextMenus",
+        "tabs",
+        "http://*/*",
+        "https://*/*",
         "storage",
-        "cookeies",
+        "cookies",
         "privacy",
         "webRequest",
         "webRequestBlocking",
+        "webNavigation",
         "*://*.duckduckgo.com/"
     ]
 }

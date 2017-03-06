@@ -18,6 +18,9 @@
 function Background() {
   $this = this;
 
+  var badger = require('pb');
+  var https = require('https');
+
   // clearing last search on browser startup
   localStorage['last_search'] = '';
 
