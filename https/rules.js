@@ -353,9 +353,8 @@ RuleSets.prototype = {
     // not authenticated or not important.  Also by the time the loop has been
     // observed and the domain blacklisted, a cookie might already have been
     // flagged as secure.
-    var https = require('https');
 
-    if (https.domainBlacklist.has(domain)) {
+    if (domainBlacklist.has(domain)) {
       log(INFO, "cookies for " + domain + "blacklisted");
       return false;
     }

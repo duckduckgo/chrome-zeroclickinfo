@@ -5,7 +5,6 @@
  * @param url: a relative URL to local XML
  */
 
-require.scopes.https = (() => {
 function loadExtensionFile(url, returnType) {
   var xhr = new XMLHttpRequest();
   // Use blocking XHR to ensure everything is loaded by the time
@@ -40,6 +39,10 @@ var switchPlannerInfo = {};
 
 // Is HTTPSe enabled, or has it been manually disabled by the user?
 var isExtensionEnabled = true;
+
+function getExtEnabled() {
+    return isExtensionEnabled;
+}
 
 // Load prefs about whether http nowhere is on. Structure is:
 //  { httpNowhere: true/false }
@@ -598,9 +601,3 @@ chrome.runtime.onConnect.addListener(function (port) {
     });
   }
 });
-
-var exports = {};
-exports.domainBlacklist = domainBlacklist;
-return exports;
-
-})();
