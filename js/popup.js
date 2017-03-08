@@ -95,7 +95,13 @@ window.onload = function() {
       add_bang('!m');
     }
 
-    var images = document.querySelectorAll('li img');
+     document.getElementById('toggle_blocking').onclick = function(){
+         toggle_blocking();
+     }
+
+
+
+    t.querySelectorAll('li img');
     for(var i = 0; i < images.length; i++) {
       images[i].onmouseover = function() {
           this.src = BTN_HOVER;
@@ -119,6 +125,20 @@ window.onload = function() {
         document.getElementById('icon_advanced').className = 'minimized';
     }
 
+    if (localStorage['blocking'] === 'false') {
+        var switch_button = document.getElementById('toggle_blocking');
+        switch_button.classList.remove('is-on');
+        var switch_txt = document.getElementById('switch_txt');
+        switch_txt.innerHTML = 'Off';
+    }
+
+    function toggle_blocking() {
+         localStorage['blocking'] = (localStorage['blocking'] === 'true')? 'false' : 'true';
+         var switch_button = document.getElementById('toggle_blocking');
+         switch_button.classList.toggle('is-on');
+         var switch_txt = document.getElementById('switch_txt');
+         switch_txt.innerHTML = (switch_txt.innerHTML === 'On')? 'Off' : 'On';
+    }
 
     setTimeout(function(){
         document.getElementById("search_form_input_homepage").focus();
