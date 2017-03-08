@@ -331,9 +331,6 @@ input[type="checkbox"]:checked + label {
    left: 10px;
 }
 
-#switch_txt:after {
-    clear: both;
-}
 
 #switch_txt {
    margin-left: 0.5em;
@@ -345,4 +342,5 @@ input[type="checkbox"]:checked + label {
 
 .clearfix {
    clear: both;
+   margin-bottom: 1em;
 }
