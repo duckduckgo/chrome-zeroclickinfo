@@ -103,7 +103,7 @@ window.onload = function() {
 
 
 
-    document.querySelectorAll('li img');
+    var images = document.querySelectorAll('li img');
     for(var i = 0; i < images.length; i++) {
       images[i].onmouseover = function() {
           this.src = BTN_HOVER;
