@@ -24,7 +24,7 @@ require.scopes.pb = (() => {
 var utils = require("utils");
 var constants = require("constants");
 var pbStorage = require("storage");
-
+var bg = chrome.extension.getBackgroundPage();
 var HeuristicBlocking = require("heuristicblocking");
 var webrequest = require("webrequest");
 var SocialWidgetLoader = require("socialwidgetloader");
@@ -525,6 +525,10 @@ Badger.prototype = {
       return;
     }
 
+    if (!bg.isExtensionEnabled) {
+        return;
+    }
+
     var tabId = details.tabId;
     if (!this.tabData[tabId]) {
       return;
@@ -716,6 +720,10 @@ Badger.prototype = {
    */
   refreshIconAndContextMenu: function(tab) {
 
+    if (!bg.isExtensionEnabled) {
+        return;
+    }
+    
     if(!tab){return;}
 
     var iconFilename = this.isPrivacyBadgerEnabled(window.extractHostFromURL(tab.url)) ? {"19": "img/icon_19.png", "38": "img/icon_38.png"} : {"19": "icons/badger-19-disabled.png", "38": "icons/badger-38-disabled.png"};

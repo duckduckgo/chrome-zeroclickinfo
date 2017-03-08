@@ -20,6 +20,7 @@
 var constants = require("constants");
 var utils = require("utils");
 var incognito = require("incognito");
+var bg = chrome.extension.getBackgroundPage();
 
 require.scopes.heuristicblocking = (function() {
 
@@ -541,6 +542,10 @@ function startListeners() {
    * Adds heuristicBlockingAccounting as listened to onBeforeSendHeaders request
    */
   chrome.webRequest.onBeforeSendHeaders.addListener(function(details) {
+    if (!bg.isExtensionEnabled) {
+        return;
+    }
+    
     if (badger) {
       return badger.heuristicBlocking.heuristicBlockingAccounting(details);
     } else {
@@ -552,6 +557,10 @@ function startListeners() {
    * Adds onResponseStarted listener. Monitor for cookies
    */
   chrome.webRequest.onResponseStarted.addListener(function(details) {
+    if (!bg.isExtensionEnabled) {
+        return;
+    }
+    
     var hasSetCookie = false;
     for(var i = 0; i < details.responseHeaders.length; i++) {
       if(details.responseHeaders[i].name.toLowerCase() == "set-cookie") {

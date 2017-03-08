@@ -28,6 +28,7 @@ var constants = require('constants');
 var getSurrogateURI = require('surrogates').getSurrogateURI;
 var mdfp = require('multiDomainFP');
 var incognito = require("incognito");
+var bg = chrome.extension.getBackgroundPage();
 
 require.scopes.webrequest = (function() {
 
@@ -46,6 +47,10 @@ var temporarySocialWidgetUnblock = {};
  * @returns {*} Can cancel requests
  */
 function onBeforeRequest(details){
+  if (!bg.isExtensionEnabled) {
+    return;
+  }
+
   var frame_id = details.frameId,
     tab_id = details.tabId,
     type = details.type,
@@ -126,6 +131,10 @@ function onBeforeRequest(details){
  * @returns {*} modified headers
  */
 function onBeforeSendHeaders(details) {
+  if (!bg.isExtensionEnabled) {
+        return;
+  }
+
   var frame_id = details.frameId,
     tab_id = details.tabId,
     url = details.url;
@@ -190,6 +199,10 @@ function onBeforeSendHeaders(details) {
  * @returns {*} The new response header
  */
 function onHeadersReceived(details){
+  if (!bg.isExtensionEnabled) {
+        return;
+  }
+  
   var tab_id = details.tabId,
     url = details.url;
 
