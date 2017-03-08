@@ -106,6 +106,8 @@ loadStoredUserRules();
  * disabled: extension is disabled from the popup menu.
  */
 var updateState = function() {
+  return;
+  /*
   chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
     if (!tabs || tabs.length === 0) {
       return;
@@ -127,7 +129,7 @@ var updateState = function() {
     chrome.browserAction.setTitle({
       title: "HTTPS Everywhere (" + iconState + ")"
     });
-  });
+  });*/
 }
 
 /**
