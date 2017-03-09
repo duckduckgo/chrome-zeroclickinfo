@@ -281,6 +281,7 @@ window.onload = function() {
         }, function(tabs) {
             if (tabs[0]) {
                 chrome.tabs.reload(tabs[0].id);
+                document.getElementById('reload_tab').classList.add('hide');
             }
         });
     }
