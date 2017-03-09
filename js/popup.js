@@ -129,18 +129,14 @@ window.onload = function() {
 
     if (!bg.isExtensionEnabled) {
         var switch_button = document.getElementById('toggle_blocking');
-        switch_button.classList.remove('is-on');
-        var switch_txt = document.getElementById('switch_txt');
-        switch_txt.innerHTML = 'Off';
+        switch_button.setAttribute("checked", "false");
     }
 
     function toggle_blocking() {
          bg.isExtensionEnabled = !bg.isExtensionEnabled;
          
          var switch_button = document.getElementById('toggle_blocking');
-         switch_button.classList.toggle('is-on');
-         var switch_txt = document.getElementById('switch_txt');
-         switch_txt.innerHTML = (switch_txt.innerHTML === 'On')? 'Off' : 'On';
+         switch_button.setAttribute("checked", "false");
     }
 
     setTimeout(function(){
