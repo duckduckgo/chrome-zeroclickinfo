@@ -283,7 +283,7 @@ window.onload = function() {
                 var tabId = tabs[0].id;
                 chrome.tabs.reload(tabId);
                 document.getElementById('reload_tab').classList.add('hide');
-                chrome.browserAction.disable({'tabId':tabId});
+                window.close();
             }
         });
     }
