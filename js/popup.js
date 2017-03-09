@@ -280,7 +280,7 @@ window.onload = function() {
             'active': true
         }, function(tabs) {
             if (tabs[0]) {
-                tabs[0].location.reload();
+                chrome.tabs.reload(tabs[0].id);
             }
         });
     }
