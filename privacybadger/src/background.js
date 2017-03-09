@@ -52,7 +52,7 @@ function Badger() {
       badger.initializeDNT();
       badger.initializeUserAllowList();
       badger.enableWebRTCProtection();
-      if (!badger.isIncognito) {badger.showFirstRunPage();}
+      // if (!badger.isIncognito) {badger.showFirstRunPage();}
     }
 
     // Show icon as page action for all tabs that already exist
