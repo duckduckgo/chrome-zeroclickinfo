@@ -39,7 +39,7 @@ function Background() {
     
     if (!chrome.extension.inIncognitoContext) {
       chrome.tabs.create({
-          url: chrome.extension.getURL("https://duckduckgo.com/spread")
+          url: "https://duckduckgo.com/spread"
       });
     }
 
