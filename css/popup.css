@@ -344,3 +344,7 @@ input[type="checkbox"]:checked + label {
    clear: both;
    margin-bottom: 1em;
 }
+
+.hide {
+   display: none;
+}
