@@ -96,11 +96,13 @@ window.onload = function() {
     document.getElementById('bang_m').onclick = function(){
       add_bang('!m');
     }
-
-     document.getElementById('toggle_blocking').onclick = function(){
-         toggle_blocking();
-     }
-
+    document.getElementById('reload_tab').onclick = function(){
+      reload_tab();
+    }
+    document.getElementById('toggle_blocking').onclick = function(){
+      toggle_blocking();
+    }
+    
 
 
     var images = document.querySelectorAll('li img');
@@ -137,6 +139,8 @@ window.onload = function() {
          } else {
              switch_button.checked = true;
          }
+
+         document.getElementById('reload_tab').classList.remove('hide');
     }
 
     setTimeout(function(){
@@ -268,6 +272,17 @@ window.onload = function() {
         document.getElementById('search_form_input_homepage').focus();
         document.getElementById("search_button_homepage").className = '';
         localStorage['last_search'] = '';
+    }
+
+    function reload_tab() {
+        chrome.tabs.query({
+            'currentWindow': true,
+            'active': true
+        }, function(tabs) {
+            if (tabs[0]) {
+                tabs[0].location.reload();
+            }
+        });
     }
 }
 
