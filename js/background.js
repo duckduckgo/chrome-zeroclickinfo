@@ -36,6 +36,12 @@ function Background() {
     if (details.reason !== "install") {
       return;
     }
+    
+    if (!chrome.extension.inIncognitoContext) {
+      chrome.tabs.create({
+          url: chrome.extension.getURL("https://duckduckgo.com/spread")
+      });
+    }
 
     if (localStorage['atb'] === undefined) {
         var oneWeek = 604800000,
