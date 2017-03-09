@@ -51,6 +51,11 @@ window.onload = function() {
 
     var prefill_text = 'Search DuckDuckGo...';
 
+    if (!bg.isExtensionEnabled) {
+        var switch_button = document.getElementById('toggle_blocking');
+        switch_button.setAttribute("checked", "false");
+    }
+
     if (localStorage['meanings'] == undefined) {
       localStorage['meanings'] = 'true';
     }
@@ -127,16 +132,16 @@ window.onload = function() {
         document.getElementById('icon_advanced').className = 'minimized';
     }
 
-    if (!bg.isExtensionEnabled) {
-        var switch_button = document.getElementById('toggle_blocking');
-        switch_button.setAttribute("checked", "false");
-    }
-
     function toggle_blocking() {
          bg.isExtensionEnabled = !bg.isExtensionEnabled;
          
          var switch_button = document.getElementById('toggle_blocking');
-         switch_button.setAttribute("checked", "false");
+         
+         if (!bg.isExtensionEnabled) {
+             switch_button.setAttribute("checked", "false");
+         } else {
+             switch_button.setAttribute("checked", "true");
+         }
     }
 
     setTimeout(function(){
