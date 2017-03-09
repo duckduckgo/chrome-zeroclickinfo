@@ -102,13 +102,87 @@ function Background() {
 
 var background = new Background();
 
+let tabCallbacks = {};
+
+// Since callbacks specified as the third argument of chrome.tabs.update calls
+// unfortunately fire prematurely, during the 'loading' phase of the tab update,
+// a collection of tab update callbacks is maintained here per tab ID, fired
+// only once the update is indeed 'complete'.
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status !== 'complete') {
+    return;
+  }
+
+  if (tabCallbacks[tabId]) {
+    tabCallbacks[tabId]();
+    delete tabCallbacks[tabId];
+  }
+});
+
+// Fetch and display search suggestions
+chrome.omnibox.onInputChanged.addListener((text, suggest) => {
+  function escapeXML(string) {
+    // Escape XML entities
+    // https://developer.chrome.com/extensions/omnibox#type-SuggestResult
+    return (string
+      .replace(`&`, `&amp;`)
+      .replace(`"`, `&quot;`)
+      .replace(`'`, `&apos;`)
+      .replace(`<`, `&lt;`)
+      .replace(`>`, `&gt;`)
+    );
+  }
+
+  const url = `https://duckduckgo.com/ac/?q=${encodeURIComponent(text)}&_=${+ new Date()}`;
+  const xhr = new XMLHttpRequest();
+
+  xhr.open('GET', url);
+
+  xhr.addEventListener('load', () => {
+    // Strip user input for more tolerant matching
+    text = escapeXML(text).toLowerCase().trim();
+
+    const suggestions = JSON.parse(xhr.responseText).map((suggestion) => {
+      // Emulate Chrome's inverse highlighting
+      let description = `<match>${escapeXML(suggestion.phrase).replace(text, `</match>${text}<match>`)}</match>`;
+
+      // Handle !bang
+      if (suggestion.snippet) {
+        const bang = suggestion.phrase.match(/^!\S+/).toString();
+
+        description = description.replace(bang, `<url>${bang}</url>`) + `<dim>${suggestion.snippet}</dim>`;
+      }
+
+      return {
+        content: suggestion.phrase,
+        description
+      };
+    });
+
+    suggest(suggestions);
+  });
+
+  xhr.send();
+});
+
 chrome.omnibox.onInputEntered.addListener(function(text) {
   chrome.tabs.query({
-    'currentWindow': true,
-    'active': true
-  }, function(tabs) {
-    chrome.tabs.update(tabs[0].id, {
-      url: "https://duckduckgo.com/?q=" + encodeURIComponent(text) + "&bext=" + localStorage['os'] + "cl"
+    currentWindow: true,
+    active: true
+  }, (tabs) => {
+    const tabId = tabs[0].id;
+
+    // Register a callback for the 'complete' state of the tab update
+    tabCallbacks[tabId] = function () {
+      chrome.tabs.executeScript({
+        file: 'js/onsearch.js',
+        runAt: 'document_end'
+      });
+    };
+
+    // Display search results
+    chrome.tabs.update(tabId, {
+      url: `https://duckduckgo.com/?q=${encodeURIComponent(text)}&bext=${localStorage['os']}cl`
     });
   });
 });

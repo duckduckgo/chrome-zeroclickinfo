@@ -1,5 +1,5 @@
 {
-    "name": "DuckDuckGo for Chrome",
+    "name": "DuckDuckGo",
     "version": "42.7.8",
     "description": "DuckDuckGo enhancements for Chrome.",
     "icons": {
@@ -36,7 +36,7 @@
         "favicon_url": "https://duckduckgo.com/favicon.ico",
         "is_default": true,
         "keyword": "duckduckgo.com",
-        "name": "DuckDuckGo Search",
+        "name": "DuckDuckGo",
         "search_url": "https://duckduckgo.com/?q={searchTerms}"
       }
     },
