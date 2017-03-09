@@ -280,9 +280,10 @@ window.onload = function() {
             'active': true
         }, function(tabs) {
             if (tabs[0]) {
-                chrome.tabs.reload(tabs[0].id);
+                var tabId = tabs[0].id;
+                chrome.tabs.reload(tabId);
                 document.getElementById('reload_tab').classList.add('hide');
-                chrome.browserAction.setPopup({'popup':''});
+                chrome.browserAction.disable({'tabId':tabId});
             }
         });
     }
