@@ -258,7 +258,7 @@ window.onload = function() {
         }
 
         if (bg.isExtensionEnabled) {
-            document.getElementById('toggle_blocking').checked = false;
+            document.getElementById('toggle_blocking').checked = true;
         }
     }
 
