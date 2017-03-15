@@ -15,8 +15,14 @@
  */
 
 
+var blockTrackers = require('blockTrackers');
+var utils = require('utils');
+var tabs = {};
+var isExtensionEnabled = true;
+
 function Background() {
   $this = this;
+
 
   // clearing last search on browser startup
   localStorage['last_search'] = '';
@@ -28,10 +34,25 @@ function Background() {
 
   localStorage['os'] = os;
 
+  chrome.tabs.query({currentWindow: true, status: 'complete'}, function(savedTabs){
+      console.log(savedTabs);
+      for(var i = 0; i < savedTabs.length; i++){ 
+          var tab = savedTabs[i];
+          if(tab.url){
+            console.log(tab);
+            tabs[tab.id] = {'trackers': {}, "total": 0, 'url': tab.url};
+          }
+      }
+  });
+
   chrome.runtime.onInstalled.addListener(function(details) {
     // only run the following section on install
     if (details.reason !== "install") {
       return;
+    }  
+
+    if (localStorage['blocking'] === undefined) {
+        localStorage['blocking'] = 'true';
     }
 
     if (localStorage['atb'] === undefined) {
@@ -129,30 +150,107 @@ chrome.contextMenus.create({
 // Add ATB param
 chrome.webRequest.onBeforeRequest.addListener(
     function (e) {
-      // Only change the URL if there is no ATB param specified.
-      if (e.url.indexOf('atb=') !== -1) {
-        return;
-      }
 
-      // Only change the URL if there is an ATB saved in localStorage
-      if (localStorage['atb'] === undefined) {
-        return;
-      }
+      // Add ATB for DDG URLs, otherwise block trackers
+      if (e.url.search('/duckduckgo\.com') !== -1) {
+          // Only change the URL if there is no ATB param specified.
+          if (e.url.indexOf('atb=') !== -1) {
+            return;
+          }
 
-      var newURL = e.url + "&atb=" + localStorage['atb'];
-      return {
-        redirectUrl: newURL
-      };
+          // Only change the URL if there is an ATB saved in localStorage
+          if (localStorage['atb'] === undefined) {
+            return;
+          }
+        
+          var newURL = e.url + "&atb=" + localStorage['atb'];
+          return {
+            redirectUrl: newURL
+          };
+      } 
+      else {
+
+          if(e.type === 'main_frame'){
+              delete tabs[e.tabId];
+          }
+
+          if(!tabs[e.tabId]){
+              tabs[e.tabId] = {'trackers': {}, "total": 0, 'url': e.url}
+          }
+
+          if(!isExtensionEnabled){
+              return;
+          }
+
+              var block =  blockTrackers.blockTrackers(e.url, tabs[e.tabId].url);
+
+              if(block){
+                var name = block.tracker;
+
+                if(!tabs[e.tabId]){
+                    tabs[e.tabId] = {'trackers': {}, "total": 0};
+                }
+
+                if(!tabs[e.tabId]['trackers'][name]){
+                    tabs[e.tabId]['trackers'][name] = {'count': 1, 'url': block.url};
+                }
+                else {
+                    tabs[e.tabId]['trackers'][name].count += 1;
+                }
+                tabs[e.tabId]['total'] += 1;
+
+                tabs[e.tabId]['dispTotal'] = Object.keys(tabs[e.tabId].trackers).length;
+
+                updateBadge(e.tabId, tabs[e.tabId].dispTotal);
+
+                return {cancel: true};
+              }
+      }
     },
     {
         urls: [
-            "*://duckduckgo.com/?*",
-            "*://*.duckduckgo.com/?*",
+            "<all_urls>",
         ],
-        types: ["main_frame"]
+        types: [
+        'main_frame',
+        'sub_frame',
+        'stylesheet',
+        'script',
+        'image',
+        'object',
+        'xmlhttprequest',
+        'other'
+      ]
     },
     ["blocking"]
 );
+
+function updateBadge(tabId, numBlocked){
+    if(numBlocked === 0){
+        chrome.browserAction.setBadgeBackgroundColor({tabId: tabId, color: "#00cc00"});
+    } 
+    else {
+        chrome.browserAction.setBadgeBackgroundColor({tabId: tabId, color: "#cc0000"});
+    }
+    chrome.browserAction.setBadgeText({tabId: tabId, text: numBlocked + ""});
+}
+
+chrome.tabs.onReplaced.addListener(function (addedTabId) {
+    chrome.tabs.get(addedTabId, function(tab) {
+        //tabs[tab.id] = {'trackers': {}, "total": 0, 'url': tab.url};
+        //chrome.browserAction.setBadgeText({tabId: tab.id, text: localStorage[tab.url] + ""});
+    });
+});
+
+chrome.tabs.onUpdated.addListener(function(id, info, tab) {
+    if(tabs[id] && info.status === "loading"){
+        tabs[id] = {'trackers': {}, "total": 0, 'url': tab.url};
+    }
+});
+
+chrome.tabs.onRemoved.addListener(function(id, info) {
+    delete tabs[id];
+});
 
 chrome.webRequest.onCompleted.addListener(
     function () {
@@ -190,3 +288,4 @@ chrome.webRequest.onCompleted.addListener(
         ],
     }
 );
+

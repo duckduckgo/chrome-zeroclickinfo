@@ -15,6 +15,8 @@
 
 */
 
+var bg = chrome.extension.getBackgroundPage();
+
 var ICON_MAXIMIZE = "data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjAgMjAiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDIwIDIwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGcgaWQ9Im1heGltaXplIj48cGF0aCBzdHlsZT0iZmlsbC1ydWxlOmV2ZW5vZGQ7Y2xpcC1ydWxlOmV2ZW5vZGQ7ZmlsbDojQUFBQUFBOyIgZD0iTTEwLDBjNS41LDAsMTAsNC41LDEwLDEwYzAsNS41LTQuNSwxMC0xMCwxMFMwLDE1LjUsMCwxMEMwLDQuNSw0LjUsMCwxMCwweiIvPjxnPjxnPjxwb2x5Z29uIHN0eWxlPSJmaWxsLXJ1bGU6ZXZlbm9kZDtjbGlwLXJ1bGU6ZXZlbm9kZDtmaWxsOiNGRkZGRkY7IiBwb2ludHM9IjE0LDkgMTEsOSAxMSw2IDksNiA5LDkgNiw5IDYsMTEgOSwxMSA5LDE0IDExLDE0IDExLDExIDE0LDExICIvPjwvZz48L2c+PC9nPjwvc3ZnPg==";
 
 var ICON_MINIMIZE = "data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjAgMjAiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDIwIDIwOyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGcgaWQ9Im1pbmltaXplIj48cGF0aCBzdHlsZT0iZmlsbC1ydWxlOmV2ZW5vZGQ7Y2xpcC1ydWxlOmV2ZW5vZGQ7ZmlsbDojQUFBQUFBOyIgZD0iTTEwLDBjNS41LDAsMTAsNC41LDEwLDEwYzAsNS41LTQuNSwxMC0xMCwxMFMwLDE1LjUsMCwxMEMwLDQuNSw0LjUsMCwxMCwweiIvPjxwYXRoIHN0eWxlPSJmaWxsLXJ1bGU6ZXZlbm9kZDtjbGlwLXJ1bGU6ZXZlbm9kZDtmaWxsOiNGRkZGRkY7IiBkPSJNMTQsOXYySDZWOUgxNHoiLz48L2c+PC9zdmc+"
@@ -94,6 +96,58 @@ window.onload = function() {
     document.getElementById('bang_m').onclick = function(){
       add_bang('!m');
     }
+    document.getElementById('reload_tab').onclick = function(){
+      reload_tab();
+    }
+    document.getElementById('toggle_blocking').onclick = function(){
+      toggle_blocking();
+    }
+
+    var trackers = document.getElementById('trackers'),
+        tracker_name = document.getElementById('tracker_name'),
+        req_count = document.getElementById('req_count');
+
+    (function(){
+        getTab(function(t) { 
+            var tab = bg.tabs[t.id];
+            tracker_name.innerHTML = '';
+            req_count.innerHTML = '';
+
+            if (tab && ((!tab.trackers) || (!Object.keys(tab.trackers).length))) {
+                trackers.classList.add('hide');
+            }
+
+            if(tab && tab.trackers && Object.keys(tab.trackers).length){
+                trackers.classList.remove('hide');
+
+                Object.keys(tab.trackers).forEach( function(name) {
+                    var temp_url = '',
+                        trackers_html = '',
+                        req_html = '';
+                    
+                    if(bg.betterList.indexOf(tab.trackers[name].url) !== -1){
+                        temp_url = 'https://better.fyi/trackers/' + tab.trackers[name].url;
+                    }
+                    
+                    tracker_name.innerHTML += '<li class="link"><a class="tracker-link" href="' + temp_url + '">' + name + '</a></li>'; 
+                    
+                    req_count.innerHTML += "<li>" + tab.trackers[name].count + "</li>";
+                });
+
+
+                var trackerLinks = document.getElementsByClassName('tracker-link');
+                for(var t=0; t < trackerLinks.length; t++){
+                    if(trackerLinks[t].href){
+                        trackerLinks[t].onclick = function() {
+                            chrome.tabs.create({url: this.href});
+                        }
+                    }
+                }
+
+            }
+        });
+    })();
+
 
     var images = document.querySelectorAll('li img');
     for(var i = 0; i < images.length; i++) {
@@ -119,6 +173,19 @@ window.onload = function() {
         document.getElementById('icon_advanced').className = 'minimized';
     }
 
+    function toggle_blocking() {
+         bg.isExtensionEnabled = !bg.isExtensionEnabled;
+         
+         var switch_button = document.getElementById('toggle_blocking');
+         
+         if (!bg.isExtensionEnabled) {
+             switch_button.checked = false;
+         } else {
+             switch_button.checked = true;
+         }
+
+         document.getElementById('reload_tab').classList.remove('hide');
+    }
 
     setTimeout(function(){
         document.getElementById("search_form_input_homepage").focus();
@@ -238,6 +305,9 @@ window.onload = function() {
             document.getElementById('adv_meanings').checked = true;
         }
 
+        if (bg.isExtensionEnabled) {
+            document.getElementById('toggle_blocking').checked = true;
+        }
     }
 
     function search_input_clear() {
@@ -246,6 +316,24 @@ window.onload = function() {
         document.getElementById('search_form_input_homepage').focus();
         document.getElementById("search_button_homepage").className = '';
         localStorage['last_search'] = '';
+    }
+
+    function reload_tab() {
+        chrome.tabs.query({
+            'currentWindow': true,
+            'active': true
+        }, function(tabs) {
+            if (tabs[0]) {
+                var tabId = tabs[0].id;
+                chrome.tabs.reload(tabId);
+                document.getElementById('reload_tab').classList.add('hide');
+                window.close();
+            }
+        });
+    }
+
+    function getTab(callback) {
+              chrome.tabs.query({active: true, lastFocusedWindow: true}, function(t) { callback(t[0]); });
     }
 }
 
