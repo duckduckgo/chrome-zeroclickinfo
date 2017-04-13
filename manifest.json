@@ -30,6 +30,9 @@
     "background": {
             "scripts": ["js/background.js"]
     },
+    "chrome_url_overrides": {
+      "newtab": "html/newtab.html"
+    },
     "chrome_settings_overrides": {
       "search_provider": {
         "encoding": "UTF-8",
