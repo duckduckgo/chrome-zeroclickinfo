@@ -1,0 +1,21 @@
+#advanced .button {
+  border-radius: 3px;
+  padding: 3px 5px 3px 5px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+#advanced .button img {
+  display: inline;
+  padding-right: 4px;
+  vertical-align: middle;
+  width: 16px;
+  height: 16px;
+}
+
+#advanced .button span {
+  position: relative;
+  top: 1px;
+  left: 1px;
+}
+
