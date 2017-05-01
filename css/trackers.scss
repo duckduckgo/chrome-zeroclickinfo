@@ -1,19 +1,20 @@
-#advanced #left, #trackers .name {
+.wrapper #left, 
+#trackers .name {
   float: left;
   width: 182px;
 }
 
-
-#advanced #right h2, #trackers .req {
+.wrapper #right h2, 
+#trackers .req {
   padding-left: 5px;
 }
 
-#advanced #right, #trackers .req {
+.wrapper #right, 
+#trackers .req {
   float: left;
   width: 317px;
   padding-bottom: 6px;
 }
-
 
 #reload_tab {
    border-radius: 3px;
