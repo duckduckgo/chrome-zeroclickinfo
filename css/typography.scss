@@ -1,0 +1,22 @@
+body {
+  font-family: "Helvetica Neue", sans-serif !important;
+}
+
+blockquote, q {
+  quotes: none;
+
+  &:before,
+  &:after {
+    content: '';
+    content: none;
+  }
+}
+
+h2 {
+  float: left;
+  width: 100%;
+  font-size: 12px;
+  font-weight: bold;
+  color: #858585;
+}
+

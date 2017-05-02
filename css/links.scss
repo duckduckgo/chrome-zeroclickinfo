@@ -1,0 +1,24 @@
+.link {
+  font-size: 12px;
+  padding: 5px 10px 5px 5px;
+  
+  a {
+    color: #4495d4 !important;
+    
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}
+
+
+.wrapper {
+    .more { // More Options link
+      padding-top: 3px !important;
+    }
+
+    .bang { // More Bangs link
+      padding-top: 5px !important;
+    }
+}
+

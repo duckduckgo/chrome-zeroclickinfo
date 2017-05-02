@@ -16,6 +16,7 @@
     "tests"
   ],
   "dependencies": {
-    "_ls": "duckduckgo/litestrap#^0.0.4"
+    "_ls": "duckduckgo/litestrap#^0.0.4",
+    "duckduckgo-styles": "duckduckgo/duckduckgo-styles#^1.1.9"
   }
 }

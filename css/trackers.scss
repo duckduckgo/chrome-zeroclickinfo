@@ -1,0 +1,34 @@
+.wrapper #left, 
+#trackers .name {
+  float: left;
+  width: 182px;
+}
+
+.wrapper #right h2, 
+#trackers .req {
+  padding-left: 5px;
+}
+
+.wrapper #right, 
+#trackers .req {
+  float: left;
+  width: 317px;
+  padding-bottom: 6px;
+}
+
+#reload_tab {
+   border-radius: 3px;
+   padding: 3px 5px 3px 5px;
+   font-size: 12px;
+   cursor: pointer;
+   background: $blue;
+   color: $white;
+   margin-bottom: 0.5em;
+   width: 5em;
+}
+
+#trackers {
+    padding-top: 6em; 
+    padding-left:1em; 
+    padding-bottom:1em;
+}
