@@ -67,9 +67,7 @@ function Background() {
 
   localStorage['os'] = os;
 
-  chrome.runtime.setUninstallURL('https://www.surveymonkey.com/r/DOC_0', function(){
-      alert('the initial uninstall url is set');
-  });
+  chrome.runtime.setUninstallURL('https://www.surveymonkey.com/r/DOC_0');
 
   chrome.runtime.onInstalled.addListener(function(details) {
     // only run the following section on install
@@ -84,7 +82,6 @@ function Background() {
         localStorage['atb'] = 'v' + majorVersion + '-' + minorVersion;
         localStorage['majorVersion'] = majorVersion;
         localStorage['minorVersion'] = minorVersion;
-        localStorage['uninstallURL'] = 'https://www.surveymonkey.com/r/DOC_2'
     }
 
     // inject the oninstall script to opened DuckDuckGo tab.
@@ -134,18 +131,15 @@ function Background() {
 
 var background = new Background();
 
-chrome.alarms.create({periodInMinutes: 1});
+chrome.alarms.create('updateUninstallURL', {periodInMinutes: 1});
 
-chrome.alarms.onAlarm.addListener(function(){
+chrome.alarms.onAlarm.addListener(function(updateUninstallURL){
     var ogMajor = localStorage['majorVersion'],
         ogMinor = localStorage['minorVersion'],
         atbDelta = background.atbDelta(ogMajor, ogMinor),
-        uninstallURLParam = atbDelta <= 14 ? atbDelta : 15,
-        uninstallURL = 'https://www.surveymonkey.com/r/DOC_' + uninstallURLParam;
+        uninstallURLParam = atbDelta <= 14 ? atbDelta : 15;
 
-    chrome.runtime.setUninstallURL(uninstallURL, function(){
-        localStorage['uninstallURL'] = uninstallURL;
-    });
+    chrome.runtime.setUninstallURL('https://www.surveymonkey.com/r/DOC_' + uninstallURLParam);
 });
 
 chrome.omnibox.onInputEntered.addListener(function(text) {
