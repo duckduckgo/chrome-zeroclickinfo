@@ -48,6 +48,7 @@
       }
     ],
     "permissions": [
+        "alarms"
         "contextMenus",
         "webRequest",
         "webRequestBlocking",
