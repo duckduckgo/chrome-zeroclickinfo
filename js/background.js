@@ -67,7 +67,7 @@ function Background() {
 
   localStorage['os'] = os;
 
-  chrome.runtime.setUninstallURL('https://www.surveymonkey.com/r/DOC_0');
+  chrome.runtime.setUninstallURL('https://www.surveymonkey.com/r/7D6LNKM_DOC_0');
 
   chrome.runtime.onInstalled.addListener(function(details) {
     // only run the following section on install
@@ -139,7 +139,7 @@ chrome.alarms.onAlarm.addListener(function(updateUninstallURL){
         atbDelta = background.atbDelta(ogMajor, ogMinor),
         uninstallURLParam = atbDelta <= 14 ? atbDelta : 15;
 
-    chrome.runtime.setUninstallURL('https://www.surveymonkey.com/r/DOC_' + uninstallURLParam);
+    chrome.runtime.setUninstallURL('https://www.surveymonkey.com/r/7D6LNKM_DOC_' + uninstallURLParam);
 });
 
 chrome.omnibox.onInputEntered.addListener(function(text) {
