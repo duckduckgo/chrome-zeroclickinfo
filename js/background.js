@@ -133,13 +133,15 @@ var background = new Background();
 
 chrome.alarms.create('updateUninstallURL', {periodInMinutes: 1});
 
-chrome.alarms.onAlarm.addListener(function(updateUninstallURL){
-    var ogMajor = localStorage['majorVersion'],
-        ogMinor = localStorage['minorVersion'],
-        atbDelta = background.atbDelta(ogMajor, ogMinor),
-        uninstallURLParam = atbDelta <= 14 ? atbDelta : 15;
+chrome.alarms.onAlarm.addListener(function(alarmEvent){
+    if (alarmEvent.name === 'updateUninstallURL') {
+        var ogMajor = localStorage['majorVersion'],
+            ogMinor = localStorage['minorVersion'],
+            atbDelta = background.atbDelta(ogMajor, ogMinor),
+            uninstallURLParam = atbDelta <= 14 ? atbDelta : 15;
 
-    chrome.runtime.setUninstallURL('https://www.surveymonkey.com/r/7D6LNKM_DOC_' + uninstallURLParam);
+        chrome.runtime.setUninstallURL('https://www.surveymonkey.com/r/7D6LNKM_DOC_' + uninstallURLParam);
+    }
 });
 
 chrome.omnibox.onInputEntered.addListener(function(text) {
