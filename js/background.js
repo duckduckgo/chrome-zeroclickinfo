@@ -14,9 +14,48 @@
  * limitations under the License.
  */
 
-
 function Background() {
   $this = this;
+
+  $this.timeSinceEpoch = function() {
+      var atbTime = {
+              oneWeek     : 604800000,
+              oneDay      : 86400000,
+              oneHour     : 3600000,
+              oneMinute   : 60000,
+              estEpoch    : 1456290000000
+          },
+          localDate = new Date(),
+          localTime = localDate.getTime(),
+          utcTime = localTime + (localDate.getTimezoneOffset() * atbTime.oneMinute),
+          est = new Date(utcTime + (atbTime.oneHour * -5)),
+          dstStartDay = 13 - ((est.getFullYear() - 2016) % 6),
+          dstStopDay = 6 - ((est.getFullYear() - 2016) % 6),
+          isDST = (est.getMonth() > 2 || (est.getMonth() == 2 && est.getDate() >= dstStartDay)) && (est.getMonth() < 10 || (est.getMonth() == 10 && est.getDate() < dstStopDay)),
+          epoch = isDST ? atbTime.estEpoch - atbTime.oneHour : atbTime.estEpoch;
+
+      return new Date().getTime() - epoch;
+  }
+
+  $this.majorVersion = function() {
+      var tse = $this.timeSinceEpoch();
+      return Math.ceil( tse / 604800000);
+  }
+
+  $this.minorVersion = function() {
+      var tse = $this.timeSinceEpoch();
+      return Math.ceil( tse % 604800000 / 86400000);
+  }
+
+  $this.atbDelta = function(ogMajor, ogMinor) {
+      var majorVersion = $this.majorVersion();
+          minorVersion = $this.minorVersion();
+          majorDiff = majorVersion - ogMajor,
+          minorDiff = Math.abs(minorVersion - ogMinor);
+
+      return majorDiff > 0 ? (7 * majorDiff) + minorDiff : minorDiff;
+  }
+
 
   // clearing last search on browser startup
   localStorage['last_search'] = '';
@@ -28,6 +67,8 @@ function Background() {
 
   localStorage['os'] = os;
 
+  chrome.runtime.setUninstallURL('https://www.surveymonkey.com/r/7D6LNKM_DOC_0');
+
   chrome.runtime.onInstalled.addListener(function(details) {
     // only run the following section on install
     if (details.reason !== "install") {
@@ -35,24 +76,12 @@ function Background() {
     }
 
     if (localStorage['atb'] === undefined) {
-        var oneWeek = 604800000,
-            oneDay = 86400000,
-            oneHour = 3600000,
-            oneMinute = 60000,
-            estEpoch = 1456290000000,
-            localDate = new Date(),
-            localTime = localDate.getTime(),
-            utcTime = localTime + (localDate.getTimezoneOffset() * oneMinute),
-            est = new Date(utcTime + (oneHour * -5)),
-            dstStartDay = 13 - ((est.getFullYear() - 2016) % 6),
-            dstStopDay = 6 - ((est.getFullYear() - 2016) % 6),
-            isDST = (est.getMonth() > 2 || (est.getMonth() == 2 && est.getDate() >= dstStartDay)) && (est.getMonth() < 10 || (est.getMonth() == 10 && est.getDate() < dstStopDay)),
-            epoch = isDST ? estEpoch - oneHour : estEpoch,
-            timeSinceEpoch = new Date().getTime() - epoch,
-            majorVersion = Math.ceil(timeSinceEpoch / oneWeek),
-            minorVersion = Math.ceil(timeSinceEpoch % oneWeek / oneDay);
+        var majorVersion = $this.majorVersion();
+            minorVersion = $this.minorVersion();
 
         localStorage['atb'] = 'v' + majorVersion + '-' + minorVersion;
+        localStorage['majorVersion'] = majorVersion;
+        localStorage['minorVersion'] = minorVersion;
     }
 
     // inject the oninstall script to opened DuckDuckGo tab.
@@ -101,6 +130,19 @@ function Background() {
 }
 
 var background = new Background();
+
+chrome.alarms.create('updateUninstallURL', {periodInMinutes: 1});
+
+chrome.alarms.onAlarm.addListener(function(alarmEvent){
+    if (alarmEvent.name === 'updateUninstallURL') {
+        var ogMajor = localStorage['majorVersion'],
+            ogMinor = localStorage['minorVersion'],
+            atbDelta = background.atbDelta(ogMajor, ogMinor),
+            uninstallURLParam = atbDelta <= 14 ? atbDelta : 15;
+
+        chrome.runtime.setUninstallURL('https://www.surveymonkey.com/r/7D6LNKM_DOC_' + uninstallURLParam);
+    }
+});
 
 chrome.omnibox.onInputEntered.addListener(function(text) {
   chrome.tabs.query({
