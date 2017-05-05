@@ -204,11 +204,20 @@ function testOptions() {
 }
 
 // Test "show meanings" option, checked and unchecked
-function testMeanings() {
-    var meanings = wd.findElement({id:'adv_meanings'});
+function testMeanings(checked) {
+    wd.manage().timeouts().implicitlyWait(100);
+    
+    var meanings = wd.findElement(webdriver.By.css('label[for="adv_meanings"]'));
+    var reg_url;
+    
+    if (checked) {
+        reg_url = /^((?!\&d\=1).)*$/;
+    } else {
+        reg_url = /^((\&d\=1).)*$/;
+        meanings.click();
+    }
     
     search_btn = wd.findElement({id:'search_button_homepage'});    
-    var reg_url =  /^((?!\&d\=1).)*$/;
  
     return testNewTabUrl(search_btn, "Meanings showing for DDG searches", reg_url);
 }
@@ -239,11 +248,11 @@ function testExpandCollapse(collapsed) {
 function testFeelingDucky() {
     search_btn = wd.findElement({id:'search_button_homepage'});
     searchbar = wd.findElement({id:'search_form_input_homepage'});
-    var reg_url = /^((duckduckgo\.com).)*$/;
+    var reg_url = /^((?!duckduckgo\.com).)*$/;
 
-    //var feelducky = wd.findElement({id:'adv_ducky'});
+    var feelducky = wd.findElement(webdriver.By.css('label[for="adv_ducky"]'));
     wd.actions()
-    .click(wd.findElement({id:'adv_ducky'}))
+    .click(feelducky)
     .perform()
     .then(function() {
        searchbar.sendKeys('Philadelphia')
@@ -282,7 +291,10 @@ function main() {
         testMoreOptions();
     })
     .then(function() {
-        testMeanings();
+        testMeanings(true);
+    })
+    .then(function() {
+        testMeanings(false);
     })
     .then(function() {
         testExpandCollapse(true);
@@ -290,11 +302,11 @@ function main() {
     .then(function() {
          testExpandCollapse(false);
     })
-    /*.then(function() {
-         testFeelingDucky();
-    })*/
     .then(function() {
-        testOptions();
+         testFeelingDucky();
+    })
+    .then(function() {
+         testOptions();
     });
     
     tearDown();
