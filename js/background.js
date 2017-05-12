@@ -147,26 +147,38 @@ chrome.webRequest.onBeforeRequest.addListener(
       }
       
       if(!tabs[e.tabId]){
-          tabs[e.tabId] = {'trackers': {}, "total": 0, 'url': e.url, "dispTotal": 0}
+          tabs[e.tabId] = {trackers: {}, total: 0, potential: 0, url: e.url, dispTotal: 0}
           updateBadge(e.tabId, tabs[e.tabId].dispTotal);
       }
 
-      var block =  trackers.isTracker(e.url, tabs[e.tabId].url, e.tabId);
+      // var block =  trackers.isTracker(e.url, tabs[e.tabId].url, e.tabId);
+      var siteInfo =  trackers.isTracker(e.url, tabs[e.tabId].url, e.tabId);
+      // { toBlock: boolean, site: site, trackerByParentCompany:  }
 
-      if(block){
-          var name = block.tracker;
+      if (siteInfo.site) {
+          let block = siteInfo.trackerByParentCompany; // possibly null
+          let name = block.tracker;
 
-          if(!tabs[e.tabId]['trackers'][name]){
-              tabs[e.tabId]['trackers'][name] = {'count': 1, 'url': block.url, 'type': block.type};
+          if (block) {
+              if (!tabs[e.tabId].trackers[name]){
+                  tabs[e.tabId].trackers[name] = {count: 1, url: block.url, type: block.type};
+              }
+              else {
+                  tabs[e.tabId].trackers.[name].count++;
+              }
+              tabs[e.tabId].dispTotal = Object.keys(tabs[e.tabId].trackers).length;
+              tabs[e.tabId].total++;
+
+              // // record the trackercount in the site object
+              // siteInfo.site.trackerCount++;
+
+              updateBadge(e.tabId, tabs[e.tabId].dispTotal);
+              chrome.runtime.sendMessage({"rerenderPopup": true});
           }
-          else {
-              tabs[e.tabId]['trackers'][name].count += 1;
-          }
-          tabs[e.tabId]['total'] += 1;
-          tabs[e.tabId]['dispTotal'] = Object.keys(tabs[e.tabId].trackers).length;
 
-          updateBadge(e.tabId, tabs[e.tabId].dispTotal);
-          chrome.runtime.sendMessage({"rerenderPopup": true});
+          // record the potential tracker count whether blocked or not
+          // siteInfo.site.potential++;
+          tabs[e.tabId].potential++;// might not be necessary
                 
           return {cancel: true};
       }

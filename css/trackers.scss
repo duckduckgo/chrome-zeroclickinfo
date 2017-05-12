@@ -224,6 +224,11 @@ ul.js-menu-item-list li.site-co:first-child {
     right: 14px;
 }
 
+.js-site-rating-none {
+    border-radius: 10px;
+    background-color:#e0e0e0;
+}
+
 .js-site-rating-A {
     background-image: url('chrome-extension://__MSG_@@extension_id__/img/toolbar-rating-a@2x.png');
 }

@@ -2,8 +2,12 @@ class Site{
     constructor(domain, scoreFunction) {
         this.domain = domain,
         this.trackers = [],
-        this.score = null;
-        this.scoreFunction = scoreFunction;
+        this.score = 'none';
+
+        this.potentialCount = 0; // count of potential trackers
+        this.trackerCount = 0;
+
+        // this.scoreFunction = scoreFunction;
         this.setWhitelistStatusFromGlobal(domain)
     }
 
@@ -38,7 +42,15 @@ class Site{
     };
 
     getScore(){
-        this.score = this.scoreFunction();
+        // this.score = this.scoreFunction();
+
+        if (this.specialDomain()) {
+            this.score = 'none';
+        }
+        // else if (this.trackers.length > 1) {
+        // }
+
+
         return this.score;
     };
 

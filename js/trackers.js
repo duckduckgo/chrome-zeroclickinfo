@@ -12,32 +12,36 @@ var load = require('load'),
     
 function isTracker(url, currLocation, tabId) {
 
-    var toBlock = false;
+    // var toBlock = false;
+
+    var res = { toBlock: false, site: null };
 
     if (settings.getSetting('trackerBlockingEnabled')) {
         
         var host = utils.extractHostFromURL(url);
-        var isWhiteListed = false;
-        var social_block = settings.getSetting('socialBlockingIsEnabled');
+        // var isWhiteListed = false;
+        // var social_block = settings.getSetting('socialBlockingIsEnabled');
         var blockSettings = settings.getSetting('blocking').slice(0);
-        var currSite = Sites.add(utils.extractHostFromURL(currLocation));
+        res.site = Sites.add(utils.extractHostFromURL(currLocation));
 
-        if(currSite.whiteListed) {
-            return;
-        }
+        // if(currSite.whiteListed) {
+        //     return;
+        // }
 
-        if(social_block){
-            blockSettings.push('Social');
-        }
+        // if(social_block){
+        //     blockSettings.push('Social');
+        // }
 
-        var trackerByParentCompany = checkTrackersWithParentCompany(blockSettings, host, currLocation);
-        if(trackerByParentCompany) {
-            currSite.addTracker(host);
-            return trackerByParentCompany;
+        res.trackerByParentCompany = checkTrackersWithParentCompany(blockSettings, host, currLocation);
+        if (res.trackerByParentCompany) {
+            res.site.addTracker(host);
+            res.toBlock = true;
+            // return trackerByParentCompany;
         }
+        // otherwise res.toBlock remains false
 
     }
-    return toBlock;
+    return res;
 }
 
 function checkTrackersWithParentCompany(blockSettings, host, currLocation) {
