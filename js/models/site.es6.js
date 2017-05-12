@@ -48,7 +48,8 @@ Site.prototype = $.extend({},
           if (site) {
               this.site = site;
               this.isWhitelisted = site.whiteListed;
-              
+              this.siteRating = site.getScore();
+
               let special = site.specialDomain();
               if (special) {
                   this.domain = special;    // eg "extensions", "options", "new tab"

@@ -4,8 +4,8 @@ class Site{
         this.trackers = [],
         this.score = 'none';
 
-        // this.potentialCount = 0; // count of potential trackers
-        // this.trackerCount = 0;
+        this.potential = 0; // count of potential trackers, not blocked
+        this.trackerCount = 0;
 
         // this.scoreFunction = scoreFunction;
         this.setWhitelistStatusFromGlobal(domain)
@@ -41,15 +41,25 @@ class Site{
         }
     };
 
-    getScore(){
+    getScore() {
         // this.score = this.scoreFunction();
 
         if (this.specialDomain()) {
             this.score = 'none';
+            return this.score;
         }
-        // else if (this.trackers.length > 1) {
-        // }
 
+        console.log(`tracker count for ${this.domain} : ${this.trackerCount}`);
+
+        if (this.trackerCount == 0) {
+            if (this.potential > 0)    // most likely whitelisted
+                this.score = 'B';
+            else
+                this.score = 'A';
+        }
+        else {
+            this.score = 'B';
+        }
 
         return this.score;
     };

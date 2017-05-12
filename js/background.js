@@ -39,7 +39,7 @@ function Background() {
       for(var i = 0; i < savedTabs.length; i++){ 
           var tab = savedTabs[i];
           if(tab.url){
-            tabs[tab.id] = {'trackers': {}, 'total': 0, 'url': tab.url, 'dispTotal': 0};
+            tabs[tab.id] = {'trackers': {}, 'total': 0, potential:0, 'url': tab.url, 'dispTotal': 0};
           }
       }
   });
@@ -90,7 +90,7 @@ function Background() {
       }, function(currentTabs) {
         var tabId = currentTabs[0].id;
         if (!tabs[tabId]) {
-            tabs[tabId] = {'trackers': {}, "total": 0, 'url': tab.url};
+            tabs[tabId] = {'trackers': {}, potential:0, "total": 0, 'url': tab.url};
         }
 
         if (!tabs[tabId].whitelist) {
@@ -152,15 +152,26 @@ chrome.webRequest.onBeforeRequest.addListener(
       }
 
       // var block =  trackers.isTracker(e.url, tabs[e.tabId].url, e.tabId);
-      var siteInfo =  trackers.isTracker(e.url, tabs[e.tabId].url, e.tabId);
-      // { toBlock: boolean, site: site, trackerByParentCompany:  }
+      var siteInfo =  trackers.isTracker(e.url, tabs[e.tabId].url, e.tabId); // { site: site, trackerByParentCompany:  }
 
-      if (siteInfo.site) {
+      if (siteInfo.site) {  // current site object, for tabs[e.tabId].url
           let block = siteInfo.trackerByParentCompany; // possibly null
-          tabs[e.tabId].potential++;
 
-          if (block && !siteInfo.site.whiteListed) {
+
+          // if (siteInfo.site.whiteListed) {
+          //     if (block) {
+          //         tabs[e.tabId].potential++;
+          //         siteInfo.site.potential++;
+          //     }
+          // }
+          // else
+          if (block) {
               let name = block.tracker;
+
+              // tabs[e.tabId].potential = trackers_length;
+              // siteInfo.site.potential = trackers_length;
+
+
               if (!tabs[e.tabId].trackers[name]){
                   tabs[e.tabId].trackers[name] = {count: 1, url: block.url, type: block.type};
               }
@@ -168,8 +179,20 @@ chrome.webRequest.onBeforeRequest.addListener(
                   tabs[e.tabId].trackers[name].count++;
               }
 
-              tabs[e.tabId].dispTotal = Object.keys(tabs[e.tabId].trackers).length;
+              let trackers_length = Object.keys(tabs[e.tabId].trackers).length;
+
+              if (siteInfo.site.whiteListed) {
+                  // tabs[e.tabId].potential = tabs[e.tabId].trackers[name].count;
+                  tabs[e.tabId].potential = trackers_length;
+                  siteInfo.site.potential = trackers_length;
+                  siteInfo.site.trackerCount = 0;
+                  return;
+              }
+
+              tabs[e.tabId].dispTotal = trackers_length;    //Object.keys(tabs[e.tabId].trackers).length;
               tabs[e.tabId].total++;
+
+              siteInfo.site.trackerCount = dispTotal;
 
               updateBadge(e.tabId, tabs[e.tabId].dispTotal);
               chrome.runtime.sendMessage({"rerenderPopup": true});
