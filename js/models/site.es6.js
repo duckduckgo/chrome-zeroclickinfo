@@ -48,7 +48,7 @@ Site.prototype = $.extend({},
           if (site) {
               this.site = site;
               this.isWhitelisted = site.whiteListed;
-              this.siteRating = site.getScore();
+              // this.siteRating = site.getScore(); ---> see updateTrackerCount() below
 
               let special = site.specialDomain();
               if (special) {
@@ -59,7 +59,7 @@ Site.prototype = $.extend({},
               }
           }
           else {
-              this.domain = '-';    // should not happen
+              this.domain = '-';    // should not happen.
           }
       },
 
@@ -67,6 +67,23 @@ Site.prototype = $.extend({},
           let tab = backgroundPage.tabs[this.tabId];
           if(tab){
             this.trackerCount = tab.dispTotal;
+            this.potential = tab.potential;
+            console.log(`site potential: ${this.potential}`);
+
+            // calculate a score: for demo purposes
+            // TODO this should probably reside in the site object
+            // and there isn't enough data here to do this well
+            if (this.trackerCount == 0 && this.potential > 0)
+                this.siteRating = 'B'
+            else if (this.trackerCount > 6 ) // arbitrary demo
+                this.siteRating = 'C';
+            else if (this.trackerCount > 0 )
+                this.siteRating = 'B';
+            else if (this.trackerCount == 0 && this.potential == 0)
+                this.siteRating = 'A';
+            else
+                this.siteRating = 'none';
+
           }
       },
 

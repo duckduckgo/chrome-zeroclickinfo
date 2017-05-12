@@ -44,24 +44,26 @@ class Site{
     getScore() {
         // this.score = this.scoreFunction();
 
-        if (this.specialDomain()) {
-            this.score = 'none';
-            return this.score;
-        }
+        return 'none'; // for now
 
-        console.log(`tracker count for ${this.domain} : ${this.trackerCount}`);
+        // if (this.specialDomain()) {
+        //     this.score = 'none';
+        //     return this.score;
+        // }
 
-        if (this.trackerCount == 0) {
-            if (this.potential > 0)    // most likely whitelisted
-                this.score = 'B';
-            else
-                this.score = 'A';
-        }
-        else {
-            this.score = 'B';
-        }
+        // console.log(`tracker count for ${this.domain} : ${this.trackerCount}`);
 
-        return this.score;
+        // if (this.trackerCount == 0) {
+        //     if (this.potential > 0)    // most likely whitelisted
+        //         this.score = 'B';
+        //     else
+        //         this.score = 'A';
+        // }
+        // else {
+        //     this.score = 'B';
+        // }
+
+        // return this.score;
     };
 
     setWhitelistStatusFromGlobal(domain){
