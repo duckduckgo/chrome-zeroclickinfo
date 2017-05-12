@@ -15,6 +15,11 @@ const ItemMenuView = require('./../views/itemMenu.es6.js');
 const ItemMenuModel = require('./../models/itemMenu.es6.js');
 const ItemMenuTemplate = require('./../templates/itemMenu.es6.js');
 
+const AutocompleteView = require('./../views/autocomplete.es6.js');
+const AutocompleteModel = require('./../models/autocomplete.es6.js');
+const autocompleteTemplate = require('./../templates/autocomplete.es6.js');
+
+
 function Trackers (ops) {
     Parent.call(this, ops);
 };
@@ -41,7 +46,7 @@ Trackers.prototype = $.extend({},
             this.views.site = new SiteView({
                 pageView: this,
                 model: new SiteModel({
-                    domain: "cnn.com",    // FIXME remove dummy data, handle initial/zero case
+                    domain: "-",
                     isWhitelisted: false,
                     siteRating: 'B',
                     trackerCount: 0
@@ -66,6 +71,16 @@ Trackers.prototype = $.extend({},
                 template: TrackerListTemplate
             });
 
+            // TODO: hook up model query to actual ddg ac endpoint.
+            // For now this is just here to demonstrate how to
+            // listen to another component via model.set() +
+            // model.store.subscribe()
+            this.views.autocomplete = new AutocompleteView({
+                pageView: this,
+                model: new AutocompleteModel({suggestions: []}),
+                appendTo: this.views.search.$el,
+                template: autocompleteTemplate
+            });
 
         }
 
