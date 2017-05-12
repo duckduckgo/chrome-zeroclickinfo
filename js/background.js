@@ -148,7 +148,7 @@ chrome.webRequest.onBeforeRequest.addListener(
       
       if(!tabs[e.tabId]){
           tabs[e.tabId] = {trackers: {}, total: 0, potential: 0, url: e.url, dispTotal: 0};
-          updateBadge(e.tabId, tabs[e.tabId].dispTotal);
+          updateBadge(e.tabId, tabs[e.tabId].dispTotal, 0);
       }
 
       // var block =  trackers.isTracker(e.url, tabs[e.tabId].url, e.tabId);
@@ -185,7 +185,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 
               // siteInfo.site.trackerCount = dispTotal;
 
-              updateBadge(e.tabId, tabs[e.tabId].dispTotal);
+              updateBadge(e.tabId, tabs[e.tabId].dispTotal, tabs[e.tabId].potential);
               chrome.runtime.sendMessage({"rerenderPopup": true});
 
                 
@@ -211,13 +211,24 @@ chrome.webRequest.onBeforeRequest.addListener(
     ["blocking"]
 );
 
-function updateBadge(tabId, numBlocked){
-    if(numBlocked === 0){
-        chrome.browserAction.setBadgeBackgroundColor({tabId: tabId, color: "#00cc00"});
-    } 
-    else {
-        chrome.browserAction.setBadgeBackgroundColor({tabId: tabId, color: "#cc0000"});
-    }
+function updateBadge(tabId, numBlocked, potential){
+    const good = "#00cc00",
+          bad = "#cc0000";
+    var color = good;
+
+    if (potential > 0)// && numBlocked == 0)
+        color = bad;
+    if (numBlocked > 0)
+        color = bad;
+    if (numBlocked === 0 && potential === 0)
+        color = good;
+
+    // if(numBlocked === 0){
+        chrome.browserAction.setBadgeBackgroundColor({tabId: tabId, color: color});
+    // } 
+    // else {
+    //     chrome.browserAction.setBadgeBackgroundColor({tabId: tabId, color: color});
+    // }
     chrome.browserAction.setBadgeText({tabId: tabId, text: numBlocked + ""});
 }
 
