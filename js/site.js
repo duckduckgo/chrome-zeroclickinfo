@@ -4,8 +4,8 @@ class Site{
         this.trackers = [],
         this.score = 'none';
 
-        this.potentialCount = 0; // count of potential trackers
-        this.trackerCount = 0;
+        // this.potentialCount = 0; // count of potential trackers
+        // this.trackerCount = 0;
 
         // this.scoreFunction = scoreFunction;
         this.setWhitelistStatusFromGlobal(domain)

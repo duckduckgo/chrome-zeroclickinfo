@@ -14,7 +14,7 @@ function isTracker(url, currLocation, tabId) {
 
     // var toBlock = false;
 
-    var res = { toBlock: false, site: null };
+    var res = { };
 
     if (settings.getSetting('trackerBlockingEnabled')) {
         
@@ -35,7 +35,7 @@ function isTracker(url, currLocation, tabId) {
         res.trackerByParentCompany = checkTrackersWithParentCompany(blockSettings, host, currLocation);
         if (res.trackerByParentCompany) {
             res.site.addTracker(host);
-            res.toBlock = true;
+            // res.toBlock = true;
             // return trackerByParentCompany;
         }
         // otherwise res.toBlock remains false

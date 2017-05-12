@@ -147,7 +147,7 @@ chrome.webRequest.onBeforeRequest.addListener(
       }
       
       if(!tabs[e.tabId]){
-          tabs[e.tabId] = {trackers: {}, total: 0, potential: 0, url: e.url, dispTotal: 0}
+          tabs[e.tabId] = {trackers: {}, total: 0, potential: 0, url: e.url, dispTotal: 0};
           updateBadge(e.tabId, tabs[e.tabId].dispTotal);
       }
 
@@ -157,30 +157,26 @@ chrome.webRequest.onBeforeRequest.addListener(
 
       if (siteInfo.site) {
           let block = siteInfo.trackerByParentCompany; // possibly null
-          let name = block.tracker;
+          tabs[e.tabId].potential++;
 
-          if (block) {
+          if (block && !siteInfo.site.whiteListed) {
+              let name = block.tracker;
               if (!tabs[e.tabId].trackers[name]){
                   tabs[e.tabId].trackers[name] = {count: 1, url: block.url, type: block.type};
               }
               else {
-                  tabs[e.tabId].trackers.[name].count++;
+                  tabs[e.tabId].trackers[name].count++;
               }
+
               tabs[e.tabId].dispTotal = Object.keys(tabs[e.tabId].trackers).length;
               tabs[e.tabId].total++;
 
-              // // record the trackercount in the site object
-              // siteInfo.site.trackerCount++;
-
               updateBadge(e.tabId, tabs[e.tabId].dispTotal);
               chrome.runtime.sendMessage({"rerenderPopup": true});
-          }
 
-          // record the potential tracker count whether blocked or not
-          // siteInfo.site.potential++;
-          tabs[e.tabId].potential++;// might not be necessary
                 
-          return {cancel: true};
+              return {cancel: true};
+          }
       }
     },
     {
@@ -213,7 +209,7 @@ function updateBadge(tabId, numBlocked){
 
 chrome.tabs.onUpdated.addListener(function(id, info, tab) {
     if(tabs[id] && info.status === "loading" && tabs[id].status !== "loading"){
-        tabs[id] = {'trackers': {}, "total": 0, "dispTotal": 0, 'url': tab.url, "status": "loading"};
+        tabs[id] = {'trackers': {}, "total": 0, potential: 0, "dispTotal": 0, 'url': tab.url, "status": "loading"};
         updateBadge(id, 0);
     }
     else if(tabs[id] && info.status === "complete"){
