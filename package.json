@@ -9,6 +9,7 @@
     "postinstall": "export PATH='$PATH:$PWD/node_modules/chromedriver/bin'",
     "build": "grunt build",
     "dev": "grunt dev",
+    "release": "grunt build && node scripts/httpsWhitelist.js",
     "selenium": "cd selenium-test && node test.js",
     "jshint": "jshint js/ --verbose > jshint_log.txt",
     "test": "concurrently 'npm run jshint' 'npm run selenium'"
@@ -25,7 +26,6 @@
     "grunt-browserify": "^5.0.0",
     "grunt-contrib-compass": "^0.9.0",
     "grunt-contrib-concat": "^0.4.0",
-    "grunt-contrib-handlebars": "^0.8.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-sass": "^2.0.0",
     "jshint": "^2.9.4",
@@ -37,8 +37,11 @@
     "bel": "^4.6.0",
     "deep-freeze": "0.0.1",
     "eventemitter2": "^4.1.0",
+    "is-plain-object": "^2.0.1",
     "jquery": "^3.2.1",
-    "minidux": "^1.0.1"
+    "normalize.scss": "^0.1.0",
+    "parse-link-header": "^1.0.0",
+    "psl": "^1.1.18"
   },
   "babel": {
     "presets": [

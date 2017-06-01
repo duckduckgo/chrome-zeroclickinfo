@@ -18,9 +18,8 @@
 var trackers = require('trackers');
 var utils = require('utils');
 var settings = require('settings');
-var load = require('load');
 var stats = require('stats');
-var tabs = {};
+const httpsWhitelist = load.JSONfromLocalFile(settings.getSetting('httpsWhitelist'));
 
 function Background() {
   $this = this;
@@ -39,7 +38,7 @@ function Background() {
       for(var i = 0; i < savedTabs.length; i++){ 
           var tab = savedTabs[i];
           if(tab.url){
-            tabs[tab.id] = {'trackers': {}, 'total': 0, potential:0, 'url': tab.url, 'dispTotal': 0};
+            tabManager.create(tab);
           }
       }
   });
@@ -50,59 +49,6 @@ function Background() {
         ATB.onInstalled();
         ATB.startUpPage();
     }
-  });
-
-  chrome.runtime.onMessage.addListener(function (request, sender, response) {
-    if (typeof(request.social) == 'undefined') {
-        return;
-    }
-
-    var code_str = 'localStorage["social"] = ' + request.social;
-   
-    Object.keys(tabs).forEach(function(tabId) {
-            if (tabs[tabId].url && (!tabs[tabId].url.match(/(chrome\:\/\/)|(chrome\-extension\:\/\/)/))) {
-                chrome.tabs.executeScript(Number(tabId), {
-                    code: code_str
-                   // allFrames: true
-                });
-            }
-        });
-
-  });
-
-  chrome.runtime.onMessage.addListener(function(request, sender, callback) {
-    if (request.options) {
-      callback(localStorage);
-    }
-
-    if (request.current_url) {
-      chrome.tabs.getSelected(function(tab) {
-        var url = tab.url;
-        callback(url);
-      });
-    }
-
-    if (request.whitelist) {
-      var toWhitelist = utils.extractHostFromURL(request.whitelist);
-      chrome.tabs.query({
-        'currentWindow': true,
-        'active': true
-      }, function(currentTabs) {
-        var tabId = currentTabs[0].id;
-        if (!tabs[tabId]) {
-            tabs[tabId] = {'trackers': {}, potential:0, "total": 0, 'url': tab.url};
-        }
-
-        if (!tabs[tabId].whitelist) {
-            tabs[tabId].whitelist = [];
-        }
-        
-        tabs[tabId].whitelist.push(toWhitelist);
-        callback();
-      });
-    }
-
-    return true;
   });
 }
 
@@ -132,126 +78,96 @@ chrome.contextMenus.create({
   }
 });
 
-// Add ATB param
+// Add ATB param and block tracker requests
 chrome.webRequest.onBeforeRequest.addListener(
-    function (e) {
+    function (requestData) {
 
-      // Add ATB for DDG URLs, otherwise block trackers
-      let ddgAtbRewrite = ATB.redirectURL(e);
+      let tabId = requestData.tabId;
+
+      // Add ATB for DDG URLs
+      let ddgAtbRewrite = ATB.redirectURL(requestData);
       if(ddgAtbRewrite)
           return ddgAtbRewrite;
-      
-      if(e.type === 'main_frame'){
-          delete tabs[e.tabId];
+
+      // skip requests to background tabs
+      if(tabId === -1){
           return;
       }
-      
-      if(!tabs[e.tabId]){
-          tabs[e.tabId] = {trackers: {}, total: 0, potential: 0, url: e.url, dispTotal: 0};
-          updateBadge(e.tabId, tabs[e.tabId].dispTotal, 0);
-      }
 
-      // var block =  trackers.isTracker(e.url, tabs[e.tabId].url, e.tabId);
-      var siteInfo =  trackers.isTracker(e.url, tabs[e.tabId].url, e.tabId); // { site: site, trackerByParentCompany:  }
+      let thisTab = tabManager.get(requestData);
 
-      if (siteInfo.site) {  // current site object, for tabs[e.tabId].url
-          let block = siteInfo.trackerByParentCompany; // possibly null
-
-          if (block) {
-              let name = block.tracker;
-
-              // tabs[e.tabId].potential = trackers_length;
-              // siteInfo.site.potential = trackers_length;
-
-              if (!tabs[e.tabId].trackers[name]){
-                  tabs[e.tabId].trackers[name] = {count: 1, url: block.url, type: block.type};
-              }
-              else {
-                  tabs[e.tabId].trackers[name].count++;
-              }
-
-              let trackers_length = Object.keys(tabs[e.tabId].trackers).length;
-
-              if (siteInfo.site.whiteListed) {
-                  // tabs[e.tabId].potential = tabs[e.tabId].trackers[name].count;
-                  tabs[e.tabId].potential = trackers_length;
-                  // siteInfo.site.potential = trackers_length;
-                  siteInfo.site.trackerCount = 0;
-                  return;
-              }
-
-              tabs[e.tabId].dispTotal = trackers_length;    // Object.keys(tabs[e.tabId].trackers).length;
-              tabs[e.tabId].total++;
-
-              // siteInfo.site.trackerCount = dispTotal;
-
-              updateBadge(e.tabId, tabs[e.tabId].dispTotal, tabs[e.tabId].potential);
-              chrome.runtime.sendMessage({"rerenderPopup": true});
-
-                
-              return {cancel: true};
+      // for main_frame requests: create a new tab instance whenever we either
+      // don't have a tab instance for this tabId or this is a new requestId.
+      if (requestData.type === "main_frame") {
+          if (!thisTab || (thisTab.requestId !== requestData.requestId)) {
+            thisTab = tabManager.create(requestData);
           }
       }
+      else {
+          // check that we have a valid tab
+          // there is a chance this tab was closed before
+          // we got the webrequest event
+          if (!(thisTab.url && thisTab.id)) {
+              return;
+          }
+
+          // update badge here to display a 0 count
+          updateBadge(thisTab.id, thisTab.getBadgeTotal());
+          chrome.runtime.sendMessage({"rerenderPopup": true});
+      
+          var tracker =  trackers.isTracker(requestData.url, thisTab.url, thisTab.id);
+      
+          if (tracker) {
+              // record all trackers on a site even if we don't block them
+              thisTab.site.addTracker(tracker.url);
+              
+              // record potential blocked trackers for this tab
+              thisTab.addToPotentialBlocked(tracker.url);
+              
+              // Block the request if the site is not whitelisted
+              if (!thisTab.site.whiteListed) {
+                  thisTab.addOrUpdateTracker(tracker);
+                  updateBadge(thisTab.id, thisTab.getBadgeTotal());
+                  chrome.runtime.sendMessage({"rerenderPopup": true});
+                  
+                  // tell Chrome to cancel this webrequest
+                  return {cancel: true};
+              }
+          }
+      }
+
+      // upgrade to https if the site isn't whitelisted or in our list
+      // of known broken https sites
+      if (!(thisTab.site.whiteListed || httpsWhitelist[thisTab.site.domain])) {
+          let upgradeStatus = onBeforeRequest(requestData);
+          
+          // check for an upgraded main_frame request to use
+          // in our site score calculations
+          if (requestData.type === "main_frame" && upgradeStatus.redirectUrl) {
+              thisTab.upgradedHttps = true;
+          }
+          return upgradeStatus;
+      }
+
     },
     {
         urls: [
             "<all_urls>",
         ],
-        types: [
-        'main_frame',
-        'sub_frame',
-        'stylesheet',
-        'script',
-        'image',
-        'object',
-        'xmlhttprequest',
-        'other'
-      ]
+        types: settings.getSetting('requestListenerTypes')
     },
     ["blocking"]
 );
 
-function updateBadge(tabId, numBlocked, potential){
-    const good = "#00cc00",
-          bad = "#cc0000";
-    var color = good;
-
-    if (potential > 0)// && numBlocked == 0)
-        color = bad;
-    if (numBlocked > 0)
-        color = bad;
-    if (numBlocked === 0 && potential === 0)
-        color = good;
-
-    // if(numBlocked === 0){
-        chrome.browserAction.setBadgeBackgroundColor({tabId: tabId, color: color});
-    // } 
-    // else {
-    //     chrome.browserAction.setBadgeBackgroundColor({tabId: tabId, color: color});
-    // }
+function updateBadge(tabId, numBlocked){
+    if(numBlocked === 0){
+        chrome.browserAction.setBadgeBackgroundColor({tabId: tabId, color: "#00cc00"});
+    } 
+    else {
+        chrome.browserAction.setBadgeBackgroundColor({tabId: tabId, color: "#cc0000"});
+    }
     chrome.browserAction.setBadgeText({tabId: tabId, text: numBlocked + ""});
 }
-
-chrome.tabs.onUpdated.addListener(function(id, info, tab) {
-    if(tabs[id] && info.status === "loading" && tabs[id].status !== "loading"){
-        tabs[id] = {'trackers': {}, "total": 0, potential: 0, "dispTotal": 0, 'url': tab.url, "status": "loading"};
-        updateBadge(id, 0);
-    }
-    else if(tabs[id] && info.status === "complete"){
-        tabs[id].status = "complete";
-        
-        if(tab.url){
-            tabs[id].url = tab.url;
-        }
-
-        Companies.syncToStorage();
-    }
-
-});
-
-chrome.tabs.onRemoved.addListener(function(id, info) {
-    delete tabs[id];
-});
 
 chrome.webRequest.onCompleted.addListener(
         ATB.updateSetAtb,
@@ -262,4 +178,3 @@ chrome.webRequest.onCompleted.addListener(
         ]
     }
 );
-

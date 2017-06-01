@@ -22,21 +22,14 @@ function isTracker(url, currLocation, tabId) {
         // var isWhiteListed = false;
         // var social_block = settings.getSetting('socialBlockingIsEnabled');
         var blockSettings = settings.getSetting('blocking').slice(0);
-        res.site = Sites.add(utils.extractHostFromURL(currLocation));
-
-        // if(currSite.whiteListed) {
-        //     return;
-        // }
 
         // if(social_block){
         //     blockSettings.push('Social');
         // }
 
-        res.trackerByParentCompany = checkTrackersWithParentCompany(blockSettings, host, currLocation);
-        if (res.trackerByParentCompany) {
-            res.site.addTracker(host);
-            // res.toBlock = true;
-            // return trackerByParentCompany;
+        var trackerByParentCompany = checkTrackersWithParentCompany(blockSettings, host, currLocation);
+        if(trackerByParentCompany) {
+            return trackerByParentCompany;
         }
         // otherwise res.toBlock remains false
 
@@ -51,7 +44,7 @@ function checkTrackersWithParentCompany(blockSettings, host, currLocation) {
             var tracker = trackerLists.trackersWithParentCompany[trackerType][host];
             if(tracker && !isRelatedEntity(tracker.c, currLocation)){
                 Companies.add(tracker.c);
-                return toBlock = {'tracker': tracker.c, 'url': host, 'type': trackerType};
+                return toBlock = {parentCompany: tracker.c, url: host, type: trackerType};
             }
         }
      });

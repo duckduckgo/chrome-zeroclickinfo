@@ -29,16 +29,18 @@
     "options_page": "html/options.html",
     "background": {
             "scripts": [
-                "https-everywhere/chromium/rules.js", 
-                "https-everywhere/chromium/storage.js", 
-                "https-everywhere/chromium/util.js", 
-                "https-everywhere/chromium/background.js", 
-                "https-everywhere/chromium/incognito-cache-clearing.js",
+                "https/chromium/rules.js",
+                "https/chromium/storage.js",
+                "https/chromium/util.js",
+                "https/chromium/background.js",
+                "https/chromium/incognito-cache-clearing.js",
                 "js/require.js",
                 "js/utils.js",
                 "js/topBlocked.js",
                 "js/sites.js",
                 "js/site.js",
+                "js/tab.js",
+                "js/tabManager.js",
                 "js/companies.js",
                 "js/company.js",
                 "js/load.js",
@@ -64,7 +66,7 @@
       {
         "matches": ["<all_urls>"],
         "all_frames": true,
-        "css": ["css/noatb.css"]
+        "css": ["public/css/noatb.css"]
       },
       {
           "js": [
@@ -82,12 +84,12 @@
         "webRequest",
         "webRequestBlocking",
         "*://*/*",
-        "webNavigation", 
-        "webRequestBlocking", 
+        "webNavigation",
+        "webRequestBlocking",
         "activeTab",
-        "tabs", 
-        "cookies", 
-        "storage", 
+        "tabs",
+        "cookies",
+        "storage",
         "<all_urls>"
     ],
     "web_accessible_resources": [

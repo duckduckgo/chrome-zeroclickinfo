@@ -29,28 +29,21 @@ Site.prototype = $.extend({},
       modelName: 'site',
 
       toggleWhitelist: function () {
-          if(this.site){
+          if(this.tab.site){
               this.isWhitelisted = !this.isWhitelisted;
-              this.site.setWhitelisted(this.isWhitelisted);
-              this.site.notifyWhitelistChanged();
+              this.tab.site.setWhitelisted(this.isWhitelisted);
+              this.tab.site.notifyWhitelistChanged();
           }
       },
 
       setSiteObj: function() {
-          let tab = backgroundPage.tabs[this.tabId];
-          let host = backgroundPage.utils.extractHostFromURL(tab.url);
-          let site = backgroundPage.Sites.get(host);
-
-          // Determine if this is a special page, eg extensions, and reset domain and disabled flag.
-          
-          this.disabled = true;
-
-          if (site) {
-              this.site = site;
-              this.isWhitelisted = site.whiteListed;
-              // this.siteRating = site.getScore(); ---> see updateTrackerCount() below
-
-              let special = site.specialDomain();
+          if (!this.tab) {
+              this.domain = '-';    // should not happen
+          }
+          else {
+              this.isWhitelisted = this.tab.site.whiteListed;
+              
+              let special = this.tab.site.specialDomain();
               if (special) {
                   this.domain = special;    // eg "extensions", "options", "new tab"
               }
@@ -58,50 +51,25 @@ Site.prototype = $.extend({},
                   this.disabled = false;
               }
           }
-          else {
-              this.domain = '-';    // should not happen.
-          }
       },
 
       updateTrackerCount: function() {
-          let tab = backgroundPage.tabs[this.tabId];
-          if(tab){
-            this.trackerCount = tab.dispTotal;
-            this.potential = tab.potential;
-            console.log(`site potential: ${this.potential}`);
-
-            // calculate a score: for demo purposes
-            // TODO this should probably reside in the site object
-            // and there isn't enough data here to do this well
-            if (this.trackerCount == 0 && this.potential > 0)
-                this.siteRating = 'B'
-            else if (this.trackerCount > 6 ) // arbitrary demo
-                this.siteRating = 'C';
-            else if (this.trackerCount > 0 )
-                this.siteRating = 'B';
-            else if (this.trackerCount == 0 && this.potential == 0)
-                this.siteRating = 'A';
-            else
-                this.siteRating = 'none';
-
+          if(this.tab){
+            this.trackerCount = this.tab.getBadgeTotal();
+            this.potential = Object.keys(this.tab.potentialBlocked).length;
           }
       },
 
       setHttpsMessage: function() {
-          let tab = backgroundPage.tabs[this.tabId];
-
-          if(/^https/.exec(tab.url)){
-              this.httpsState = 'default';
+          if (!this.tab) {
+              return;
           }
-          else{
-              let url = backgroundPage.utils.parseURL(tab.url);
-              let httpsRules = backgroundPage.all_rules.potentiallyApplicableRulesets(url.hostname);
 
-              httpsRules.forEach((ruleSet) => {
-                  if(ruleSet.active && ruleSet.apply(tab.url)){
-                      this.httpsState = 'default'; // figure out if this is upgraded later
-                  }
-              });
+          if (this.tab.upgradedHttps) {
+              this.httpsState = 'upgraded';
+          }
+          else if (/^https/.exec(this.tab.url)) {
+              this.httpsState = 'default';
           }
 
           this.httpsStatusText = httpsStates[this.httpsState];
