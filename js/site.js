@@ -2,8 +2,12 @@ class Site{
     constructor(domain, scoreFunction) {
         this.domain = domain,
         this.trackers = [],
-        this.score = null;
-        this.scoreFunction = scoreFunction;
+        this.score = 'none';
+
+        this.potential = 0; // count of potential trackers, not blocked
+        this.trackerCount = 0;
+
+        // this.scoreFunction = scoreFunction;
         this.setWhitelistStatusFromGlobal(domain)
     }
 
@@ -37,9 +41,29 @@ class Site{
         }
     };
 
-    getScore(){
-        this.score = this.scoreFunction();
-        return this.score;
+    getScore() {
+        // this.score = this.scoreFunction();
+
+        return 'none'; // for now
+
+        // if (this.specialDomain()) {
+        //     this.score = 'none';
+        //     return this.score;
+        // }
+
+        // console.log(`tracker count for ${this.domain} : ${this.trackerCount}`);
+
+        // if (this.trackerCount == 0) {
+        //     if (this.potential > 0)    // most likely whitelisted
+        //         this.score = 'B';
+        //     else
+        //         this.score = 'A';
+        // }
+        // else {
+        //     this.score = 'B';
+        // }
+
+        // return this.score;
     };
 
     setWhitelistStatusFromGlobal(domain){

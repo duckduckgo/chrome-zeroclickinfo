@@ -12,7 +12,9 @@ var load = require('load'),
     
 function isTracker(url, currLocation, tabId) {
 
-    var toBlock = false;
+    // var toBlock = false;
+
+    var res = { };
 
     // DEMO embedded tweet option
     // a more robust test for tweet code may need to be used besides just
@@ -28,21 +30,22 @@ function isTracker(url, currLocation, tabId) {
     if (settings.getSetting('trackerBlockingEnabled')) {
         
         var host = utils.extractHostFromURL(url);
-        var isWhiteListed = false;
-        var social_block = settings.getSetting('socialBlockingIsEnabled');
+        // var isWhiteListed = false;
+        // var social_block = settings.getSetting('socialBlockingIsEnabled');
         var blockSettings = settings.getSetting('blocking').slice(0);
 
-        if(social_block){
-            blockSettings.push('Social');
-        }
+        // if(social_block){
+        //     blockSettings.push('Social');
+        // }
 
         var trackerByParentCompany = checkTrackersWithParentCompany(blockSettings, host, currLocation);
         if(trackerByParentCompany) {
             return trackerByParentCompany;
         }
+        // otherwise res.toBlock remains false
 
     }
-    return toBlock;
+    return res;
 }
 
 function checkTrackersWithParentCompany(blockSettings, host, currLocation) {
