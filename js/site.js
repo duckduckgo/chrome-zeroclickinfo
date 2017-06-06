@@ -78,12 +78,13 @@ class Site{
             return "new tab";
 
         if (browser === "moz") {
+            // special case for saved/reopend about: firefox tabs
             if (!this.domain) {
-                return "add-ons";
+                return "about";
             }
             // look for firefox uuid as a domain on some addon: pages
             if (this.domain.match(/^[a-z0-9]{8}(-[a-z0-9]{4}){3}-[a-z0-9]{12}$/)){
-                return  "add-ons"
+                return  "about"
             }
         }
 
