@@ -77,6 +77,16 @@ class Site{
         if (this.domain === 'newtab')
             return "new tab";
 
+        if (browser === "moz") {
+            if (!this.domain) {
+                return "add-ons";
+            }
+            // look for firefox uuid as a domain on some addon: pages
+            if (this.domain.match(/^[a-z0-9]{8}(-[a-z0-9]{4}){3}-[a-z0-9]{12}$/)){
+                return  "add-ons"
+            }
+        }
+
         return false;
     }
 }
