@@ -1,6 +1,9 @@
 require.scopes.utils = ( () => {
 
     function extractHostFromURL(url) {
+        if (!url)
+            return;
+
         var a = parseURL(url)
         var parts = a.hostname.split('.');
         // remove subdomains from url
