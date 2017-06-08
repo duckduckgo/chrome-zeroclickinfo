@@ -1,7 +1,7 @@
 {
-    "name": "DuckDuckGo for Chrome - V2 Beta",
-    "version": "2017.4.13",
-    "description": "DuckDuckGo enhancements for Chrome.",
+    "name": "DuckDuckGo for Firefox - V2 Beta",
+    "version": "2017.6.8",
+    "description": "DuckDuckGo enhancements for Firefox.",
     "icons": {
         "16": "img/icon_16.png",
         "48": "img/icon_48.png",
