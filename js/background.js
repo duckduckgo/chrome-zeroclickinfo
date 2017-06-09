@@ -124,7 +124,6 @@ chrome.webRequest.onBeforeRequest.addListener(
               return;
           }
 
-
           // update badge here to display a 0 count
           updateBadge(thisTab.id, thisTab.getBadgeTotal());
           chrome.runtime.sendMessage({"rerenderPopup": true}, ignoreLastError);
