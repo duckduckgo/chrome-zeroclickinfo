@@ -128,11 +128,12 @@ chrome.webRequest.onBeforeRequest.addListener(
           updateBadge(thisTab.id, thisTab.getBadgeTotal());
           chrome.runtime.sendMessage({"rerenderPopup": true});
       
-          var tracker =  trackers.isTracker(requestData.url, thisTab.url, thisTab.id);
+          var tracker =  trackers.isTracker(requestData.url, thisTab.url, thisTab.id, requestData);
       
           if (tracker) {
               // record all trackers on a site even if we don't block them
               thisTab.site.addTracker(tracker.url);
+
               
               // record potential blocked trackers for this tab
               thisTab.addToPotentialBlocked(tracker.url);
@@ -142,6 +143,9 @@ chrome.webRequest.onBeforeRequest.addListener(
                   thisTab.addOrUpdateTracker(tracker);
                   updateBadge(thisTab.id, thisTab.getBadgeTotal());
                   chrome.runtime.sendMessage({"rerenderPopup": true});
+
+                  console.info( utils.extractHostFromURL(thisTab.url)
+                               + " [" + tracker.parentCompany + "] " + tracker.url);
                   
                   // tell Chrome to cancel this webrequest
                   return {cancel: true};
