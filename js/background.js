@@ -20,6 +20,14 @@ var utils = require('utils');
 var settings = require('settings');
 var stats = require('stats');
 const httpsWhitelist = load.JSONfromLocalFile(settings.getSetting('httpsWhitelist'));
+const extensionId = chrome.runtime.id;
+
+if (settings.getSetting("beta")) {
+    chrome.browserAction.setPopup({popup: 'html/trackers.html'});
+    settings.updateSetting('httpsEverywhereEnabled', true);
+    settings.updateSetting('trackerBlockingEnabled', true);
+    settings.updateSetting('embeddedTweetsEnabled', false);
+}
 
 // Set browser for popup asset paths
 // chrome doesn't have getBrowserInfo so we'll default to chrome
@@ -102,6 +110,16 @@ chrome.webRequest.onBeforeRequest.addListener(
       if(ddgAtbRewrite)
           return ddgAtbRewrite;
 
+      if (!settings.getSetting('beta')){
+          if (requestData.url === "chrome-extension://" + extensionId + "/html/options.html") {
+              console.log(requestData);
+              return {redirectUrl: "chrome-extension://" + extensionId + "/html/option-old.html"};
+          }
+          else {
+              return;
+          }
+      }
+
       // skip requests to background tabs
       if(tabId === -1){
           return;
@@ -160,7 +178,7 @@ chrome.webRequest.onBeforeRequest.addListener(
           
           // check for an upgraded main_frame request to use
           // in our site score calculations
-          if (requestData.type === "main_frame" && upgradeStatus.redirectUrl) {
+          if (requestData.type === "main_frame" && upgradeStatus && upgradeStatus.redirectUrl) {
               thisTab.upgradedHttps = true;
           }
 
