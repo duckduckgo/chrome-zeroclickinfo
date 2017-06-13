@@ -1,13 +1,14 @@
 let version = (() => {
     let name;
-    let legacyOptionPage = "chrome-extension://" + chrome.runtime.id + "/html/legacy/version/1/options.html";
+    let legacyOptionPage = chrome.extension.getURL("/html/legacy/version/1/options.html");
 
     /*
      * Rewrite the old options page to the new one
      */
     let optionPageRequestListener = ((req) => { 
+        console.log(req.url);
         if (version.name === "beta" && req.url && req.url === legacyOptionPage) {
-            let newOptionPage = "chrome-extension://" + chrome.runtime.id + "/html/options.html";
+            let newOptionPage = chrome.extension.getURL("/html/options.html");
             return {redirectUrl: newOptionPage};
         }
     });
