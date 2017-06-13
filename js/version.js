@@ -1,12 +1,12 @@
 let version = (() => {
     let name;
-    let oldOptionPage = "chrome-extension://" + chrome.runtime.id + "/html/option-old.html";
+    let legacyOptionPage = "chrome-extension://" + chrome.runtime.id + "/html/legacy/version/1/options.html";
 
     /*
      * Rewrite the old options page to the new one
      */
     let optionPageRequestListener = ((req) => { 
-        if (version.name === "beta" && req.url && req.url === oldOptionPage) {
+        if (version.name === "beta" && req.url && req.url === legacyOptionPage) {
             let newOptionPage = "chrome-extension://" + chrome.runtime.id + "/html/options.html";
             return {redirectUrl: newOptionPage};
         }
@@ -34,7 +34,7 @@ let version = (() => {
         },
 
         betaStateOff: () => {
-            chrome.browserAction.setPopup({popup:'html/popup.html'});
+            chrome.browserAction.setPopup({popup:'html/legacy/version/1/popup.html'});
             settings.updateSetting('extensionIsEnabled', false);
             settings.updateSetting('httpsEverywhereEnabled', false);
             settings.updateSetting('trackerBlockingEnabled', false);

@@ -69,7 +69,8 @@ window.onload = function() {
     document.getElementById('adv_meanings').onclick = meanings_check;
 
     document.getElementById('addons').onclick = function(){
-        chrome.tabs.create({url: "html/option-old.html"});
+        let url = chrome.extension.getURL("/html/legacy/version/1/options.html");
+        chrome.tabs.create({url: url});
     }
 
 
