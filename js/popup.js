@@ -57,7 +57,7 @@ window.onload = function() {
       localStorage['advanced_options'] = 'true';
     }
 
-    if (localStorage['last_search'] != '') {
+    if (localStorage['last_search'] && localStorage['last_search'] != '') {
         document.getElementById('search_form_input_homepage').value = localStorage['last_search'];
         document.getElementById("search_form_input_clear").style.display = 'inline-block';
         document.getElementById("search_button_homepage").className = 'selected';
