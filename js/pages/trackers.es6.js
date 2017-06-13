@@ -19,6 +19,21 @@ const AutocompleteView = require('./../views/autocomplete.es6.js');
 const AutocompleteModel = require('./../models/autocomplete.es6.js');
 const autocompleteTemplate = require('./../templates/autocomplete.es6.js');
 
+let bkg = chrome.extension.getBackgroundPage();
+
+/*
+* Firefox doesn't let us redirect option page requests. Instead we can
+* open the options page in a new tab (simlar to how chrome does it)
+*/
+function openOptionsPage() {
+    console.log(bkg.version);
+    if (bkg.browser === "moz") {
+        return (() => chrome.tabs.create({url: bkg.version.firefoxOptionPage}));
+    }
+    else {
+        return chrome.runtime.openOptionsPage;
+    }
+}
 
 function Trackers (ops) {
     Parent.call(this, ops);
@@ -60,7 +75,7 @@ Trackers.prototype = $.extend({},
                 model: new LinkableModel({
                     text: 'Options',
                     id: 'options-link',
-                    link: chrome.runtime.openOptionsPage,
+                    link: openOptionsPage(),
                     klass: 'link-secondary',
                     spanClass: 'icon pull-right icon--arrow'
                 }),

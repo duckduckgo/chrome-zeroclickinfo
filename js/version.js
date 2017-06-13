@@ -1,14 +1,13 @@
-let version = (() => {
+var version = (() => {
     let name;
     let legacyOptionPage = chrome.extension.getURL("/html/legacy/version/1/options.html");
+    let newOptionPage = chrome.extension.getURL("/html/options.html");
 
     /*
      * Rewrite the old options page to the new one
      */
     let optionPageRequestListener = ((req) => { 
-        console.log(req.url);
         if (version.name === "beta" && req.url && req.url === legacyOptionPage) {
-            let newOptionPage = chrome.extension.getURL("/html/options.html");
             return {redirectUrl: newOptionPage};
         }
     });
@@ -28,6 +27,7 @@ let version = (() => {
 
         betaStateOn: () => {
             chrome.browserAction.setPopup({popup:'html/trackers.html'});
+            version.firefoxOptionPage = newOptionPage;
             settings.updateSetting('extensionIsEnabled', true);
             settings.updateSetting('httpsEverywhereEnabled', true);
             settings.updateSetting('trackerBlockingEnabled', true);
@@ -36,6 +36,7 @@ let version = (() => {
 
         betaStateOff: () => {
             chrome.browserAction.setPopup({popup:'html/legacy/version/1/popup.html'});
+            version.firefoxOptionPage = legacyOptionPage;
             settings.updateSetting('extensionIsEnabled', false);
             settings.updateSetting('httpsEverywhereEnabled', false);
             settings.updateSetting('trackerBlockingEnabled', false);
