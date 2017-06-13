@@ -20,14 +20,6 @@ var utils = require('utils');
 var settings = require('settings');
 var stats = require('stats');
 const httpsWhitelist = load.JSONfromLocalFile(settings.getSetting('httpsWhitelist'));
-const extensionId = chrome.runtime.id;
-
-if (settings.getSetting("beta")) {
-    chrome.browserAction.setPopup({popup: 'html/trackers.html'});
-    settings.updateSetting('httpsEverywhereEnabled', true);
-    settings.updateSetting('trackerBlockingEnabled', true);
-    settings.updateSetting('embeddedTweetsEnabled', false);
-}
 
 // Set browser for popup asset paths
 // chrome doesn't have getBrowserInfo so we'll default to chrome
@@ -109,15 +101,11 @@ chrome.webRequest.onBeforeRequest.addListener(
       let ddgAtbRewrite = ATB.redirectURL(requestData);
       if(ddgAtbRewrite)
           return ddgAtbRewrite;
-
-      if (!settings.getSetting('beta')){
-          if (requestData.url === "chrome-extension://" + extensionId + "/html/options.html") {
-              console.log(requestData);
-              return {redirectUrl: "chrome-extension://" + extensionId + "/html/option-old.html"};
-          }
-          else {
-              return;
-          }
+      
+      // all privacy features are off
+      // version.js will set this flag to turn tracking/https off or on
+      if (!settings.getSetting('extensionIsEnabled')) {
+          return;
       }
 
       // skip requests to background tabs

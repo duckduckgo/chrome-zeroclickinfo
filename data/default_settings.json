@@ -22,5 +22,5 @@
     "blocking": ["Advertising", "Analytics"],
     "requestListenerTypes": ["main_frame","sub_frame","stylesheet","script","image","object","xmlhttprequest","other"],
     "httpsWhitelist": "data/httpsWhitelist.json",
-    "beta": false
+    "version": "production"
 }
