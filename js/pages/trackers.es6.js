@@ -70,10 +70,17 @@ Trackers.prototype = $.extend({},
                 template: siteTemplate
             });
 
+            this.views.trackerlist = new TrackerListView({
+                pageView: this,
+                model: new TrackerListModel({}),
+                appendTo: $parent,
+                template: trackerListTemplate
+            });
+
             this.views.options = new LinkableView({
                 pageView: this,
                 model: new LinkableModel({
-                    text: 'Options',
+                    text: 'Settings',
                     id: 'options-link',
                     link: openOptionsPage(),
                     klass: 'link-secondary',
@@ -81,13 +88,6 @@ Trackers.prototype = $.extend({},
                 }),
                 appendTo: $parent,
                 template: linkableTemplate
-            });
-
-            this.views.trackerlist = new TrackerListView({
-                pageView: this,
-                model: new TrackerListModel({}),
-                appendTo: $parent,
-                template: trackerListTemplate
             });
 
             // TODO: hook up model query to actual ddg ac endpoint.
