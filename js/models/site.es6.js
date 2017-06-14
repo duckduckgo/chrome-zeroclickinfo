@@ -38,7 +38,11 @@ Site.prototype = $.extend({},
 
       setSiteObj: function() {
           if (!this.tab) {
-              this.domain = '-';    // should not happen
+              // firefox new tab page doesn't fire an onUpdated event so we don't have a tab yet
+              if (backgroundPage.browser === "moz")
+                  this.domain = "new tab";
+              else
+                this.domain = '-';    // should not happen
           }
           else {
               this.isWhitelisted = this.tab.site.whiteListed;
