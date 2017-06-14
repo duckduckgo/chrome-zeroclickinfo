@@ -26,7 +26,6 @@
       }
     },
     "omnibox": {"keyword": "d"},
-    "options_page": "html/legacy/version/1/options.html",
     "background": {
             "scripts": [
                 "https/chromium/rules.js",
@@ -84,7 +83,6 @@
         "webRequestBlocking",
         "*://*/*",
         "webNavigation",
-        "webRequestBlocking",
         "activeTab",
         "tabs",
         "cookies",
