@@ -101,6 +101,12 @@ chrome.webRequest.onBeforeRequest.addListener(
       let ddgAtbRewrite = ATB.redirectURL(requestData);
       if(ddgAtbRewrite)
           return ddgAtbRewrite;
+      
+      // all privacy features are off
+      // version.js will set this flag to turn tracking/https off or on
+      if (!settings.getSetting('extensionIsEnabled')) {
+          return;
+      }
 
       // skip requests to background tabs
       if(tabId === -1){
@@ -160,7 +166,7 @@ chrome.webRequest.onBeforeRequest.addListener(
           
           // check for an upgraded main_frame request to use
           // in our site score calculations
-          if (requestData.type === "main_frame" && upgradeStatus.redirectUrl) {
+          if (requestData.type === "main_frame" && upgradeStatus && upgradeStatus.redirectUrl) {
               thisTab.upgradedHttps = true;
           }
 
