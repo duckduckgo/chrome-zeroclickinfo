@@ -41,6 +41,14 @@ var version = (() => {
             settings.updateSetting('httpsEverywhereEnabled', false);
             settings.updateSetting('trackerBlockingEnabled', false);
             settings.updateSetting('embeddedTweetsEnabled', true);
+
+            // remove badge icon numbers
+            chrome.tabs.query({currentWindow: true, status: 'complete'}, function(tabs){
+                tabs.forEach((tab) => {
+                    chrome.browserAction.setBadgeText({tabId: tab.id, text: ''});
+                });
+            });
+
         },
 
         startup: () => {
