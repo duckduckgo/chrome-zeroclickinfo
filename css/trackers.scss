@@ -24,7 +24,6 @@
 
     .search-form {
         position: absolute;
-        width: 255px; /* temp fix for firefox horizontal scrollbar */
         top: 7px;
         left: 7px;
         right: 7px;
@@ -35,7 +34,7 @@
         color: #383838;
 
         .search-form__input {
-            width: 220px; /* temp fix for firefox horizontal scrollbar */
+            width: $popup__width;
             -moz-appearance: none;
             font-size: 17px;
             font-weight: normal;
