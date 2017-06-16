@@ -24,7 +24,7 @@
 
     .search-form {
         position: absolute;
-        width: $popup-width - 2px; /* temp fix for firefox horizontal scrollbar */
+        width: 255px; /* temp fix for firefox horizontal scrollbar */
         top: 7px;
         left: 7px;
         right: 7px;
@@ -35,7 +35,7 @@
         color: #383838;
 
         .search-form__input {
-            width: $popup-width - 28px; /* temp fix for firefox horizontal scrollbar */
+            width: 220px; /* temp fix for firefox horizontal scrollbar */
             -moz-appearance: none;
             font-size: 17px;
             font-weight: normal;
@@ -89,8 +89,18 @@
             display: none;
         }
 
-        .ddg-logo {
+        .ddg-logo-chrome {
             background-image: url($ddg-logo__url);
+            background-size: cover;
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            top: 7px;
+            left: 7px;
+        }
+
+        .ddg-logo-moz {
+            background-image: url($ddg-logo__url-moz);
             background-size: cover;
             width: 25px;
             height: 25px;

@@ -101,6 +101,10 @@ chrome.webRequest.onBeforeRequest.addListener(
       let ddgAtbRewrite = ATB.redirectURL(requestData);
       if(ddgAtbRewrite)
           return ddgAtbRewrite;
+      
+      if (version.name !== 'beta') {
+          return;
+      }
 
       // skip requests to background tabs
       if(tabId === -1){
@@ -160,7 +164,7 @@ chrome.webRequest.onBeforeRequest.addListener(
           
           // check for an upgraded main_frame request to use
           // in our site score calculations
-          if (requestData.type === "main_frame" && upgradeStatus.redirectUrl) {
+          if (requestData.type === "main_frame" && upgradeStatus && upgradeStatus.redirectUrl) {
               thisTab.upgradedHttps = true;
           }
 
