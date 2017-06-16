@@ -24,6 +24,8 @@ let bkg = chrome.extension.getBackgroundPage();
 /*
 * Firefox doesn't let us redirect option page requests. Instead we can
 * open the options page in a new tab (simlar to how chrome does it)
+*
+* LEGACY_V1 remove me later
 */
 function openOptionsPage() {
     console.log(bkg.version);
