@@ -102,9 +102,7 @@ chrome.webRequest.onBeforeRequest.addListener(
       if(ddgAtbRewrite)
           return ddgAtbRewrite;
       
-      // all privacy features are off
-      // version.js will set this flag to turn tracking/https off or on
-      if (!settings.getSetting('extensionIsEnabled')) {
+      if (version.name !== 'beta') {
           return;
       }
 

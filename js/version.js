@@ -28,20 +28,11 @@ var version = (() => {
         betaStateOn: () => {
             chrome.browserAction.setPopup({popup:'html/trackers.html'});
             version.firefoxOptionPage = newOptionPage;
-            settings.updateSetting('extensionIsEnabled', true);
-            settings.updateSetting('httpsEverywhereEnabled', true);
-            settings.updateSetting('trackerBlockingEnabled', true);
-            settings.updateSetting('embeddedTweetsEnabled', false);
         },
 
         betaStateOff: () => {
             chrome.browserAction.setPopup({popup:'html/legacy/version/1/popup.html'});
             version.firefoxOptionPage = legacyOptionPage;
-            settings.updateSetting('extensionIsEnabled', false);
-            settings.updateSetting('httpsEverywhereEnabled', false);
-            settings.updateSetting('trackerBlockingEnabled', false);
-            settings.updateSetting('embeddedTweetsEnabled', true);
-
             // remove badge icon numbers
             chrome.tabs.query({currentWindow: true, status: 'complete'}, function(tabs){
                 tabs.forEach((tab) => {

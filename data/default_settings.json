@@ -1,9 +1,9 @@
 {
-    "extensionIsEnabled": false,
+    "extensionIsEnabled": true,
     "socialBlockingIsEnabled": false,
-    "trackerBlockingEnabled": false,
-    "httpsEverywhereEnabled": false,
-    "embeddedTweetsEnabled": true,
+    "trackerBlockingEnabled": true,
+    "httpsEverywhereEnabled": true,
+    "embeddedTweetsEnabled": false,
     "meanings": true,
     "advanced_options": true,
     "last_search": "",
