@@ -22,6 +22,10 @@ var version = (() => {
             }
             version.name = value;
             settings.updateSetting('version', value);
+
+            // let legacy extension know the version
+            chrome.runtime.sendMessage({'version': value});
+
             return version.name;
         },
 
