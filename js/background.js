@@ -126,7 +126,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 
           // update badge here to display a 0 count
           updateBadge(thisTab.id, thisTab.getBadgeTotal());
-          chrome.runtime.sendMessage({"rerenderPopup": true});
+          chrome.runtime.sendMessage({"rerenderPopup": true}, ignoreLastError);
       
           var tracker =  trackers.isTracker(requestData.url, thisTab.url, thisTab.id, requestData);
       
@@ -142,7 +142,7 @@ chrome.webRequest.onBeforeRequest.addListener(
               if (!thisTab.site.whitelisted) {
                   thisTab.addOrUpdateTracker(tracker);
                   updateBadge(thisTab.id, thisTab.getBadgeTotal());
-                  chrome.runtime.sendMessage({"rerenderPopup": true});
+                  chrome.runtime.sendMessage({"rerenderPopup": true}, ignoreLastError);
 
                   console.info( utils.extractHostFromURL(thisTab.url)
                                + " [" + tracker.parentCompany + "] " + tracker.url);
@@ -194,3 +194,10 @@ chrome.webRequest.onCompleted.addListener(
         ]
     }
 );
+
+function ignoreLastError() {
+    if (chrome.runtime.lastError) {
+        // do nothing
+    }
+}
+
