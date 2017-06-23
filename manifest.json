@@ -36,7 +36,6 @@
                 "js/require.js",
                 "js/utils.js",
                 "js/topBlocked.js",
-                "js/sites.js",
                 "js/site.js",
                 "js/tab.js",
                 "js/tabManager.js",
@@ -47,6 +46,7 @@
                 "js/atb.js",
                 "js/trackerLists.js",
                 "js/trackers.js",
+                "js/url-parse.js",
                 "js/background.js",
                 "js/version.js",
                 "js/abp.js"
