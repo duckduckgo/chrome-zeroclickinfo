@@ -88,8 +88,18 @@
             display: none;
         }
 
-        .ddg-logo {
+        .ddg-logo-chrome {
             background-image: url($ddg-logo__url);
+            background-size: cover;
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            top: 7px;
+            left: 7px;
+        }
+
+        .ddg-logo-moz {
+            background-image: url($ddg-logo__url-moz);
             background-size: cover;
             width: 25px;
             height: 25px;
