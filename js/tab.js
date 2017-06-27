@@ -4,7 +4,7 @@ class Tracker {
         this.urls = [url],
         this.count = 1;
     };
-    
+
     increment() {
             this.count += 1;
     };
@@ -25,7 +25,7 @@ class Tracker {
  *  id: Chrome tab id
  *  url: url of the tab
  *  potentialBlocked: a list of all tracker urls seen
- *  trackers: container of tracker instances 
+ *  trackers: container of tracker instances we blocked in tab
  *      parentCompany -> ref to a Company object
  *      urls: all tracker urls we have seen for this company
  *      count: total number of requests
@@ -49,7 +49,10 @@ class Tab {
         this.requestId = tabData.requestId,
         this.trackers = {},
         this.status = tabData.status,
-        this.site = new Site(utils.extractHostFromURL(tabData.url));
+        this.site = new Site(utils.extractHostFromURL(tabData.url)),
+
+        // set the new tab icon to the dax logo
+        chrome.browserAction.setIcon({path: 'img/icon_16.png', tabId: tabData.tabId});
     };
 
     updateBadgeIcon() {
@@ -61,9 +64,11 @@ class Tab {
 
     updateSite() {
         this.site = new Site(utils.extractHostFromURL(this.url))
+        // reset badge to dax whenever we go to a new site
+        chrome.browserAction.setIcon({path: 'img/icon_16.png', tabId: this.id});
     };
 
-    /* Add up all of the unique tracker urls that 
+    /* Add up all of the unique tracker urls that
      * we have see on this tab
      */
     getBadgeTotal() {
