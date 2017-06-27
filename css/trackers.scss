@@ -19,19 +19,9 @@ body {
 #trackers-container {
 
     .search-form {
-        position: absolute;
-        width: 255px; /* temp fix for firefox horizontal scrollbar */
-        top: 7px;
-        left: 7px;
-        right: 7px;
-        height: 38px;
-        margin: 0;
-        font-size: 1.14em;
-        border-radius: 2px;
-        color: #383838;
 
         .search-form__input {
-            width: 220px; /* temp fix for firefox horizontal scrollbar */
+            width: $popup__width;
             -moz-appearance: none;
             font-size: 17px;
             font-weight: normal;
@@ -84,7 +74,7 @@ body {
             display: none;
         }
 
-        .ddg-logo-chrome {
+        .ddg-logo {
             background-image: url($ddg-logo__url);
             background-size: cover;
             width: 25px;
@@ -93,17 +83,6 @@ body {
             top: 9px;
             left: 7px;
         }
-
-        .ddg-logo-moz {
-            background-image: url($ddg-logo__url-moz);
-            background-size: cover;
-            width: 25px;
-            height: 25px;
-            position: absolute;
-            top: 7px;
-            left: 7px;
-        }
-
     }
 
     .site-info {

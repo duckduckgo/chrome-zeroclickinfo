@@ -1,12 +1,10 @@
 const Parent = window.DDG.base.View;
-let bkg = chrome.extension.getBackgroundPage();
 
 function Search (ops) {
 
     this.model = ops.model;
     this.pageView = ops.pageView;
     this.template = ops.template;
-    this.model.browser = bkg.browser;
 
     Parent.call(this, ops);
 
