@@ -109,6 +109,10 @@ var ATB = (() => {
                     chrome.tabs.executeScript(tab.id, {
                         file: 'js/oninstall.js'
                     });
+
+                    chrome.tabs.executeScript(tab.id, {
+                        file: 'js/serpVersion.js'
+                    });
                     
                     chrome.tabs.insertCSS(tab.id, {
                         file: 'css/noatb.css'

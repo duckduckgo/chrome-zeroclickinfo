@@ -1,2 +1,5 @@
 var extensionVersionFlag = document.querySelector('html').getAttribute('data-chromeversion');
-chrome.runtime.sendMessage({versionFlag: extensionVersionFlag});
+
+if (extensionVersionFlag) {
+    chrome.runtime.sendMessage({versionFlag: extensionVersionFlag});
+}
