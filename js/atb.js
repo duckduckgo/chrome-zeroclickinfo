@@ -54,9 +54,19 @@ var ATB = (() => {
                     return;
                 }
 
-                let newURL = request.url + "&atb=" + atbSetting;
+                // handle anchor tags for pages like about#newsletter
+                let urlParts = request.url.split('#');
+                let newURL = request.url
 
-                return {redirectUrl: newURL};
+                // if we have an anchor tag
+                if (urlParts.length === 2) {
+                    newURL = urlParts[0] + "&atb=" + atbSetting + "#" + urlParts[1]
+                }
+                else {
+                    newURL = request.url + "&atb=" + atbSetting
+                }
+
+                return {redirectUrl: newURL}
             }
         },
 
@@ -125,13 +135,15 @@ var ATB = (() => {
             ATB.setInitialVersions();
             ATB.inject();
             
-        },
+        }
 
+        /* not being used right now
         startUpPage: () => {
             if (!chrome.extension.inIncognitoContext) {
                 chrome.tabs.create({url: "/html/intro.html"});
             }
         }
+        */
     }
 })();
 

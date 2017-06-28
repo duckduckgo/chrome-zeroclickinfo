@@ -1,4 +1,6 @@
 const Parent = window.DDG.base.Page;
+const mixins = require('./mixins/index.es6.js');
+
 const TrackerListView = require('./../views/trackerlist-truncated.es6.js');
 const TrackerListModel = require('./../models/trackerlist-top-blocked.es6.js');
 const trackerListTemplate = require('./../templates/trackerlist-truncated.es6.js');
@@ -43,6 +45,7 @@ function Trackers (ops) {
 
 Trackers.prototype = $.extend({},
     Parent.prototype,
+    mixins.setBrowserClassOnBodyTag,
     {
 
         pageName: 'trackers',
@@ -52,6 +55,8 @@ Trackers.prototype = $.extend({},
             var $parent = $('#trackers-container');
 
             Parent.prototype.ready.call(this);
+
+            this.setBrowserClassOnBodyTag();
 
             this.views.search = new SearchView({
                 pageView: this,
@@ -105,7 +110,6 @@ Trackers.prototype = $.extend({},
             });
 
         }
-
     }
 );
 
