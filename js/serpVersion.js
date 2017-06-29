@@ -1,8 +1,2 @@
-let domNodes = $('[data-extensionversion]')
-
-if (domNodes.length) {
-    let node = domNodes[0];
-    let version = node.getAttribute('data-extensionversion')
-    console.log("Setting version: ", version)
-    if (version) chrome.runtime.sendMessage({versionFlag: version});
-}
+let version = document.querySelector('html').getAttribute('data-extensionversion');    
+if (version === "beta") chrome.runtime.sendMessage({versionFlag: version});
