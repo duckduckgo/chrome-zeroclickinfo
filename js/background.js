@@ -29,7 +29,6 @@ try {
     chrome.runtime.getBrowserInfo((info) => {
         if (info.name === "Firefox") {
             browser = "moz";
-            chrome.runtime.sendMessage({logLegacy: 'Running ATB startup'});
             ATB.onInstalled();
         }
     });
@@ -111,7 +110,8 @@ chrome.webRequest.onBeforeRequest.addListener(
       // Add ATB for DDG URLs
       let ddgAtbRewrite = ATB.redirectURL(requestData);
       if(ddgAtbRewrite)
-          return ddgAtbRewrite;
+          return;
+          //return ddgAtbRewrite;
       
       if (version.name !== 'beta') {
           return;
