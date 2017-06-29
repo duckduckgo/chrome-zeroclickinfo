@@ -27,8 +27,11 @@ const httpsWhitelist = load.JSONfromLocalFile(settings.getSetting('httpsWhitelis
 var browser = "chrome";
 try {
     chrome.runtime.getBrowserInfo((info) => {
-        if (info.name === "Firefox")
+        if (info.name === "Firefox") {
             browser = "moz";
+            chrome.runtime.sendMessage({logLegacy: 'Running ATB startup'});
+            ATB.onInstalled();
+        }
     });
 }
 catch(e){
@@ -60,6 +63,7 @@ function Background() {
           }
       }
   });
+
 
   chrome.runtime.onInstalled.addListener(function(details) {
     // only run the following section on install
