@@ -160,7 +160,7 @@ var ATB = (() => {
         onInstalled: () => {
             // we already migrate on update events but just to be
             // safe lets do this on install too
-            ATB.migrate();
+            //ATB.migrate();
 
             ATB.inject();
             
