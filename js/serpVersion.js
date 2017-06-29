@@ -1,5 +1,8 @@
-var extensionVersionFlag = document.querySelector('html').getAttribute('data-extensionversion');
+let domNodes = $('[data-extensionversion]')
 
-if (extensionVersionFlag) {
-    chrome.runtime.sendMessage({versionFlag: extensionVersionFlag});
+if (domNodes.length) {
+    let node = domNodes[0];
+    let version = node.getAttribute('data-extensionversion')
+    console.log("Setting version: ", version)
+    if (version) chrome.runtime.sendMessage({versionFlag: version});
 }
