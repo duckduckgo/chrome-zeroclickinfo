@@ -72,14 +72,28 @@ var ATB = (() => {
 
         // migrate old versions that used localstorage over to use settings and chrome.storage.local
         migrate: () => {
-            let atbNames = ['atb', 'set_atb']
-            atbNames.map((name) => {
-                let localValue = localStorage[name]
-                let storageValue = settings.getSetting(name)
-                if (localValue && !storageValue) {
-                    settings.updateSetting(name, localValue)
-                }
-            });
+            if (browser === "moz") {
+                chrome.runtime.sendMessage({logLegacy: "migrating moz atb"});
+
+                chrome.runtime.sendMessage('get-atb', (res) => {
+                    chrome.runtime.sendMessage({logLegacy: "migrating moz atb res: " + JSON.stringify(res)});
+                    if (res) {
+                        let atb = res.atb;
+                        let set_atb = res.set_atb;
+                        let storageAtb = settings.getSetting('atb')
+                        let storageSetAtb = settings.getSetting('set_atb')
+
+                        if (atb && !storageAtb) settings.updateSetting('atb', atb)
+                        if (set_atb && !storageSetAtb) settings.updateSetting('set_atb', set_atb)
+                        
+                        // try to set inital versions after migrating    
+                        ATB.setInitialVersions();
+                    }
+                });
+            }
+            else {
+                ATB.setInitialVersions();
+            }
         },
 
         setInitialVersions: () => {
@@ -148,7 +162,6 @@ var ATB = (() => {
             // safe lets do this on install too
             ATB.migrate();
 
-            ATB.setInitialVersions();
             ATB.inject();
             
         }
