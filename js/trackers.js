@@ -1,7 +1,10 @@
 
 // these are defined in abp.js
 var abp,
-    easylists;
+    easylists,
+    cryptoJS;
+
+let cache = new Map();
 
 require.scopes.trackers = (function() {    
 
@@ -12,12 +15,34 @@ var load = require('load'),
     entityList = load.JSONfromExternalFile(settings.getSetting('entityList')),
     entityMap =  load.JSONfromLocalFile(settings.getSetting('entityMap'));
 
+function getHash(url) {
+    return cryptoJS.createHash('sha256').update(url).digest('base64')
+}
+
+function isCached(url) {
+    return cache.get(getHash(url))
+}
+
+// add hashed URLs to the cache. Remove older entries if the cache is full
+function addToCache(url) {
+    // removes oldest item in the cache
+    if (cache.size > 10000) {
+        cache.delete(cache.keys().next().value)
+    }
+    cache.set(getHash(url), true);
+}
+
 function isTracker(urlToCheck, currLocation, tabId, request) {
 
     // TODO: easylist is marking some of our requests as trackers. Whitelist us
     // by default for now until we can figure out why. 
     if (currLocation.match(/duckduckgo\.com/)) {
         return false;
+    }
+
+    if (isCached(urlToCheck)) {
+        console.log("GOT CACHED HIT: ", urlToCheck)
+        return;
     }
 
     var toBlock = false;
@@ -70,6 +95,10 @@ function isTracker(urlToCheck, currLocation, tabId, request) {
         }
 
     }
+
+    // if we get this far the request isn't a tracker so add it to the cache
+    addToCache(urlToCheck);
+
     return toBlock;
 }
 
