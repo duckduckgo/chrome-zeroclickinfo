@@ -6,6 +6,7 @@
  */
 abp = require('abp-filter-parser');
 let request = require('request');
+cryptoJS = require("crypto"); 
 
 easylists = {
     privacy: {
