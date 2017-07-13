@@ -68,12 +68,6 @@ window.onload = function() {
     document.getElementById('adv_ducky').onclick = ducky_check;
     document.getElementById('adv_meanings').onclick = meanings_check;
 
-    document.getElementById('addons').onclick = function(){
-        let url = chrome.extension.getURL("/html/legacy/version/1/options.html");
-        chrome.tabs.create({url: url});
-    }
-
-
     document.getElementById('bang_w').onclick = function(){
       add_bang('!w');
     }
