@@ -9,21 +9,21 @@
 const siteScores = ['A', 'B', 'C', 'D']
 
 class Score {
-    constructor(specialPage) {
-        this.specialPage = specialPage;     // see specialDomain() in class Site below
-        this.hasHTTPS = false;
-        this.inMajorTrackingNetwork = false;
-        this.totalBlocked = 0;
-        this.hasObscureTracker = false;
+    constructor (specialPage) {
+        this.specialPage = specialPage  // see specialDomain() in class Site below
+        this.hasHTTPS = false
+        this.inMajorTrackingNetwork = false
+        this.totalBlocked = 0
+        this.hasObscureTracker = false
     }
 
     /*
      * Calculates and returns a site score
      */
-    get() {
-        if (this.specialPage) return 'none';
+    get () {
+        if (this.specialPage) return 'none'
 
-        let scoreIndex = 1;
+        let scoreIndex = 1
 
         if (this.inMajorTrackingNetwork) scoreIndex++
         if (this.hasHTTPS) scoreIndex--
@@ -33,22 +33,21 @@ class Score {
         scoreIndex += Math.ceil(this.totalBlocked / 10)
 
         // return corresponding score or lowest score if outside the array
-        return siteScores[scoreIndex] || siteScores[siteScores.length - 1];
-    };
+        return siteScores[scoreIndex] || siteScores[siteScores.length - 1]
+    }
 
     /*
      * Update the score attruibues as new events come in. The actual
      * site score is calculated later when you call .get()
      */
-    update(event) {
+    update (event) {
 
         let majorTrackingNetworks = settings.getSetting('majorTrackingNetworks')
         let IPRegex = /[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/
 
         if (event.hasHTTPS) {
             this.hasHTTPS = true
-        }
-        else if (event.trackerBlocked) {
+        } else if (event.trackerBlocked) {
 
             // tracker is from one of the top blocked companies
             if (majorTrackingNetworks[event.trackerBlocked.parentCompany]) {
@@ -60,58 +59,56 @@ class Score {
                 this.hasObscureTracker = true
             }
 
-            this.totalBlocked++;
+            this.totalBlocked++
         }
-    };
+    }
 }
 
 class Site {
-    constructor(domain) {
-        this.domain = domain,
-        this.trackerUrls = [], // was this.trackers
-        this.score = new Score(this.specialDomain());
-
+    constructor (domain) {
+        this.domain = domain
+        this.trackerUrls = []
+        this.score = new Score(this.specialDomain())
         // whitelist only HTTPS upgrades
-        this.HTTPSwhitelisted = false;
-
+        this.HTTPSwhitelisted = false
         // whitelist all privacy features
-        this.whitelisted = false;
+        this.whitelisted = false
 
-        this.setWhitelistStatusFromGlobal(domain);
+        this.setWhitelistStatusFromGlobal(domain)
     }
 
-    setWhitelisted(name, value){
-        this[name] = value;
-    };
+    setWhitelisted (name, value) {
+        this[name] = value
+    }
 
     /*
      * Send message to the popup to rerender the whitelist
      */
     notifyWhitelistChanged () {
-        chrome.runtime.sendMessage({'whitelistChanged': true});
-    };
+        chrome.runtime.sendMessage({'whitelistChanged': true})
+    }
 
-    isWhiteListed () { return this.whitelisted };
+    isWhiteListed () { return this.whitelisted }
 
     addTracker (tracker) {
-        if (this.trackerUrls.indexOf(tracker.url) === -1){
-            this.trackerUrls.push(tracker.url);
-            this.score.update({trackerBlocked: tracker, totalBlocked: this.trackerUrls.length});
+        if (this.trackerUrls.indexOf(tracker.url) === -1) {
+            this.trackerUrls.push(tracker.url)
+            this.score.update({trackerBlocked: tracker, totalBlocked: this.trackerUrls.length})
         }
-    };
+    }
 
     /*
      * When site objects are created we check the stored whitelists
      * and set the new site whitelist statuses
      */
-    setWhitelistStatusFromGlobal(domain){
-        let globalwhitelists = ['whitelisted', 'HTTPSwhitelisted'];
+    setWhitelistStatusFromGlobal (domain) {
+        let globalwhitelists = ['whitelisted', 'HTTPSwhitelisted']
 
         globalwhitelists.map((name) => {
-            let list = settings.getSetting(name) || {};
-            this.setWhitelisted(name, list[this.domain]);
-        });
-    };
+            let list = settings.getSetting(name) || {}
+            this.setWhitelisted(name, list[this.domain])
+        })
+    }
 
     /*
      * specialDomain
@@ -122,20 +119,12 @@ class Site {
      *          or false if not a special page.
      */
     specialDomain() {
-        if (this.domain === 'extensions')
-            return "extensions";
-
-        if (this.domain === chrome.runtime.id)
-            return "options";
-
-        if (this.domain === 'newtab')
-            return "new tab";
-
+        if (this.domain === 'extensions') return "extensions"
+        if (this.domain === chrome.runtime.id) return "options"
+        if (this.domain === 'newtab') return "new tab"
         // special case for about: firefox tabs
-        if (browser === "moz" && !this.domain) {
-            return "about";
-        }
+        if (browser === "moz" && !this.domain) return "about"
 
-        return false;
+        return false
     }
 }

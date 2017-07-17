@@ -1,13 +1,13 @@
 class Tracker {
     constructor(name, url, type) {
-        this.parentCompany = Companies.get(name);
-        this.urls = [url],
-        this.count = 1; // request count
-    };
+        this.parentCompany = Companies.get(name)
+        this.urls = [url]
+        this.count = 1 // request count
+    }
 
     increment() {
-        this.count += 1;
-    };
+        this.count += 1
+    }
 
     /* A parent company may try
      * to track you through many different entities.
@@ -15,9 +15,9 @@ class Tracker {
      */
     addURL(url) {
         if (this.urls.indexOf(url) === -1) {
-            this.urls.push(url);
+            this.urls.push(url)
         }
-    };
+    }
 }
 
 /* This class contains information about what trackers and sites
@@ -44,90 +44,87 @@ const scoreIconLocations = {
 }
 
 class Tab {
-    constructor(tabData) {
-        this.id = tabData.id || tabData.tabId,
-        this.trackers = {},
-        this.trackersBlocked = {},
-        this.url = tabData.url,
-        this.upgradedHttps = false,
-        this.httpsRequests = [],
-        this.httpsWhitelisted = false,
-        this.requestId = tabData.requestId,
-        this.status = tabData.status,
-        this.site = new Site(utils.extractHostFromURL(tabData.url)),
+    constructor (tabData) {
+        this.id = tabData.id || tabData.tabId
+        this.trackers = {}
+        this.trackersBlocked = {}
+        this.url = tabData.url
+        this.upgradedHttps = false
+        this.httpsRequests = []
+        this.httpsWhitelisted = false
+        this.requestId = tabData.requestId
+        this.status = tabData.status
+        this.site = new Site(utils.extractHostFromURL(tabData.url))
 
         // set the new tab icon to the dax logo
-        chrome.browserAction.setIcon({path: 'img/icon_48.png', tabId: tabData.tabId});
+        chrome.browserAction.setIcon({path: 'img/icon_48.png', tabId: tabData.tabId})
     };
 
-    updateBadgeIcon() {
+    updateBadgeIcon () {
         if (!this.site.specialDomain() && !this.site.whitelisted && settings.getSetting('trackerBlockingEnabled')) {
-            let scoreIcon = scoreIconLocations[this.site.score.get()];
-            chrome.browserAction.setIcon({path: scoreIcon, tabId: this.id});
+            let scoreIcon = scoreIconLocations[this.site.score.get()]
+            chrome.browserAction.setIcon({path: scoreIcon, tabId: this.id})
         }
-    };
+    }
 
     updateSite() {
         this.site = new Site(utils.extractHostFromURL(this.url))
         // reset badge to dax whenever we go to a new site
-        chrome.browserAction.setIcon({path: 'img/icon_48.png', tabId: this.id});
-    };
+        chrome.browserAction.setIcon({path: 'img/icon_48.png', tabId: this.id})
+    }
 
     /* Add up all of the unique tracker urls that
      * were requested on this page/tab
      */
     getUniqueTrackersCount () {
         return Object.keys(this.trackers).reduce((total, name) => {
-            return this.trackers[name].urls.length + total;
-        }, 0);
-    };
-
+            return this.trackers[name].urls.length + total
+        }, 0)
+    }
 
     /* Add up all of the unique tracker urls that
      * were blocked on this page/tab
      */
     getUniqueTrackersBlockedCount () {
         return Object.keys(this.trackersBlocked).reduce((total, name) => {
-            return this.trackersBlocked[name].urls.length + total;
-        }, 0);
-    };
+            return this.trackersBlocked[name].urls.length + total
+        }, 0)
+    }
 
     /* Store all trackers for a given tab even if we
      * don't block them.
      */
     addToTrackers (t) {
-        let tracker = this.trackers[t.parentCompany];
+        let tracker = this.trackers[t.parentCompany]
         if (tracker) {
-            tracker.increment();
-            tracker.addURL(t.url);
+            tracker.increment()
+            tracker.addURL(t.url)
+        } else {
+            let newTracker = new Tracker(t.parentCompany, t.url, t.type)
+            this.trackers[t.parentCompany] = newTracker
+            return newTracker
         }
-        else {
-            let newTracker = new Tracker(t.parentCompany, t.url, t.type);
-            this.trackers[t.parentCompany] = newTracker;
-            return newTracker;
-        }
-    };
+    }
 
     addOrUpdateTrackersBlocked (t) {
-        let tracker = this.trackersBlocked[t.parentCompany];
+        let tracker = this.trackersBlocked[t.parentCompany]
         if (tracker) {
-            tracker.increment();
-            tracker.addURL(t.url);
+            tracker.increment()
+            tracker.addURL(t.url)
+        } else {
+            let newTracker = new Tracker(t.parentCompany, t.url, t.type)
+            this.trackersBlocked[t.parentCompany] = newTracker
+            return newTracker
         }
-        else {
-            let newTracker = new Tracker(t.parentCompany, t.url, t.type);
-            this.trackersBlocked[t.parentCompany] = newTracker;
-            return newTracker;
-        }
-    };
+    }
 }
 
 chrome.webRequest.onHeadersReceived.addListener((header) => {
-    let tab = tabManager.get({'tabId': header.tabId});
+    let tab = tabManager.get({'tabId': header.tabId})
     // remove successful rewritten requests
     if (tab && header.statusCode < 400) {
         tab.httpsRequests = tab.httpsRequests.filter((url) => {
-            return url !== header.url;
-        });
+            return url !== header.url
+        })
     }
-}, {urls: ['<all_urls>']});
+}, {urls: ['<all_urls>']})

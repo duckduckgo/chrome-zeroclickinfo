@@ -1,68 +1,61 @@
 var ATB = (() => {
-    var ddgRegex = '/duckduckgo\.com';
-    var ddgAtbURL = 'https://duckduckgo.com/atb.js?';
+    var ddgRegex = '/duckduckgo\.com'
+    var ddgAtbURL = 'https://duckduckgo.com/atb.js?'
 
     return {
         updateSetAtb: () => {
             return new Promise((resolve, reject) => {
-                let atbSetting = settings.getSetting('atb'),
-                    setAtbSetting = settings.getSetting('set_atb');
+                let atbSetting = settings.getSetting('atb');
+                let setAtbSetting = settings.getSetting('set_atb')
 
-                if(!atbSetting || !setAtbSetting)
-                    resolve(null);
+                if(!atbSetting || !setAtbSetting) resolve(null)
 
                 ATB.getSetAtb(atbSetting, setAtbSetting).then((newAtb) => {
-                    if(newAtb !== setAtbSetting){
-                        settings.updateSetting('set_atb', newAtb);
+                    if (newAtb !== setAtbSetting) {
+                        settings.updateSetting('set_atb', newAtb)
                     }
-                    resolve(newAtb);
-                });
-            });
+                    resolve(newAtb)
+                })
+            })
         },
 
         getSetAtb: (atbSetting, setAtb, callback) => {
             return new Promise((resolve, reject) => {
-                var xhr = new XMLHttpRequest();
+                var xhr = new XMLHttpRequest()
 
                 xhr.onreadystatechange = function() {
-                    if(xhr.readyState === XMLHttpRequest.DONE){
-                        if(xhr.status == 200){
-                            let curATB = JSON.parse(xhr.responseText);
-                            resolve(curATB.version);
+                    if (xhr.readyState === XMLHttpRequest.DONE){
+                        if (xhr.status == 200){
+                            let curATB = JSON.parse(xhr.responseText)
+                            resolve(curATB.version)
                         }
                     }
-                };
+                }
 
-                let randomValue = Math.ceil(Math.random() * 1e7);
-                let AtbRequestURL = ddgAtbURL + randomValue + '&atb=' + atbSetting + '&set_atb=' + setAtb;
+                let randomValue = Math.ceil(Math.random() * 1e7)
+                let AtbRequestURL = ddgAtbURL + randomValue + '&atb=' + atbSetting + '&set_atb=' + setAtb
 
-                xhr.open('GET', AtbRequestURL, true );
-                xhr.send();
-            });
+                xhr.open('GET', AtbRequestURL, true )
+                xhr.send()
+            })
         },
 
         redirectURL: (request) => {
-            if(request.url.search(ddgRegex) !== -1){
-                
-                if(request.url.indexOf('atb=') !== -1){
-                    return;
-                }
+            if (request.url.search(ddgRegex) !== -1) {
 
-                let atbSetting = settings.getSetting('atb');
+                if (request.url.indexOf('atb=') !== -1) return
 
-                if(!atbSetting){
-                    return;
-                }
+                let atbSetting = settings.getSetting('atb')
+                if (!atbSetting) return
 
                 // handle anchor tags for pages like about#newsletter
-                let urlParts = request.url.split('#');
+                let urlParts = request.url.split('#')
                 let newURL = request.url
 
                 // if we have an anchor tag
                 if (urlParts.length === 2) {
                     newURL = urlParts[0] + "&atb=" + atbSetting + "#" + urlParts[1]
-                }
-                else {
+                } else {
                     newURL = request.url + "&atb=" + atbSetting
                 }
 
@@ -79,14 +72,14 @@ var ATB = (() => {
                 if (localValue && !storageValue) {
                     settings.updateSetting(name, localValue)
                 }
-            });
+            })
         },
 
         setInitialVersions: () => {
-            if(!settings.getSetting('atb')){
-                let versions = ATB.calculateInitialVersions();
+            if (!settings.getSetting('atb')) {
+                let versions = ATB.calculateInitialVersions()
                 if(versions && versions.major && versions.minor){
-                    settings.updateSetting('atb', 'v' + versions.major + '-' +versions.minor);
+                    settings.updateSetting('atb', 'v' + versions.major + '-' +versions.minor)
                 }
             }
         },
@@ -107,53 +100,51 @@ var ATB = (() => {
                 epoch = isDST ? estEpoch - oneHour : estEpoch,
                 timeSinceEpoch = new Date().getTime() - epoch,
                 majorVersion = Math.ceil(timeSinceEpoch / oneWeek),
-                minorVersion = Math.ceil(timeSinceEpoch % oneWeek / oneDay);        
-            return {"major": majorVersion, "minor": minorVersion};
+                minorVersion = Math.ceil(timeSinceEpoch % oneWeek / oneDay);
+            return {"major": majorVersion, "minor": minorVersion}
         },
 
         setAtbValuesFromSuccessPage: (atb) => {
-            if(!settings.getSetting('set_atb')){
-                settings.updateSetting('atb', atb);
-                settings.updateSetting('set_atb', atb);
+            if (!settings.getSetting('set_atb')) {
+                settings.updateSetting('atb', atb)
+                settings.updateSetting('set_atb', atb)
             }
 
-            let xhr = new XMLHttpRequest();
-            xhr.open('GET', 'https://duckduckgo.com/exti/?atb=' + atb, true);
-            xhr.send();
+            let xhr = new XMLHttpRequest()
+            xhr.open('GET', 'https://duckduckgo.com/exti/?atb=' + atb, true)
+            xhr.send()
         },
 
         inject: () => {
             chrome.tabs.query({ url: 'https://*.duckduckgo.com/*' }, function (tabs) {
-                var i = tabs.length, tab;
+                var i = tabs.length, tab
                 while (i--) {
-                    tab = tabs[i];
-                    
+                    tab = tabs[i]
+
                     chrome.tabs.executeScript(tab.id, {
                         file: 'js/oninstall.js'
-                    });
-                    
+                    })
+
                     chrome.tabs.insertCSS(tab.id, {
                         file: 'css/noatb.css'
-                    });
+                    })
                 }
-            });
+            })
         },
 
         onInstalled: () => {
             // we already migrate on update events but just to be
             // safe lets do this on install too
-            ATB.migrate();
-
-            ATB.setInitialVersions();
-            ATB.inject();
-            
+            ATB.migrate()
+            ATB.setInitialVersions()
+            ATB.inject()
         }
     }
-})();
+})()
 
 // register message listener
 chrome.runtime.onMessage.addListener((request) => {
-    if(request.atb){
-        ATB.setAtbValuesFromSuccessPage(request.atb);
+    if (request.atb) {
+        ATB.setAtbValuesFromSuccessPage(request.atb)
     }
 });

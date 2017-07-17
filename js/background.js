@@ -15,41 +15,39 @@
  */
 
 
-var trackers = require('trackers');
-var utils = require('utils');
-var settings = require('settings');
-var stats = require('stats');
-const httpsWhitelist = load.JSONfromLocalFile(settings.getSetting('httpsWhitelist'));
+var trackers = require('trackers')
+var utils = require('utils')
+var settings = require('settings')
+var stats = require('stats')
+const httpsWhitelist = load.JSONfromLocalFile(settings.getSetting('httpsWhitelist'))
 
 // Set browser for popup asset paths
 // chrome doesn't have getBrowserInfo so we'll default to chrome
 // and try to detect if this is firefox
-var browser = "chrome";
+var browser = "chrome"
 try {
     chrome.runtime.getBrowserInfo((info) => {
         if (info.name === "Firefox")
-            browser = "moz";
-    });
-}
-catch(e){
-};
+            browser = "moz"
+    })
+} catch (e) {}
 
 function Background() {
-  $this = this;
+  $this = this
 
   // clearing last search on browser startup
-  settings.updateSetting('last_search', '');
+  settings.updateSetting('last_search', '')
 
-  var os = "o";
-  if (window.navigator.userAgent.indexOf("Windows") != -1) os = "w";
-  if (window.navigator.userAgent.indexOf("Mac") != -1) os = "m";
-  if (window.navigator.userAgent.indexOf("Linux") != -1) os = "l";
+  var os = "o"
+  if (window.navigator.userAgent.indexOf("Windows") != -1) os = "w"
+  if (window.navigator.userAgent.indexOf("Mac") != -1) os = "m"
+  if (window.navigator.userAgent.indexOf("Linux") != -1) os = "l"
 
-  localStorage['os'] = os;
+  localStorage['os'] = os
 
   chrome.tabs.query({currentWindow: true, status: 'complete'}, function(savedTabs){
       for(var i = 0; i < savedTabs.length; i++){
-          var tab = savedTabs[i];
+          var tab = savedTabs[i]
 
           if(tab.url){
               let newTab = tabManager.create(tab);
@@ -59,31 +57,31 @@ function Background() {
               }
           }
       }
-  });
+  })
 
   chrome.runtime.onInstalled.addListener(function(details) {
     // only run the following section on install
     if (details.reason === "install") {
-        ATB.onInstalled();
+        ATB.onInstalled()
     }
     else if (details.reason === "upgrade") {
         ATB.migrate()
     }
-  });
+  })
 }
 
 var background = new Background();
 
-chrome.omnibox.onInputEntered.addListener(function(text) {
+chrome.omnibox.onInputEntered.addListener(function (text) {
   chrome.tabs.query({
     'currentWindow': true,
     'active': true
   }, function(tabs) {
     chrome.tabs.update(tabs[0].id, {
       url: "https://duckduckgo.com/?q=" + encodeURIComponent(text) + "&bext=" + localStorage['os'] + "cl"
-    });
-  });
-});
+    })
+  })
+})
 
 //This adds Context Menu when user select some text.
 //create context menu
@@ -94,25 +92,22 @@ chrome.contextMenus.create({
     var queryText = info.selectionText;
     chrome.tabs.create({
       url: "https://duckduckgo.com/?q=" + queryText + "&bext=" + localStorage['os'] + "cr"
-    });
+    })
   }
-});
+})
 
 // Add ATB param and block tracker requests
 chrome.webRequest.onBeforeRequest.addListener(
     function (requestData) {
 
-      let tabId = requestData.tabId;
+      let tabId = requestData.tabId
 
       // Add ATB for DDG URLs
-      let ddgAtbRewrite = ATB.redirectURL(requestData);
-      if(ddgAtbRewrite)
-          return ddgAtbRewrite;
+      let ddgAtbRewrite = ATB.redirectURL(requestData)
+      if (ddgAtbRewrite) return ddgAtbRewrite
 
       // skip requests to background tabs
-      if(tabId === -1){
-          return;
-      }
+      if (tabId === -1) return
 
       let thisTab = tabManager.get(requestData);
 
@@ -165,16 +160,17 @@ chrome.webRequest.onBeforeRequest.addListener(
       // upgrade to https if the site isn't whitelisted or in our list
       // of known broken https sites
       if (!(thisTab.site.whitelisted || httpsWhitelist[thisTab.site.domain] || thisTab.site.HTTPSwhitelisted)) {
-          let upgradeStatus = onBeforeRequest(requestData);
+          let upgradeStatus = onBeforeRequest(requestData)
 
           if (upgradeStatus.redirectUrl){
-              thisTab.httpsRequests.push(upgradeStatus.redirectUrl);
+              thisTab.httpsRequests.push(upgradeStatus.redirectUrl)
           }
 
-          return upgradeStatus;
+          return upgradeStatus
       }
 
     },
+
     {
         urls: [
             "<all_urls>",
@@ -182,7 +178,7 @@ chrome.webRequest.onBeforeRequest.addListener(
         types: settings.getSetting('requestListenerTypes')
     },
     ["blocking"]
-);
+)
 
 chrome.webRequest.onCompleted.addListener(
         ATB.updateSetAtb,
@@ -192,4 +188,4 @@ chrome.webRequest.onCompleted.addListener(
             "*://*.duckduckgo.com/?*"
         ]
     }
-);
+)
