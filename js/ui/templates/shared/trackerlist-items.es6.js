@@ -2,7 +2,6 @@ const bel = require('bel')
 
 module.exports = function (trackerListMap) {
   return trackerListMap.map((obj) => {
-
     // Special case: in a page's tracker list, "unkown" company contains
     // a list of trackers we can't resolve to a company. In this case,
     // we render each tracker domain individually with no count
@@ -27,6 +26,5 @@ module.exports = function (trackerListMap) {
         </div>
       </li>`
     }
-
   })
 }

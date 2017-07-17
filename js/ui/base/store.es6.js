@@ -33,13 +33,11 @@
  * TODO: create a state injector for test mocks
  */
 
-
 // Dependencies
 const isPlainObject = require('is-plain-object')
 const deepFreeze = require('deep-freeze')
 const EventEmitter2 = require('eventemitter2')
 const notifiers = require('./notifiers.es6.js')
-
 
 /**
  * .register() creates a notifier function for each caller.
@@ -49,7 +47,7 @@ const notifiers = require('./notifiers.es6.js')
  */
 function register (notifierName) {
   if (typeof notifierName !== 'string') { throw new Error(`notifierName argument must be a string`) }
-  if (notifiers.registered[notifierName]) { throw new Error (`notifierName argument must be unique to store. ${notifierName} already exists`) }
+  if (notifiers.registered[notifierName]) { throw new Error(`notifierName argument must be unique to store. ${notifierName} already exists`) }
 
   notifiers.add(notifierName)
   const combinedNotifiers = notifiers.combine()
@@ -66,7 +64,6 @@ function register (notifierName) {
   }
 }
 
-
 /**
  * .publish() dispatches a notification to the store which can be subscribed to.
  * Although this api method is public, most of what you need to do can be
@@ -80,12 +77,11 @@ function register (notifierName) {
  */
 function publish (notification) {
   _store.dispatch({
-  notifierName: notification.notifierName,
-  change: notification.change,
-  attributes: notification.attributes
+    notifierName: notification.notifierName,
+    change: notification.change,
+    attributes: notification.attributes
   })
 }
-
 
 /**
  * Broadcasts state change events out to subscribers
@@ -93,21 +89,19 @@ function publish (notification) {
  */
 const _publisher = new EventEmitter2()
 _publisher.setMaxListeners(100) // EventEmitter2 default of 10 is too low
+
 /**
  * Emits notifications via _publisher
  * @api private
  */
 function _publish (state) {
-
   Object.keys(state).forEach((key) => {
     if (state[key] && state[key].change) {
       console.info(`STORE NOTIFICATION change:${key}`, state[key])
       _publisher.emit(`change:${key}`, state[key])
     }
   })
-
 }
-
 
 /**
  * Remove notifier from store.
@@ -120,7 +114,6 @@ function remove (notifierName) {
     _store.replaceNotifier(combinedNotifiers)
   }
 }
-
 
 /**
  * `_store` is where notifiers live after they are registered.
@@ -174,7 +167,6 @@ function _createStore (notifier) {
     replaceNotifier: replaceNotifier
   }
 }
-
 
 // Public api
 module.exports = {

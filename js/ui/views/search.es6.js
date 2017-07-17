@@ -1,7 +1,6 @@
 const Parent = window.DDG.base.View
 
 function Search (ops) {
-
   this.model = ops.model
   this.pageView = ops.pageView
   this.template = ops.template
@@ -15,7 +14,6 @@ function Search (ops) {
     [this.$go, 'click', this._handleSubmit],
     [this.$form, 'submit', this._handleSubmit]
   ])
-
 }
 
 Search.prototype = $.extend({},

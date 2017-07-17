@@ -2,9 +2,7 @@ const bel = require('bel')
 const trackerListItems = require('./shared/trackerlist-items.es6.js')
 
 module.exports = function () {
-
   if (this.model.companyListMap && this.model.companyListMap.length > 0) {
-
     return bel`<section class="top-blocked card">
       <h3 class="menu-title border--bottom">Top blocked companies over time</h3>
       <ul class="menu-list top-blocked__list">
@@ -17,9 +15,7 @@ module.exports = function () {
         </li>
       </ul>
     </section>`
-
   } else {
-
     return bel`<section class="top-blocked card">
           <h3 class="menu-title">Top blocked over time</h3>
           <ul class="menu-list top-blocked__list">
@@ -29,7 +25,5 @@ module.exports = function () {
             </li>
           </ul>
       </section>`
-
   }
 }
-

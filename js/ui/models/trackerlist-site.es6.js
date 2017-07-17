@@ -9,7 +9,6 @@ function SiteTrackerList (attrs) {
   Parent.call(this, attrs)
 }
 
-
 SiteTrackerList.prototype = $.extend({},
   Parent.prototype,
   {
@@ -19,7 +18,7 @@ SiteTrackerList.prototype = $.extend({},
     fetchAsyncData: function () {
       const self = this
 
-      return new Promise ((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         backgroundPage.utils.getCurrentTab((rawTab) => {
           if (rawTab) {
             self.tab = backgroundPage.tabManager.get({'tabId': rawTab.id})
@@ -59,7 +58,6 @@ SiteTrackerList.prototype = $.extend({},
               .sort((a, b) => {
                 return b.count - a.count
               })
-
           } else {
             console.debug('SiteTrackerList model: no tab')
           }
@@ -70,6 +68,5 @@ SiteTrackerList.prototype = $.extend({},
     }
   }
 )
-
 
 module.exports = SiteTrackerList

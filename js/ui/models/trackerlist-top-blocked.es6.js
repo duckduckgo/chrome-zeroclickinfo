@@ -2,10 +2,8 @@ const Parent = window.DDG.base.Model
 const backgroundPage = chrome.extension.getBackgroundPage()
 
 function TrackerListTopBlocked (attrs) {
-
   // TODO: clean this up a bit
   Parent.call(this, attrs)
-
   this.companyList = backgroundPage.Companies.getTopBlocked(attrs.numCompanies)
 
   // find company with largest number of trackers
@@ -23,10 +21,9 @@ function TrackerListTopBlocked (attrs) {
         count: company.count,
         px: Math.floor(company.count * 228 / maxCount)
       }
-    })
-
+    }
+  )
 }
-
 
 TrackerListTopBlocked.prototype = $.extend({},
   Parent.prototype,
@@ -37,6 +34,4 @@ TrackerListTopBlocked.prototype = $.extend({},
   }
 )
 
-
 module.exports = TrackerListTopBlocked
-

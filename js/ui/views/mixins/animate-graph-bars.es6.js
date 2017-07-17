@@ -9,7 +9,6 @@ module.exports = {
         let w = $el.data().width
         $el.css('width', w)
       })
-
     }, 250)
   }
 }

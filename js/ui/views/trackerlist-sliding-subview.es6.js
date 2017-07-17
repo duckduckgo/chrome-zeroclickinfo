@@ -1,14 +1,13 @@
-const Parent__SlidingSubview = require('./sliding-subview.es6.js')
+const ParentSlidingSubview = require('./sliding-subview.es6.js')
 const animateGraphBars = require('./mixins/animate-graph-bars.es6.js')
 const SiteTrackersModel = require('./../models/trackerlist-site.es6.js')
 const AllTrackersModel = require('./../models/trackerlist-top-blocked.es6.js')
 
 function TrackerList (ops) {
-
   this.selectedTab = ops.defaultTab // poss values: `page` or `all`
   ops.model = null
   this.template = ops.template
-  Parent__SlidingSubview.call(this, ops)
+  ParentSlidingSubview.call(this, ops)
   this.updateList()
 
   // tab clicks
@@ -24,7 +23,7 @@ function TrackerList (ops) {
 }
 
 TrackerList.prototype = $.extend({},
-  Parent__SlidingSubview.prototype,
+  ParentSlidingSubview.prototype,
   animateGraphBars,
   {
 
@@ -38,7 +37,6 @@ TrackerList.prototype = $.extend({},
     switchTabs: function (e) {
       e.preventDefault()
       let selector = '.js-nav-tab-' + this.selectedTab
-      let $elHasClass = $(e.currentTarget).hasClass
 
       if (this.selectedTab === 'all') {
         if (!$(e.currentTarget).hasClass(selector)) {
@@ -53,20 +51,19 @@ TrackerList.prototype = $.extend({},
           this.setActiveTab()
         }
       }
-
     },
 
     updateList: function () {
       if (this.selectedTab === 'all') {
         let num = 10
         this.model = new AllTrackersModel({
-          modelName: 'trackerListTop' + num + 'Blocked' + Math.round(Math.random()*100000),
+          modelName: 'trackerListTop' + num + 'Blocked' + Math.round(Math.random() * 100000),
           numCompanies: 10
         })
         this.renderList()
       } else if (this.selectedTab === 'page') {
         this.model = new SiteTrackersModel({
-          modelName: 'siteTrackerList-' + Math.round(Math.random()*100000)
+          modelName: 'siteTrackerList-' + Math.round(Math.random() * 100000)
         })
         this.model.fetchAsyncData().then(() => {
           this.renderList()

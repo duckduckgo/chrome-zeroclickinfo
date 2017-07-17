@@ -4,7 +4,6 @@ const tabbedTrackerListTemplate = require('./../templates/trackerlist-tabbed.es6
 const backgroundPage = chrome.extension.getBackgroundPage()
 
 function Site (ops) {
-
   this.model = ops.model
   this.pageView = ops.pageView
   this.template = ops.template
@@ -27,20 +26,18 @@ function Site (ops) {
   }
 
   let self = this
-  chrome.runtime.onMessage.addListener(function(req, sender, res) {
+  chrome.runtime.onMessage.addListener(function (req, sender, res) {
     if (req.updateTrackerCount) {
       if (self.model.update()) this.rerender()
     }
   })
-
 }
 
 Site.prototype = $.extend({},
   Parent.prototype,
   {
 
-    _setup: function() {
-
+    _setup: function () {
       this._cacheElems('.js-site', [
         'toggle',
         'show-all-trackers'
@@ -50,7 +47,6 @@ Site.prototype = $.extend({},
         [this.$toggle, 'click', this._whitelistClick],
         [this.$showalltrackers, 'click', this._showAllTrackers]
       ])
-
     },
 
     getBackgroundTabData: function () {
@@ -69,7 +65,6 @@ Site.prototype = $.extend({},
           self.model.update()
           self.model.setHttpsMessage()
           self.rerender() // our custom rerender below
-
         } else {
           console.debug('Site view: no tab')
         }
@@ -85,13 +80,13 @@ Site.prototype = $.extend({},
       w.close()
     },
 
-    rerender: function() {
+    rerender: function () {
       this.unbindEvents()
       this._rerender()
       this._setup()
     },
 
-    _setDisabled: function() {
+    _setDisabled: function () {
       this.$body.addClass('disabled')
     },
 

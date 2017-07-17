@@ -1,7 +1,6 @@
 const Parent = window.DDG.base.View
 
 function Whitelist (ops) {
-
   this.model = ops.model
   this.pageView = ops.pageView
   this.template = ops.template
@@ -25,12 +24,12 @@ Whitelist.prototype = $.extend({},
   {
 
     _removeItem: function (e) {
-      var itemIndex = $(e.target).data("item")
+      var itemIndex = $(e.target).data('item')
       this.model.removeDomain(itemIndex)
       this.rerender()
     },
 
-    setup: function() {
+    setup: function () {
       this._cacheElems('.js-whitelist', [ 'remove' ])
 
       this.bindEvents([
@@ -38,14 +37,13 @@ Whitelist.prototype = $.extend({},
       ])
     },
 
-    rerender: function() {
+    rerender: function () {
       this.unbindEvents()
       this._rerender()
       this.setup()
     }
 
-  },
-
+  }
 )
 
 module.exports = Whitelist

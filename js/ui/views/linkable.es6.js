@@ -1,7 +1,6 @@
 const Parent = window.DDG.base.View
 
 function Linkable (ops) {
-
   this.model = ops.model
   this.pageView = ops.pageView
   this.template = ops.template

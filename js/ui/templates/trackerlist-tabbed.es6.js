@@ -2,9 +2,7 @@ const bel = require('bel')
 const trackerListItems = require('./shared/trackerlist-items.es6.js')
 
 module.exports = function () {
-
   if (!this.model) {
-
     return bel`<section class="sliding-subview sliding-subview--trackers-blocked sliding-subview--has-fixed-header">
       <nav class="sliding-subview__header card">
         <a href="#" class="sliding-subview__header__title sliding-subview__header__title--has-icon js-sliding-subview-close">
@@ -16,7 +14,6 @@ module.exports = function () {
         </ul>
       </nav>
     </section>`
-
   } else if (this.model.companyListMap) {
     if (this.model.companyListMap.length > 0) {
       return bel`
@@ -29,6 +26,4 @@ module.exports = function () {
       </ol>`
     }
   }
-
 }
-

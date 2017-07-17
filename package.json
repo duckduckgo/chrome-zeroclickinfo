@@ -55,5 +55,8 @@
         }
       ]
     ]
+  },
+  "standard": {
+    "globals": [ "$", "chrome", "localStorage", "load" ]
   }
 }

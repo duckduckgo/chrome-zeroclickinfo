@@ -13,8 +13,7 @@ const store = require('./store.es6.js')
  * @param {object} ops
  */
 
- function BaseView (ops) {
-
+function BaseView (ops) {
   this.model = ops.model
   this.views = this.views || {}
   this.store = store
@@ -25,7 +24,6 @@ const store = require('./store.es6.js')
   this.$parent = (typeof ops.appendTo === 'string') ? $(ops.appendTo) : ops.appendTo
   this.$before = (typeof ops.before === 'string') ? $(ops.before) : ops.before
   this.$after = (typeof ops.after === 'string') ? $(ops.after) : ops.after
-
   if (ops.events) {
     for (var id in ops.events) {
       this.on(id, ops.events[id])
@@ -33,7 +31,6 @@ const store = require('./store.es6.js')
   }
 
   this._render(ops)
-
 }
 
 BaseView.prototype = $.extend(
@@ -71,14 +68,14 @@ BaseView.prototype = $.extend(
      * all related DOM elements are removed.
      *
      */
-    destroyChildViews: function() {
-      !function destroyViews(views){
+    destroyChildViews: function () {
+      !function destroyViews (views) {
         if (!views) return
         var v
         if ($.isArray(views)) {
-          for (var i=0; i<views.length; i++) {
+          for (var i = 0; i < views.length; i++) {
             v = views[i]
-            if(v && $.isArray(v)){
+            if (v && $.isArray(v)) {
               destroyViews(v)
             } else {
               v && v.destroy && v.destroy()
@@ -119,14 +116,14 @@ BaseView.prototype = $.extend(
         }
       }
 
-      if (!this.$el) { throw new Error("Template Not Found: " + this.template) }
+      if (!this.$el) { throw new Error('Template Not Found: ' + this.template) }
 
       this._addToDOM()
 
       this.$ = this.$el.find.bind(this.$el)
     },
 
-    _rerender: function() {
+    _rerender: function () {
       var $prev = this.$el.prev()
       if ($prev.length) {
         delete this.$parent
@@ -147,7 +144,7 @@ BaseView.prototype = $.extend(
     /**
      * Add the rendered element to the DOM.
      */
-    _addToDOM: function() {
+    _addToDOM: function () {
       if (this.$parent) {
         this.$parent.append(this.$el)
       } else if (this.$before) {
@@ -171,16 +168,16 @@ BaseView.prototype = $.extend(
      * @param {Array} elems
      */
     _cacheElems: function (prefix, elems) {
-      for (var i=0; i<elems.length; i++) {
+      for (var i = 0; i < elems.length; i++) {
         var selector = prefix + '-' + elems[i]
         // the replace removes '-' from class names, so:
         // 'class-name' becomes this.$classname:
-        var id = '$' + elems[i].replace(/-/g,'')
-
+        var id = '$' + elems[i].replace(/-/g, '')
         this[id] = this.$(selector)
       }
     }
 
-})
+  }
+)
 
 module.exports = BaseView

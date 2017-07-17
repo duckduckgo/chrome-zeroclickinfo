@@ -1,7 +1,6 @@
 const Parent = window.DDG.base.View
 
 function Autocomplete (ops) {
-
   this.model = ops.model
   this.pageView = ops.pageView
   this.template = ops.template
@@ -9,7 +8,7 @@ function Autocomplete (ops) {
   Parent.call(this, ops)
 
   this.bindEvents([
-    [this.store.subscribe, 'change:search', this._handleSearchText],
+    [this.store.subscribe, 'change:search', this._handleSearchText]
   ])
 }
 

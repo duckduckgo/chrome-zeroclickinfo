@@ -16,7 +16,6 @@ const AutocompleteView = require('./../views/autocomplete.es6.js')
 const AutocompleteModel = require('./../models/autocomplete.es6.js')
 const autocompleteTemplate = require('./../templates/autocomplete.es6.js')
 
-
 function Trackers (ops) {
   Parent.call(this, ops)
 }
@@ -28,17 +27,14 @@ Trackers.prototype = $.extend({},
 
     pageName: 'trackers',
 
-    ready: function() {
-
+    ready: function () {
       var $parent = $('#trackers-container')
-
       Parent.prototype.ready.call(this)
-
       this.setBrowserClassOnBodyTag()
 
       this.views.search = new SearchView({
         pageView: this,
-        model: new SearchModel({searchText:''}), // TODO proper location of remembered query
+        model: new SearchModel({searchText: ''}), // TODO proper location of remembered query
         appendTo: $parent,
         template: searchTemplate
       })
@@ -59,7 +55,7 @@ Trackers.prototype = $.extend({},
         pageView: this,
         model: new TrackerListModel({ numCompanies: 4 }),
         appendTo: $parent,
-        template: trackerListTemplate,
+        template: trackerListTemplate
       })
 
       this.views.options = new LinkableView({
@@ -86,7 +82,6 @@ Trackers.prototype = $.extend({},
         appendTo: null,
         template: autocompleteTemplate
       })
-
     }
   }
 )

@@ -2,9 +2,8 @@ const bel = require('bel')
 const toggleButton = require('./shared/toggle-button')
 
 module.exports = function () {
-
   let countText = this.model.trackersBlockedCount || 0
-  if (this.model.trackersCount > 0 && this.model.trackersCount != countText) {
+  if (this.model.trackersCount > 0 && this.model.trackersCount !== countText) {
     countText = countText + '/' + this.model.trackersCount
   }
 
@@ -34,6 +33,4 @@ module.exports = function () {
       </li>
     </ul>
   </section>`
-
 }
-

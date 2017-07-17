@@ -4,7 +4,6 @@ const TrackerListSlidingSubview = require('./../views/trackerlist-sliding-subvie
 const tabbedTrackerListTemplate = require('./../templates/trackerlist-tabbed.es6.js')
 
 function TrackerList (ops) {
-
   this.model = ops.model
   this.pageView = ops.pageView
   this.template = ops.template

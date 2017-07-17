@@ -2,12 +2,9 @@ const Parent = window.DDG.base.Model
 const backgroundPage = chrome.extension.getBackgroundPage()
 
 function Whitelist (attrs) {
-
   this.setWhitelistFromSettings()
-
   Parent.call(this, attrs)
 }
-
 
 Whitelist.prototype = $.extend({},
   Parent.prototype,
@@ -15,8 +12,7 @@ Whitelist.prototype = $.extend({},
 
     modelName: 'whitelist',
 
-
-    removeDomain(itemIndex) {
+    removeDomain (itemIndex) {
       var domain = this.list[itemIndex]
       console.log(`whitelist: remove ${domain}`)
 
@@ -29,9 +25,8 @@ Whitelist.prototype = $.extend({},
       this.setWhitelistFromSettings()
     },
 
-    setWhitelistFromSettings: function() {
+    setWhitelistFromSettings: function () {
       var wlist = backgroundPage.settings.getSetting('whitelisted') || {}
-
       this.list = Object.keys(wlist)
       this.list.sort()
     }

@@ -1,7 +1,6 @@
 const bel = require('bel')
 
 module.exports = function () {
-
   return bel`<section class="options-content__whitelist">
       <h2 class="menu-title">Whitelisted Sites</h2>
       <ul class="menu-list">
@@ -9,11 +8,9 @@ module.exports = function () {
       </ul>
     </section>`
 
-
   function listItems (list) {
-
     if (list.length > 0) {
-      var i=0
+      var i = 0
       return bel`${list.map((dom) => bel`
         <li>
           <a class="link-secondary" href="https://${dom}">${dom}</a>

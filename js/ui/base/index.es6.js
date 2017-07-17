@@ -14,5 +14,5 @@ window.DDG.base = {
   Model: BaseModel,
   Page: BasePage,
   utils: {},
-  View: BaseView,
+  View: BaseView
 }

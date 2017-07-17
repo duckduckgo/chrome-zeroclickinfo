@@ -1,10 +1,8 @@
 const Parent = window.DDG.base.Page
 const mixins = require('./mixins/index.es6.js')
-
 const PrivacyOptionsView = require('./../views/privacy-options.es6.js')
 const PrivacyOptionsModel = require('./../models/privacy-options.es6.js')
 const privacyOptionsTemplate = require('./../templates/privacy-options.es6.js')
-
 const WhitelistView = require('./../views/whitelist.es6.js')
 const WhitelistModel = require('./../models/whitelist.es6.js')
 const whitelistTemplate = require('./../templates/whitelist.es6.js')
@@ -20,12 +18,9 @@ Options.prototype = $.extend({},
 
     pageName: 'options',
 
-    ready: function() {
-
-      var $parent = $("#options-content")
-
+    ready: function () {
+      var $parent = $('#options-content')
       Parent.prototype.ready.call(this)
-
       this.setBrowserClassOnBodyTag()
 
       this.views.options = new PrivacyOptionsView({
@@ -41,15 +36,10 @@ Options.prototype = $.extend({},
         appendTo: $parent,
         template: whitelistTemplate
       })
-
     }
-
   }
 )
-
 
 // kickoff!
 window.DDG = window.DDG || {}
 window.DDG.page = new Options()
-
-
