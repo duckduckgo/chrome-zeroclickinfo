@@ -12,8 +12,8 @@
     "dev": "grunt dev",
     "release": "grunt build && node scripts/httpsWhitelist.js",
     "selenium": "cd selenium-test && node test.js",
-    "jshint": "jshint js/ --verbose > jshint_log.txt",
-    "test": "concurrently 'npm run jshint' 'npm run selenium'"
+    "lint": "standard 'js/**/*.es6.js'",
+    "test": "concurrently 'npm run lint' 'npm run selenium'"
   },
   "devDependencies": {
     "babelify": "^7.3.0",
@@ -29,10 +29,10 @@
     "grunt-contrib-concat": "^0.4.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-sass": "^2.0.0",
-    "jshint": "^2.9.4",
     "load-grunt-tasks": "^3.5.2",
     "localStorage": "^1.0.3",
-    "selenium-webdriver": "^3.0.1"
+    "selenium-webdriver": "^3.0.1",
+    "standard": "^10.0.2"
   },
   "dependencies": {
     "abp-filter-parser": "git://github.com/duckduckgo/abp-filter-parser.git",
@@ -44,7 +44,6 @@
     "normalize.scss": "^0.1.0",
     "parse-link-header": "^1.0.0",
     "psl": "^1.1.18",
-    "standard": "^10.0.2",
     "url-parse": "^1.1.9"
   },
   "babel": {
