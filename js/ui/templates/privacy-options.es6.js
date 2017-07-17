@@ -1,5 +1,5 @@
-const bel = require('bel');
-const toggleButton = require('./shared/toggle-button');
+const bel = require('bel')
+const toggleButton = require('./shared/toggle-button')
 
 module.exports = function () {
     return bel`<section class="options-content__privacy divider-bottom">
@@ -24,6 +24,6 @@ module.exports = function () {
                                'embeddedTweetsEnabled')}
             </li>
         </ul>
-    </section>`;
+    </section>`
 }
 

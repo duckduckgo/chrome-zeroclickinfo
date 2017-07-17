@@ -1,9 +1,9 @@
-const Parent = window.DDG.base.Model;
+const Parent = window.DDG.base.Model
 
 function Linkable (attrs) {
 
-    Parent.call(this, attrs);
-};
+    Parent.call(this, attrs)
+}
 
 
 Linkable.prototype = $.extend({},
@@ -13,8 +13,8 @@ Linkable.prototype = $.extend({},
       modelName: 'linkable'
 
   }
-);
+)
 
 
-module.exports = Linkable;
+module.exports = Linkable
 

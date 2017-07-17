@@ -1,14 +1,13 @@
-const Parent = window.DDG.base.Model;
-const backgroundPage = chrome.extension.getBackgroundPage();
+const Parent = window.DDG.base.Model
+const backgroundPage = chrome.extension.getBackgroundPage()
 
 function SiteTrackerList (attrs) {
-
-    attrs = attrs || {};
-    attrs.tab = null;
-    attrs.potentialBlocked = [];
-    attrs.companyListMap = [];
-    Parent.call(this, attrs);
-};
+    attrs = attrs || {}
+    attrs.tab = null
+    attrs.potentialBlocked = []
+    attrs.companyListMap = []
+    Parent.call(this, attrs)
+}
 
 
 SiteTrackerList.prototype = $.extend({},
@@ -18,36 +17,36 @@ SiteTrackerList.prototype = $.extend({},
       modelName: 'siteTrackerList',
 
       fetchAsyncData: function () {
-          const self = this;
+          const self = this
 
           return new Promise ((resolve, reject) => {
               backgroundPage.utils.getCurrentTab((rawTab) => {
                   if (rawTab) {
-                      self.tab = backgroundPage.tabManager.get({'tabId': rawTab.id});
+                      self.tab = backgroundPage.tabManager.get({'tabId': rawTab.id})
 
                       // list of all trackers on page (whether we blocked them or not)
-                      self.trackers = self.tab.trackers || {};
-                      const companyNames = Object.keys(self.trackers);
+                      self.trackers = self.tab.trackers || {}
+                      const companyNames = Object.keys(self.trackers)
 
                       // find largest number of trackers (by company)
-                      let maxCount = 0;
+                      let maxCount = 0
                       if (self.trackers && companyNames.length > 0) {
                           companyNames.map((name) => {
                               // don't count "unknown" trackers since they will
                               // be listed individually at bottom of graph,
                               // we don't want "unknown" tracker total as maxCount
                               if (name !== 'unknown') {
-                                  // let compare = self.trackersBlocked[name].count;
-                                  let compare = self.trackers[name].count;
-                                  if (compare > maxCount) maxCount = compare;
+                                  // let compare = self.trackersBlocked[name].count
+                                  let compare = self.trackers[name].count
+                                  if (compare > maxCount) maxCount = compare
                               }
-                          });
+                          })
                       }
 
                       // set trackerlist metadata for list display by company:
                       self.companyListMap = companyNames.map(
                           (companyName) => {
-                              let company = self.trackers[companyName];
+                              let company = self.trackers[companyName]
                               // calc max using pixels instead of % to make margins easier
                               // max width: 270 - (horizontal margin + padding in css) = 228
                               return {
@@ -58,19 +57,19 @@ SiteTrackerList.prototype = $.extend({},
                               }
                           })
                           .sort((a, b) => {
-                              return b.count - a.count;
+                              return b.count - a.count
                           })
 
                   } else {
-                      console.debug('SiteTrackerList model: no tab');
+                      console.debug('SiteTrackerList model: no tab')
                   }
 
-                  resolve();
-              });
-          });
+                  resolve()
+              })
+          })
       }
   }
-);
+)
 
 
-module.exports = SiteTrackerList;
+module.exports = SiteTrackerList

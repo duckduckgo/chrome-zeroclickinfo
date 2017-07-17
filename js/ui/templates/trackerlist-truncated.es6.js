@@ -1,5 +1,5 @@
-const bel = require('bel');
-const trackerListItems = require('./shared/trackerlist-items.es6.js');
+const bel = require('bel')
+const trackerListItems = require('./shared/trackerlist-items.es6.js')
 
 module.exports = function () {
 
@@ -16,7 +16,7 @@ module.exports = function () {
                     </a>
                 </li>
             </ul>
-        </section>`;
+        </section>`
 
     } else {
 
@@ -28,7 +28,7 @@ module.exports = function () {
                             Start browsing the web and check back in a bit!
                         </li>
                     </ul>
-            </section>`;
+            </section>`
 
     }
 }

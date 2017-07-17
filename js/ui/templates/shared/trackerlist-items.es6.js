@@ -1,4 +1,4 @@
-const bel = require('bel');
+const bel = require('bel')
 
 module.exports = function (trackerListMap) {
     return trackerListMap.map((obj) => {
@@ -8,14 +8,14 @@ module.exports = function (trackerListMap) {
         // we render each tracker domain individually with no count
         // (we don't have individual tracker count data for these yet)
         if (obj.name.toLowerCase() === 'unknown') {
-            return obj.urls.map((url) => generateLi({ name: url }, true));
+            return obj.urls.map((url) => generateLi({ name: url }, true))
         } else {
-            return generateLi(obj);
+            return generateLi(obj)
         }
 
         function generateLi (data, isUnknownCompany) {
-            let isHidden = '';
-            if (isUnknownCompany) { isHidden = 'is-hidden'; }
+            let isHidden = ''
+            if (isUnknownCompany) isHidden = 'is-hidden'
 
             return bel`<li class="top-blocked__li">
               <span class="top-blocked__li__company-name">${data.name}</span>
@@ -25,7 +25,7 @@ module.exports = function (trackerListMap) {
                   style="width: 0px" data-width="${data.px}px">
                   </div>
               </div>
-            </li>`;
+            </li>`
         }
 
   })

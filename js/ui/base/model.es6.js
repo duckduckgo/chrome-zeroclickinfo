@@ -1,12 +1,12 @@
-const $ = require('jquery');
-const mixins = require('./mixins/index.es6.js');
-const store = require('./store.es6.js');
+const $ = require('jquery')
+const mixins = require('./mixins/index.es6.js')
+const store = require('./store.es6.js')
 
 function BaseModel (attrs) {
 
     // attributes are applied directly
     // onto the instance:
-    $.extend(this, attrs);
+    $.extend(this, attrs)
 
     // register model with `store` of
     // global notifications
@@ -14,11 +14,10 @@ function BaseModel (attrs) {
     if (!this.modelName || typeof this.modelName !== 'string') {
         throw new Error ('cannot init model without `modelName` property')
     } else {
-        this.store = store;
-        this.store.register(this.modelName);
+        this.store = store
+        this.store.register(this.modelName)
     }
-
-};
+}
 
 BaseModel.prototype = $.extend({},
     mixins.events,
@@ -47,22 +46,22 @@ BaseModel.prototype = $.extend({},
             // this.set({
             //   title: 'something',
             //   description: 'something described'
-            // });
+            // })
             if (typeof attr === 'object') {
                 for (var key in attr) {
-                    this.set(key, attr[key], val);
+                    this.set(key, attr[key], val)
                 }
-                return;
+                return
             }
 
-            const lastValue = this[attr] || null;
-            this[attr] = val;
+            const lastValue = this[attr] || null
+            this[attr] = val
 
             this.store.publish({
                 notifierName: this.modelName,
                 change: { attribute: attr, value: val, lastValue: lastValue },
                 attributes: this._toJSON()
-            });
+            })
         },
 
 
@@ -75,7 +74,7 @@ BaseModel.prototype = $.extend({},
          * which calls this.store.publish()
          */
         clear: function(attr) {
-            this.set(attr, null);
+            this.set(attr, null)
         },
 
 
@@ -86,8 +85,8 @@ BaseModel.prototype = $.extend({},
          * Mostly used when view.destroy() is called.
          */
          destroy: function () {
-             this.unbindEvents();
-             this.store.remove(this.modelName);
+             this.unbindEvents()
+             this.store.remove(this.modelName)
          },
 
          /**
@@ -97,12 +96,12 @@ BaseModel.prototype = $.extend({},
           * are functions.
           */
          _toJSON: function () {
-             let attributes = Object.assign({}, Object.getPrototypeOf(this), this);
-             if (attributes.store) delete attributes.store;
-             return JSON.parse(JSON.stringify(attributes));
+             let attributes = Object.assign({}, Object.getPrototypeOf(this), this)
+             if (attributes.store) delete attributes.store
+             return JSON.parse(JSON.stringify(attributes))
          }
 
     }
-);
+)
 
-module.exports = BaseModel;
+module.exports = BaseModel

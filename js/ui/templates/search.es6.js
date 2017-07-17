@@ -1,4 +1,4 @@
-const bel = require('bel');
+const bel = require('bel')
 
 module.exports = function () {
     return bel`<section>
@@ -8,5 +8,5 @@ module.exports = function () {
           <input type="submit" class="search-form__submit" />
           <span class="ddg-logo"></span>
         </form>
-    </section>`;
+    </section>`
 }

@@ -1,10 +1,10 @@
-const Parent = window.DDG.base.Model;
+const Parent = window.DDG.base.Model
 
 function Search (attrs) {
 
-    Parent.call(this, attrs);
+    Parent.call(this, attrs)
 
-};
+}
 
 
 Search.prototype = $.extend({},
@@ -14,17 +14,17 @@ Search.prototype = $.extend({},
       modelName: 'search',
 
       doSearch: function (s) {
-          this.searchText = s;
-          console.log(`doSearch() for ${s}`);
+          this.searchText = s
+          console.log(`doSearch() for ${s}`)
 
             chrome.tabs.create({
               url: "https://duckduckgo.com/?q=" + s + "&bext=" + localStorage['os'] + "cr"
-            });
+            })
       }
 
   }
-);
+)
 
 
-module.exports = Search;
+module.exports = Search
 

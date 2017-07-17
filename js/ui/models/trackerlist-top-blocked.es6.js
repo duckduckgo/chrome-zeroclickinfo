@@ -1,17 +1,17 @@
-const Parent = window.DDG.base.Model;
-const backgroundPage = chrome.extension.getBackgroundPage();
+const Parent = window.DDG.base.Model
+const backgroundPage = chrome.extension.getBackgroundPage()
 
 function TrackerListTopBlocked (attrs) {
 
     // TODO: clean this up a bit
-    Parent.call(this, attrs);
+    Parent.call(this, attrs)
 
-    this.companyList = backgroundPage.Companies.getTopBlocked(attrs.numCompanies);
+    this.companyList = backgroundPage.Companies.getTopBlocked(attrs.numCompanies)
 
     // find company with largest number of trackers
-    let maxCount = 0;
+    let maxCount = 0
     if (this.companyList && this.companyList.length) {
-        maxCount = this.companyList[0].count;
+        maxCount = this.companyList[0].count
     }
 
     this.companyListMap = this.companyList.map(
@@ -22,10 +22,10 @@ function TrackerListTopBlocked (attrs) {
               name: company.name,
               count: company.count,
               px: Math.floor(company.count * 228 / maxCount)
-            };
-        });
+            }
+        })
 
-};
+}
 
 
 TrackerListTopBlocked.prototype = $.extend({},
@@ -35,8 +35,8 @@ TrackerListTopBlocked.prototype = $.extend({},
       modelName: 'trackerListTopBlocked'
 
   }
-);
+)
 
 
-module.exports = TrackerListTopBlocked;
+module.exports = TrackerListTopBlocked
 

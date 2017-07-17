@@ -1,6 +1,6 @@
-const $ = require('jquery');
-const mixins = require('./mixins/index.es6.js');
-const store = require('./store.es6.js');
+const $ = require('jquery')
+const mixins = require('./mixins/index.es6.js')
+const store = require('./store.es6.js')
 
 /**
  * Abstract Base class for any type of view.
@@ -15,26 +15,26 @@ const store = require('./store.es6.js');
 
  function BaseView (ops) {
 
-    this.model = ops.model;
-    this.views = this.views || {};
-    this.store = store;
+    this.model = ops.model
+    this.views = this.views || {}
+    this.store = store
 
     // A jquery object should be passed in as either 'appendTo', 'before' or 'after'
     // indicating where on the DOM the view should be added. If none is passed
     // the view will render itself to an in-memory jquery object, but won't be added to the DOM.
-    this.$parent = (typeof ops.appendTo === 'string') ? $(ops.appendTo) : ops.appendTo;
-    this.$before = (typeof ops.before === 'string') ? $(ops.before) : ops.before;
-    this.$after = (typeof ops.after === 'string') ? $(ops.after) : ops.after;
+    this.$parent = (typeof ops.appendTo === 'string') ? $(ops.appendTo) : ops.appendTo
+    this.$before = (typeof ops.before === 'string') ? $(ops.before) : ops.before
+    this.$after = (typeof ops.after === 'string') ? $(ops.after) : ops.after
 
     if (ops.events) {
         for (var id in ops.events) {
-            this.on(id, ops.events[id]);
+            this.on(id, ops.events[id])
         }
     }
 
-    this._render(ops);
+    this._render(ops)
 
-};
+}
 
 BaseView.prototype = $.extend(
     {},
@@ -56,10 +56,10 @@ BaseView.prototype = $.extend(
          * unbinding of events.
          */
         destroy: function () {
-            this.unbindEvents();
-            this.destroyChildViews();
-            this.$el.remove();
-            if (this.model) this.model.destroy();
+            this.unbindEvents()
+            this.destroyChildViews()
+            this.$el.remove()
+            if (this.model) this.model.destroy()
         },
 
         /**
@@ -73,31 +73,31 @@ BaseView.prototype = $.extend(
          */
         destroyChildViews: function() {
             !function destroyViews(views){
-                if (!views) { return; }
-                var v;
+                if (!views) return
+                var v
                 if ($.isArray(views)) {
                     for (var i=0; i<views.length; i++) {
-                        v = views[i];
+                        v = views[i]
                         if(v && $.isArray(v)){
-                            destroyViews(v);
+                            destroyViews(v)
                         } else {
-                            v && v.destroy && v.destroy();
+                            v && v.destroy && v.destroy()
                         }
                     }
-                    views = null;
+                    views = null
                 } else {
-                    for(var c in views){
-                        v = views[c];
-                        if(v && $.isArray(v)){
-                            destroyViews(v);
+                    for (var c in views) {
+                        v = views[c]
+                        if (v && $.isArray(v)) {
+                            destroyViews(v)
                         } else {
-                            v && v.destroy && v.destroy();
+                            v && v.destroy && v.destroy()
                         }
-                        delete views[c];
+                        delete views[c]
                     }
                 }
-            }(this.views);
-            delete this.views;
+            }(this.views)
+            delete this.views
         },
 
         /**
@@ -112,48 +112,48 @@ BaseView.prototype = $.extend(
         _render: function (ops) {
             if (!this.$el) {
                 if (ops && ops.$el) {
-                    this.$el = ops.$el;
+                    this.$el = ops.$el
                 } else {
-                    var el = this.template.call(this);
-                    this.$el = $(el);
+                    var el = this.template.call(this)
+                    this.$el = $(el)
                 }
             }
 
-            if (!this.$el) { throw new Error("Template Not Found: " + this.template); }
+            if (!this.$el) { throw new Error("Template Not Found: " + this.template) }
 
-            this._addToDOM();
+            this._addToDOM()
 
-            this.$ = this.$el.find.bind(this.$el);
+            this.$ = this.$el.find.bind(this.$el)
         },
 
         _rerender: function() {
-            var $prev = this.$el.prev();
+            var $prev = this.$el.prev()
             if ($prev.length) {
-                delete this.$parent;
-                this.$after = $prev;
+                delete this.$parent
+                this.$after = $prev
             } else {
-                var $next = this.$el.next();
+                var $next = this.$el.next()
                 if ($next.length) {
-                    delete this.$parent;
-                    this.$before = $next;
+                    delete this.$parent
+                    this.$before = $next
                 }
             }
 
-            this.$el.remove();
-            delete this.$el;
-            this._render();
+            this.$el.remove()
+            delete this.$el
+            this._render()
         },
 
         /**
          * Add the rendered element to the DOM.
          */
-        _addToDOM: function(){
+        _addToDOM: function() {
             if (this.$parent) {
-                this.$parent.append(this.$el);
+                this.$parent.append(this.$el)
             } else if (this.$before) {
-                this.$before.before(this.$el);
+                this.$before.before(this.$el)
             } else if (this.$after) {
-                this.$after.after(this.$el);
+                this.$after.after(this.$el)
             }
         },
 
@@ -163,24 +163,24 @@ BaseView.prototype = $.extend(
          *
          * It should be used like this:
          *
-         * this._cacheElems('.js-detail',['next','prev']);
+         * this._cacheElems('.js-detail',['next','prev'])
          * --> this.$next (is cached ref to '.js-detail-next'
          *     this.$prev (is cached ref to '.js-detail-prev'
          *
          * @param {String} prefix
          * @param {Array} elems
          */
-        _cacheElems: function(prefix, elems){
+        _cacheElems: function (prefix, elems) {
             for (var i=0; i<elems.length; i++) {
-                var selector = prefix + '-' + elems[i],
-                    // the replace removes '-' from class names, so:
-                    // 'class-name' becomes this.$classname:
-                    id = '$' + elems[i].replace(/-/g,'');
+                var selector = prefix + '-' + elems[i]
+                // the replace removes '-' from class names, so:
+                // 'class-name' becomes this.$classname:
+                var id = '$' + elems[i].replace(/-/g,'')
 
-                this[id] = this.$(selector);
+                this[id] = this.$(selector)
             }
         }
 
-});
+})
 
-module.exports = BaseView;
+module.exports = BaseView

@@ -7,7 +7,8 @@
  * generated notification dispatch handler (handlers
  * are similar to Redux reducers).
  */
-const registered = {};
+const registered = {}
+
 /**
 * .add() auto-generates the store's notification dispatch
 * handlers by adding each to the `registered` object that
@@ -21,7 +22,7 @@ const registered = {};
 function add (notifierName) {
 
     registered[notifierName] = (state, notification) => {
-        if (state === undefined) state = { change: null };
+        if (state === undefined) state = { change: null }
 
         if (notification.notifierName === notifierName) {
             /**
@@ -29,13 +30,13 @@ function add (notifierName) {
             * types. in the future if we want to add more types,
             * they would go here:
             */
-            var change = notification.change || null;
+            var change = notification.change || null
             return {
               change: change,
               attributes: notification.attributes
-            };
+            }
         } else {
-          return state;
+          return state
         }
     }
 }
@@ -51,25 +52,25 @@ function combine () {
     var keys = Object.keys(registered)
 
     return function combination (state, notification) {
-      var hasChanged = false;
-      var nextState = {};
+      var hasChanged = false
+      var nextState = {}
 
       for (var i = 0; i < keys.length; i++) {
-        var key = keys[i];
-        if (typeof registered[key] !== 'function') throw new Error('notifier ' + key + 'must be a function');
-        nextState[key] = registered[key](state[key], notification);
-        hasChanged = hasChanged || nextState[key] !== state[key];
+        var key = keys[i]
+        if (typeof registered[key] !== 'function') throw new Error('notifier ' + key + 'must be a function')
+        nextState[key] = registered[key](state[key], notification)
+        hasChanged = hasChanged || nextState[key] !== state[key]
       }
 
-      return hasChanged ? nextState : state;
+      return hasChanged ? nextState : state
     }
 
 }
 
 function remove (notifier) {
     if (registered[notifier]) {
-        delete registered[notifier];
-        return true;
+        delete registered[notifier]
+        return true
     }
 }
 

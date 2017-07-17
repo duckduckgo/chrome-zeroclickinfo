@@ -1,11 +1,11 @@
-const bel = require('bel');
-const toggleButton = require('./shared/toggle-button');
+const bel = require('bel')
+const toggleButton = require('./shared/toggle-button')
 
 module.exports = function () {
 
-    let countText = this.model.trackersBlockedCount || 0;
+    let countText = this.model.trackersBlockedCount || 0
     if (this.model.trackersCount > 0 && this.model.trackersCount != countText) {
-        countText = countText + '/' + this.model.trackersCount;
+        countText = countText + '/' + this.model.trackersCount
     }
 
     return bel`<section class="site-info card">
@@ -33,7 +33,7 @@ module.exports = function () {
                 ${toggleButton(!this.model.isWhitelisted, 'js-site-toggle pull-right')}
             </li>
         </ul>
-    </section>`;
+    </section>`
 
 }
 
