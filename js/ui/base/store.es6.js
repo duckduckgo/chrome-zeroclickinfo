@@ -13,21 +13,21 @@
  *
  * --> What you need to know as a feature developer: <--
  *
- *     - To PUBLISH a notification about a state change from a model to
- *       another model, view or page just call:
+ *   - To PUBLISH a notification about a state change from a model to
+ *     another model, view or page just call:
  *
- *       `model.set('bar', 1234)`
+ *     `model.set('bar', 1234)`
  *
- *     - To SUBSCRIBE to notifications about a published state change to
- *       a model from another model, view or a page (pretend the modelName is
- *       `search` that you want to subscribe to):
+ *   - To SUBSCRIBE to notifications about a published state change to
+ *     a model from another model, view or a page (pretend the modelName is
+ *     `search` that you want to subscribe to):
  *
- *          `this.bindEvents([
- *            [this.store.subscribe, 'change:search', this._handler],
- *          ])`
+ *      `this.bindEvents([
+ *      [this.store.subscribe, 'change:search', this._handler],
+ *      ])`
  *
- *        The first argument passed to `this._handler()` will be an
- *        object containing details about the search model's state change.
+ *    The first argument passed to `this._handler()` will be an
+ *    object containing details about the search model's state change.
  *
  *
  * TODO: create a state injector for test mocks
@@ -48,22 +48,22 @@ const notifiers = require('./notifiers.es6.js')
  * @api public
  */
 function register (notifierName) {
-    if (typeof notifierName !== 'string') { throw new Error(`notifierName argument must be a string`) }
-    if (notifiers.registered[notifierName]) { throw new Error (`notifierName argument must be unique to store. ${notifierName} already exists`) }
+  if (typeof notifierName !== 'string') { throw new Error(`notifierName argument must be a string`) }
+  if (notifiers.registered[notifierName]) { throw new Error (`notifierName argument must be unique to store. ${notifierName} already exists`) }
 
-    notifiers.add(notifierName)
-    const combinedNotifiers = notifiers.combine()
+  notifiers.add(notifierName)
+  const combinedNotifiers = notifiers.combine()
 
-    if (!_store) {
-        _store = _createStore(combinedNotifiers)
-        _store.subscribe((state) => {
-            state = deepFreeze(state) // make immutable before publishing
-            _publish(state) // publish notif. about state changes to subscribers
-        })
-    } else {
-        // update reducers to include the newest registered here
-        _store.replaceNotifier(combinedNotifiers)
-    }
+  if (!_store) {
+    _store = _createStore(combinedNotifiers)
+    _store.subscribe((state) => {
+      state = deepFreeze(state) // make immutable before publishing
+      _publish(state) // publish notif. about state changes to subscribers
+    })
+  } else {
+    // update reducers to include the newest registered here
+    _store.replaceNotifier(combinedNotifiers)
+  }
 }
 
 
@@ -72,17 +72,17 @@ function register (notifierName) {
  * Although this api method is public, most of what you need to do can be
  * done with model.set() and model.clear() instead of directly here.
  * @param {object} notification {
- *     {string} notifierName - name of notifier that was registered
- *     {object} change - { attribute, value, lastValue }
- *     {object} attributes - state of notifier (all of its direct properties)
+ *   {string} notifierName - name of notifier that was registered
+ *   {object} change - { attribute, value, lastValue }
+ *   {object} attributes - state of notifier (all of its direct properties)
 * }
  * @api public
  */
 function publish (notification) {
   _store.dispatch({
-    notifierName: notification.notifierName,
-    change: notification.change,
-    attributes: notification.attributes
+  notifierName: notification.notifierName,
+  change: notification.change,
+  attributes: notification.attributes
   })
 }
 
@@ -99,12 +99,12 @@ _publisher.setMaxListeners(100) // EventEmitter2 default of 10 is too low
  */
 function _publish (state) {
 
-    Object.keys(state).forEach((key) => {
-        if (state[key] && state[key].change) {
-            console.info(`STORE NOTIFICATION change:${key}`, state[key])
-            _publisher.emit(`change:${key}`, state[key])
-        }
-    })
+  Object.keys(state).forEach((key) => {
+    if (state[key] && state[key].change) {
+      console.info(`STORE NOTIFICATION change:${key}`, state[key])
+      _publisher.emit(`change:${key}`, state[key])
+    }
+  })
 
 }
 
@@ -116,8 +116,8 @@ function _publish (state) {
  */
 function remove (notifierName) {
   if (notifiers.remove(notifierName)) {
-      const combinedNotifiers = notifiers.combine()
-      _store.replaceNotifier(combinedNotifiers)
+    const combinedNotifiers = notifiers.combine()
+    _store.replaceNotifier(combinedNotifiers)
   }
 }
 
@@ -138,41 +138,41 @@ var _store = null
  * @api private
  */
 function _createStore (notifier) {
-    if (!notifier || typeof notifier !== 'function') throw new Error('notifier must be a function')
+  if (!notifier || typeof notifier !== 'function') throw new Error('notifier must be a function')
 
-    var state = {}
-    var listener = null
-    var isEmitting = false
+  var state = {}
+  var listener = null
+  var isEmitting = false
 
-    function dispatch (notification) {
-        if (!notification || !isPlainObject(notification)) throw new Error('notification parameter is required and must be a plain object')
-        if (!notification.notifierName || typeof notification.notifierName !== 'string') throw new Error('notifierName property of notification parameter is required and must be a string')
-        if (isEmitting) throw new Error('subscribers may not generate notifications')
+  function dispatch (notification) {
+    if (!notification || !isPlainObject(notification)) throw new Error('notification parameter is required and must be a plain object')
+    if (!notification.notifierName || typeof notification.notifierName !== 'string') throw new Error('notifierName property of notification parameter is required and must be a string')
+    if (isEmitting) throw new Error('subscribers may not generate notifications')
 
-        isEmitting = true
-        state = notifier(state, notification)
-        if (listener) listener(state)
-        isEmitting = false
-        return notification
-    }
+    isEmitting = true
+    state = notifier(state, notification)
+    if (listener) listener(state)
+    isEmitting = false
+    return notification
+  }
 
-    function subscribe (cb) {
-        if (!cb || typeof cb !== 'function') throw new Error('listener must be a function')
-        listener = cb
-    }
+  function subscribe (cb) {
+    if (!cb || typeof cb !== 'function') throw new Error('listener must be a function')
+    listener = cb
+  }
 
-    function replaceNotifier (next) {
-        if (typeof next !== 'function') throw new Error('new notifier must be a function')
-        notifier = next
-    }
+  function replaceNotifier (next) {
+    if (typeof next !== 'function') throw new Error('new notifier must be a function')
+    notifier = next
+  }
 
-    dispatch({ notifierName: '@@createStore/INIT' })
+  dispatch({ notifierName: '@@createStore/INIT' })
 
-    return {
-        dispatch: dispatch,
-        subscribe: subscribe,
-        replaceNotifier: replaceNotifier
-    }
+  return {
+    dispatch: dispatch,
+    subscribe: subscribe,
+    replaceNotifier: replaceNotifier
+  }
 }
 
 

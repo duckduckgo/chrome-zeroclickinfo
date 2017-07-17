@@ -21,57 +21,57 @@ const registered = {}
 */
 function add (notifierName) {
 
-    registered[notifierName] = (state, notification) => {
-        if (state === undefined) state = { change: null }
+  registered[notifierName] = (state, notification) => {
+    if (state === undefined) state = { change: null }
 
-        if (notification.notifierName === notifierName) {
-            /**
-            * So far, model changes are the only notification
-            * types. in the future if we want to add more types,
-            * they would go here:
-            */
-            var change = notification.change || null
-            return {
-              change: change,
-              attributes: notification.attributes
-            }
-        } else {
-          return state
-        }
+    if (notification.notifierName === notifierName) {
+      /**
+      * So far, model changes are the only notification
+      * types. in the future if we want to add more types,
+      * they would go here:
+      */
+      var change = notification.change || null
+      return {
+        change: change,
+        attributes: notification.attributes
+      }
+    } else {
+      return state
     }
+  }
 }
 
 function combine () {
-    /*
-    * This is based on Redux/Minidux's combineReducers() method
-    * ... only we aren't using full reducers (overkill for us).
-    * We just send single notifications about state changes to
-    * store event subscribers. This function is a slimmer version of:
-    * https://www.npmjs.com/package/minidux#combinereducersreducers
-    */
-    var keys = Object.keys(registered)
+  /*
+  * This is based on Redux/Minidux's combineReducers() method
+  * ... only we aren't using full reducers (overkill for us).
+  * We just send single notifications about state changes to
+  * store event subscribers. This function is a slimmer version of:
+  * https://www.npmjs.com/package/minidux#combinereducersreducers
+  */
+  var keys = Object.keys(registered)
 
-    return function combination (state, notification) {
-      var hasChanged = false
-      var nextState = {}
+  return function combination (state, notification) {
+    var hasChanged = false
+    var nextState = {}
 
-      for (var i = 0; i < keys.length; i++) {
-        var key = keys[i]
-        if (typeof registered[key] !== 'function') throw new Error('notifier ' + key + 'must be a function')
-        nextState[key] = registered[key](state[key], notification)
-        hasChanged = hasChanged || nextState[key] !== state[key]
-      }
-
-      return hasChanged ? nextState : state
+    for (var i = 0; i < keys.length; i++) {
+    var key = keys[i]
+    if (typeof registered[key] !== 'function') throw new Error('notifier ' + key + 'must be a function')
+    nextState[key] = registered[key](state[key], notification)
+    hasChanged = hasChanged || nextState[key] !== state[key]
     }
+
+    return hasChanged ? nextState : state
+  }
 
 }
 
 function remove (notifier) {
-    if (registered[notifier]) {
-        delete registered[notifier]
-        return true
-    }
+  if (registered[notifier]) {
+    delete registered[notifier]
+    return true
+  }
 }
 
 

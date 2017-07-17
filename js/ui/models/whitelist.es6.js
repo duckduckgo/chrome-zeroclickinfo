@@ -3,9 +3,9 @@ const backgroundPage = chrome.extension.getBackgroundPage()
 
 function Whitelist (attrs) {
 
-    this.setWhitelistFromSettings()
+  this.setWhitelistFromSettings()
 
-    Parent.call(this, attrs)
+  Parent.call(this, attrs)
 }
 
 
@@ -13,28 +13,28 @@ Whitelist.prototype = $.extend({},
   Parent.prototype,
   {
 
-        modelName: 'whitelist',
+    modelName: 'whitelist',
 
 
-        removeDomain(itemIndex) {
-            var domain = this.list[itemIndex]
-            console.log(`whitelist: remove ${domain}`)
+    removeDomain(itemIndex) {
+      var domain = this.list[itemIndex]
+      console.log(`whitelist: remove ${domain}`)
 
-            backgroundPage.tabManager.whitelistDomain({
-                list: 'whitelisted',
-                domain: domain,
-                value: false
-            })
+      backgroundPage.tabManager.whitelistDomain({
+        list: 'whitelisted',
+        domain: domain,
+        value: false
+      })
 
-            this.setWhitelistFromSettings()
-        },
+      this.setWhitelistFromSettings()
+    },
 
-        setWhitelistFromSettings: function() {
-            var wlist = backgroundPage.settings.getSetting('whitelisted') || {}
+    setWhitelistFromSettings: function() {
+      var wlist = backgroundPage.settings.getSetting('whitelisted') || {}
 
-            this.list = Object.keys(wlist)
-            this.list.sort()
-        }
+      this.list = Object.keys(wlist)
+      this.list.sort()
+    }
 
   }
 )

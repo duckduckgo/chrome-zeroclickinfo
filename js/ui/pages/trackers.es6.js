@@ -18,77 +18,77 @@ const autocompleteTemplate = require('./../templates/autocomplete.es6.js')
 
 
 function Trackers (ops) {
-    Parent.call(this, ops)
+  Parent.call(this, ops)
 }
 
 Trackers.prototype = $.extend({},
-    Parent.prototype,
-    mixins.setBrowserClassOnBodyTag,
-    {
+  Parent.prototype,
+  mixins.setBrowserClassOnBodyTag,
+  {
 
-        pageName: 'trackers',
+    pageName: 'trackers',
 
-        ready: function() {
+    ready: function() {
 
-            var $parent = $('#trackers-container')
+      var $parent = $('#trackers-container')
 
-            Parent.prototype.ready.call(this)
+      Parent.prototype.ready.call(this)
 
-            this.setBrowserClassOnBodyTag()
+      this.setBrowserClassOnBodyTag()
 
-            this.views.search = new SearchView({
-                pageView: this,
-                model: new SearchModel({searchText:''}), // TODO proper location of remembered query
-                appendTo: $parent,
-                template: searchTemplate
-            })
+      this.views.search = new SearchView({
+        pageView: this,
+        model: new SearchModel({searchText:''}), // TODO proper location of remembered query
+        appendTo: $parent,
+        template: searchTemplate
+      })
 
-            this.views.site = new SiteView({
-                pageView: this,
-                model: new SiteModel({
-                    domain: '-',
-                    isWhitelisted: false,
-                    siteRating: 'B',
-                    trackerCount: 0
-                }),
-                appendTo: $parent,
-                template: siteTemplate
-            })
+      this.views.site = new SiteView({
+        pageView: this,
+        model: new SiteModel({
+          domain: '-',
+          isWhitelisted: false,
+          siteRating: 'B',
+          trackerCount: 0
+        }),
+        appendTo: $parent,
+        template: siteTemplate
+      })
 
-            this.views.trackerlist = new TrackerListView({
-                pageView: this,
-                model: new TrackerListModel({ numCompanies: 4 }),
-                appendTo: $parent,
-                template: trackerListTemplate,
-            })
+      this.views.trackerlist = new TrackerListView({
+        pageView: this,
+        model: new TrackerListModel({ numCompanies: 4 }),
+        appendTo: $parent,
+        template: trackerListTemplate,
+      })
 
-            this.views.options = new LinkableView({
-                pageView: this,
-                model: new LinkableModel({
-                    text: 'Settings',
-                    id: 'options-link',
-                    link: chrome.runtime.openOptionsPage,
-                    klass: 'link-secondary',
-                    spanClass: 'icon icon__settings pull-right'
-                }),
-                appendTo: $parent,
-                template: linkableTemplate
-            })
+      this.views.options = new LinkableView({
+        pageView: this,
+        model: new LinkableModel({
+          text: 'Settings',
+          id: 'options-link',
+          link: chrome.runtime.openOptionsPage,
+          klass: 'link-secondary',
+          spanClass: 'icon icon__settings pull-right'
+        }),
+        appendTo: $parent,
+        template: linkableTemplate
+      })
 
-            // TODO: hook up model query to actual ddg ac endpoint.
-            // For now this is just here to demonstrate how to
-            // listen to another component via model.set() +
-            // store.subscribe()
-            this.views.autocomplete = new AutocompleteView({
-                pageView: this,
-                model: new AutocompleteModel({suggestions: []}),
-                // appendTo: this.views.search.$el,
-                appendTo: null,
-                template: autocompleteTemplate
-            })
+      // TODO: hook up model query to actual ddg ac endpoint.
+      // For now this is just here to demonstrate how to
+      // listen to another component via model.set() +
+      // store.subscribe()
+      this.views.autocomplete = new AutocompleteView({
+        pageView: this,
+        model: new AutocompleteModel({suggestions: []}),
+        // appendTo: this.views.search.$el,
+        appendTo: null,
+        template: autocompleteTemplate
+      })
 
-        }
     }
+  }
 )
 
 // kickoff!

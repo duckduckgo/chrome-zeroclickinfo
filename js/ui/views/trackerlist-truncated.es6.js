@@ -5,33 +5,33 @@ const tabbedTrackerListTemplate = require('./../templates/trackerlist-tabbed.es6
 
 function TrackerList (ops) {
 
-    this.model = ops.model
-    this.pageView = ops.pageView
-    this.template = ops.template
+  this.model = ops.model
+  this.pageView = ops.pageView
+  this.template = ops.template
 
-    Parent.call(this, ops)
+  Parent.call(this, ops)
 
-    this._cacheElems('.js-top-blocked', ['graph-bar-fg', 'see-all'])
-    this.bindEvents([
-        [this.$seeall, 'click', this._seeAllClick]
-    ])
+  this._cacheElems('.js-top-blocked', ['graph-bar-fg', 'see-all'])
+  this.bindEvents([
+    [this.$seeall, 'click', this._seeAllClick]
+  ])
 
-    this.animateGraphBars()
+  this.animateGraphBars()
 }
 
 TrackerList.prototype = $.extend({},
-    Parent.prototype,
-    animateGraphBars,
-    {
+  Parent.prototype,
+  animateGraphBars,
+  {
 
-        _seeAllClick: function () {
-            this.views.slidingSubview = new TrackerListSlidingSubview({
-                template: tabbedTrackerListTemplate,
-                defaultTab: 'all'
-            })
-        }
-
+    _seeAllClick: function () {
+      this.views.slidingSubview = new TrackerListSlidingSubview({
+        template: tabbedTrackerListTemplate,
+        defaultTab: 'all'
+      })
     }
+
+  }
 )
 
 module.exports = TrackerList

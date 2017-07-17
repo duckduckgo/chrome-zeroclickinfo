@@ -10,41 +10,41 @@ const WhitelistModel = require('./../models/whitelist.es6.js')
 const whitelistTemplate = require('./../templates/whitelist.es6.js')
 
 function Options (ops) {
-    Parent.call(this, ops)
+  Parent.call(this, ops)
 }
 
 Options.prototype = $.extend({},
-    Parent.prototype,
-    mixins.setBrowserClassOnBodyTag,
-    {
+  Parent.prototype,
+  mixins.setBrowserClassOnBodyTag,
+  {
 
-        pageName: 'options',
+    pageName: 'options',
 
-        ready: function() {
+    ready: function() {
 
-            var $parent = $("#options-content")
+      var $parent = $("#options-content")
 
-            Parent.prototype.ready.call(this)
+      Parent.prototype.ready.call(this)
 
-            this.setBrowserClassOnBodyTag()
+      this.setBrowserClassOnBodyTag()
 
-            this.views.options = new PrivacyOptionsView({
-                pageView: this,
-                model: new PrivacyOptionsModel({}),
-                appendTo: $parent,
-                template: privacyOptionsTemplate
-            })
+      this.views.options = new PrivacyOptionsView({
+        pageView: this,
+        model: new PrivacyOptionsModel({}),
+        appendTo: $parent,
+        template: privacyOptionsTemplate
+      })
 
-            this.views.whitelist = new WhitelistView({
-                pageView: this,
-                model: new WhitelistModel({}),
-                appendTo: $parent,
-                template: whitelistTemplate
-            })
-
-        }
+      this.views.whitelist = new WhitelistView({
+        pageView: this,
+        model: new WhitelistModel({}),
+        appendTo: $parent,
+        template: whitelistTemplate
+      })
 
     }
+
+  }
 )
 
 
