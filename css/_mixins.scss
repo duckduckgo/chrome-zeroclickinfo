@@ -92,7 +92,14 @@
     }
 }
 
-
+@mixin button () {
+    .button {
+        background:none;
+        border:none;
+        margin:0;
+        padding:0;
+    }
+}
 /* Images & icons */
 @mixin icon_display () {
     background-repeat: no-repeat;

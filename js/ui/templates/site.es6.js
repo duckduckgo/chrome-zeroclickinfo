@@ -1,5 +1,6 @@
 const bel = require('bel');
 const toggleButton = require('./shared/toggle-button');
+const Button = require('./shared/button');
 
 module.exports = function () {
 
@@ -31,6 +32,10 @@ module.exports = function () {
             <li class="site-info__li--toggle">
                 <span class="site-info__toggle-text">${this.model.whitelistStatusText}</span>
                 ${toggleButton(!this.model.isWhitelisted, 'js-site-toggle pull-right')}
+            </li>
+            <li class="site-info__li--report">
+                ${Button(this.model.domain, 'Report Broken Site', 'button site-info__report-text js-site-report')}
+                <span class="icon icon__arrow pull-right"></span>
             </li>
         </ul>
     </section>`;

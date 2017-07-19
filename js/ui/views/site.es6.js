@@ -43,12 +43,14 @@ Site.prototype = $.extend({},
 
             this._cacheElems('.js-site', [
                 'toggle',
-                'show-all-trackers'
+                'show-all-trackers',
+                'report'
             ]);
 
             this.bindEvents([
               [this.$toggle, 'click', this._whitelistClick],
-              [this.$showalltrackers, 'click', this._showAllTrackers]
+              [this.$showalltrackers, 'click', this._showAllTrackers],
+              [this.$report, 'click', this._reportSiteClick]
             ]);
 
         },
@@ -74,6 +76,11 @@ Site.prototype = $.extend({},
                     console.debug('Site view: no tab');
                 }
             });
+        },
+
+        _reportSiteClick: function() {
+            let reportURL = "https://www.surveymonkey.com/r/V6L5ZY2?url="
+            chrome.tabs.create({url: reportURL + this.model.domain})
         },
 
         _whitelistClick: function (e) {
