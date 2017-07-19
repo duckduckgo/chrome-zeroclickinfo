@@ -73,7 +73,7 @@ TrackerList.prototype = $.extend({},
 
     renderList: function () {
       this.$el.find('.js-top-blocked-list').remove()
-      let ol = this.template.call(this)
+      let ol = this.template()
       this.$el.append(ol)
       this.$graphbarfg = this.$el.find('.js-top-blocked-graph-bar-fg')
       this.animateGraphBars()

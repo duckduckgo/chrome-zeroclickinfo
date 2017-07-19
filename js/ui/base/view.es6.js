@@ -111,7 +111,7 @@ BaseView.prototype = $.extend(
         if (ops && ops.$el) {
           this.$el = ops.$el
         } else {
-          var el = this.template.call(this)
+          var el = this.template()
           this.$el = $(el)
         }
       }

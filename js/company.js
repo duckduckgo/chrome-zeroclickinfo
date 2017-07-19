@@ -1,4 +1,4 @@
-class Company {
+Company = class Company {
   constructor (name) {
     this.name = name
     this.count = 0
