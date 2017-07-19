@@ -4,9 +4,9 @@
  *
  * This will be browserifyed and turned into abp.js by running 'grunt'
  */
-let abp = require('abp-filter-parser')
+abp = require('abp-filter-parser')
 
-let easylists = {
+easylists = {
   privacy: {
     url: 'https://easylist.to/easylist/easyprivacy.txt',
     parsed: {}

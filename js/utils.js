@@ -1,5 +1,5 @@
 // url-parse node module. Defined in url-parse.js
-// var URLParser
+var URLParser
 
 require.scopes.utils = (() => {
   function extractHostFromURL (url) {

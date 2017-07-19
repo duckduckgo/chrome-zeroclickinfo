@@ -5,7 +5,7 @@
  * Require url-parse module
  * This will be browserifyed by running grunt
  */
-var URLParser = require('url-parse');
+URLParser = require('url-parse');
 
 },{"url-parse":4}],2:[function(require,module,exports){
 'use strict';

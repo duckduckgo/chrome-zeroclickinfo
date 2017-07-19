@@ -57,10 +57,22 @@
     ]
   },
   "standard": {
-    "globals": ["$", "chrome", "localStorage", "load", "XMLHttpRequest", "ATB", "settings", "Tab"],
+    "globals": ["$", "chrome", "localStorage", "load", "XMLHttpRequest", "ATB", "settings", "Tab", "abp", "easylists", "URLParser"],
     "ignore": [
+      "js/abp-preprocessed.es6.js",
       "js/abp.js",
+      "js/atb.js",
+      "js/background.js",
+      "js/company.js",
+      "js/companies.js",
+      "js/options.js",
+      "js/settings.js",
+      "js/site.js",
       "js/socialwidgets.js",
+      "js/tab.js",
+      "js/trackers.js",
+      "js/trackerLists.js",
+      "js/url-parse.es6.js",
       "js/url-parse.js"
     ]
   }
