@@ -69,7 +69,7 @@ BaseView.prototype = $.extend(
      *
      */
     destroyChildViews: function () {
-      !function destroyViews (views) {
+      !(function destroyViews (views) {
         if (!views) return
         var v
         if ($.isArray(views)) {
@@ -93,7 +93,7 @@ BaseView.prototype = $.extend(
             delete views[c]
           }
         }
-      }(this.views)
+      })(this.views)
       delete this.views
     },
 

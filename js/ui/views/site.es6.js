@@ -28,7 +28,7 @@ function Site (ops) {
   let self = this
   chrome.runtime.onMessage.addListener(function (req, sender, res) {
     if (req.updateTrackerCount) {
-      if (self.model.update()) this.rerender()
+      if (self.model.update()) self.rerender()
     }
   })
 }
