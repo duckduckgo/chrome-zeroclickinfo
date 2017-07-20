@@ -69,7 +69,7 @@ BaseView.prototype = $.extend(
      *
      */
     destroyChildViews: function () {
-      !(function destroyViews (views) {
+      !(function destroyViews (views) { // eslint-disable-line
         if (!views) return
         var v
         if ($.isArray(views)) {
