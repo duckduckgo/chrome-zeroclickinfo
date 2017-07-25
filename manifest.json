@@ -28,11 +28,6 @@
     "omnibox": {"keyword": "d"},
     "background": {
             "scripts": [
-                "https/chromium/rules.js",
-                "https/chromium/storage.js",
-                "https/chromium/util.js",
-                "https/chromium/background.js",
-                "https/chromium/incognito-cache-clearing.js",
                 "data/defaultSettings.js",
                 "js/require.js",
                 "js/utils.js",
