@@ -41,9 +41,7 @@ var FAKE_POST_FUNCTION =
 "   }";
 
 window.onload = function() {
-
     document.getElementById('search_form_input_homepage').focus();
-
     document.getElementById('search_form_homepage').onsubmit = search;
     document.getElementById('search_form_input_clear').onclick = search_input_clear;
 
@@ -58,7 +56,7 @@ window.onload = function() {
     }
 
     if (localStorage['last_search'] && localStorage['last_search'] != '') {
-        document.getElementById('search_form_input_homepage').value = localStorage['last_search'];
+        //document.getElementById('search_form_input_homepage').value = localStorage['last_search'];
         document.getElementById("search_form_input_clear").style.display = 'inline-block';
         document.getElementById("search_button_homepage").className = 'selected';
         document.getElementById('search_form_input_homepage').select();
@@ -89,6 +87,7 @@ window.onload = function() {
     document.getElementById('bang_m').onclick = function(){
       add_bang('!m');
     }
+
 
     var images = document.querySelectorAll('li img');
     for(var i = 0; i < images.length; i++) {
@@ -158,6 +157,7 @@ window.onload = function() {
 
         special += '&bext=' + os + 'cp';
 
+
         if (localStorage['use_post'] === 'true') {
             var fake_post_code = FAKE_POST_FUNCTION.replace(/(\n|\t)/gm,'');
 
@@ -176,6 +176,8 @@ window.onload = function() {
                 url: "https://duckduckgo.com/?q="+encodeURIComponent(input)+special
             });
         }
+
+        window.close()
     }
 
     document.getElementById('icon_advanced').onclick = function(){
@@ -242,5 +244,8 @@ window.onload = function() {
         document.getElementById("search_button_homepage").className = '';
         localStorage['last_search'] = '';
     }
+
+
+
 }
 
