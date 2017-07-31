@@ -1,6 +1,8 @@
 const Parent = window.DDG.base.View;
 const TrackerListSlidingSubview = require('./../views/trackerlist-sliding-subview.es6.js');
 const tabbedTrackerListTemplate = require('./../templates/trackerlist-tabbed.es6.js');
+const SiteScoreView = require('./../views/site-score.es6.js');
+const siteScoreTemplate = require('./../templates/site-score.es6.js');
 const backgroundPage = chrome.extension.getBackgroundPage();
 
 function Site (ops) {
@@ -43,12 +45,14 @@ Site.prototype = $.extend({},
 
             this._cacheElems('.js-site', [
                 'toggle',
-                'show-all-trackers'
+                'show-all-trackers',
+                'rating'
             ]);
 
             this.bindEvents([
               [this.$toggle, 'click', this._whitelistClick],
-              [this.$showalltrackers, 'click', this._showAllTrackers]
+              [this.$showalltrackers, 'click', this._showAllTrackers],
+              [this.$rating, 'click', this._handleRatingClick]
             ]);
 
         },
@@ -83,6 +87,15 @@ Site.prototype = $.extend({},
             chrome.tabs.reload(this.model.tab.id);
             const w = chrome.extension.getViews({type: 'popup'})[0];
             w.close()
+        },
+
+        _handleRatingClick: function (e) {
+            e.preventDefault();
+            this.views.score = new SiteScoreView({
+                pageView: this.pageView,
+                appendTo: this.pageView.$parent,
+                template: siteScoreTemplate,
+            });
         },
 
         rerender: function() {
