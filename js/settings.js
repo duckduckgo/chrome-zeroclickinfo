@@ -18,6 +18,10 @@ require.scopes.settings =(() => {
         chrome.storage.local.get(['settings'], function(results){
             Object.assign(settings, results['settings']);
             runExternalSettings();
+
+            // to make sure we have the correct version from storage.local
+            // we need to run this after all saved settings have loaded
+            version.startup()
         });
     }
 
