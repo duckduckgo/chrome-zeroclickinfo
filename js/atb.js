@@ -137,6 +137,10 @@ var ATB = (() => {
         },
 
         setAtbValuesFromSuccessPage: (atb) => {
+            
+            // remove this later when we enable the module
+            return;
+
             if(!settings.getSetting('set_atb')){
                 settings.updateSetting('atb', atb);
                 settings.updateSetting('set_atb', atb);
@@ -182,6 +186,6 @@ var ATB = (() => {
 // register message listener
 chrome.runtime.onMessage.addListener((request) => {
     if(request.atb){
-        ATB.setAtbValuesFromSuccessPage(request.atb);
+        //ATB.setAtbValuesFromSuccessPage(request.atb);
     }
 });
