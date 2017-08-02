@@ -67,9 +67,3 @@ var version = (() => {
     }
 })();
 
-/*
- * On startup check the saved version in default settings
- * Update the popup and privacy feature settings
- */
-version.startup();
-
