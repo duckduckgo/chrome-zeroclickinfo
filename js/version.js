@@ -22,9 +22,6 @@ var version = (() => {
             }
             version.name = value;
 
-            // let legacy extension know the version
-            chrome.runtime.sendMessage({'version': value});
-
             return version.name;
         },
 
@@ -48,7 +45,7 @@ var version = (() => {
         startup: () => {
             // call out own update method to make sure all setting 
             // are in the correct state
-            let startupVersion = settings.getSetting('version')
+            let startupVersion = settings.getSetting('version') || 'v1'
 
             // check for existing blocking data and set to beta state there is any
             if (Companies) {
