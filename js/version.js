@@ -56,6 +56,8 @@ var version = (() => {
                 }
             }
 
+            console.debug('setting version to: ', startupVersion)
+
             version.update(startupVersion);
             
             // register listener to rewrite the options page request
