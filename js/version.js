@@ -21,10 +21,6 @@ var version = (() => {
                 version.betaStateOff();
             }
             version.name = value;
-            settings.updateSetting('version', value);
-
-            // let legacy extension know the version
-            chrome.runtime.sendMessage({'version': value});
 
             return version.name;
         },
@@ -49,7 +45,20 @@ var version = (() => {
         startup: () => {
             // call out own update method to make sure all setting 
             // are in the correct state
-            version.update(settings.getSetting('version'));
+            let startupVersion = settings.getSetting('version') || 'v1'
+
+            // check for existing blocking data and set to beta state there is any
+            if (Companies) {
+                let topBlocked = Companies.getTopBlocked()
+                if (topBlocked.length) {
+                    startupVersion = 'beta'
+                    settings.updateSetting('version', startupVersion)
+                }
+            }
+
+            console.debug('setting version to: ', startupVersion)
+
+            version.update(startupVersion);
             
             // register listener to rewrite the options page request
             chrome.webRequest.onBeforeRequest.addListener(optionPageRequestListener, {
@@ -60,6 +69,7 @@ var version = (() => {
             chrome.runtime.onMessage.addListener((message) => {
                 if (message && message.versionFlag) {
                     console.log("Setting version to: ", message.versionFlag);
+                    settings.updateSetting('version', message.versionFlag)
                     version.update(message.versionFlag)
                 }
             });
