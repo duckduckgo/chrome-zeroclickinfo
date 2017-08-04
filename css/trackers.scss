@@ -132,6 +132,10 @@ body {
         .site-info__rating {
             @include icon_display();
 
+            &:hover {
+                cursor: pointer;
+            }
+
             &.site-info__rating--none {
                 border-radius: 10px;
                 background-color:#e0e0e0;

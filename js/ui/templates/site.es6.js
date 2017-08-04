@@ -8,11 +8,11 @@ module.exports = function () {
         countText = countText + '/' + this.model.trackersCount;
     }
 
-    return bel`<section class="site-info card">
+    return bel`<section class="site-info js-site-info card">
         <ul class="menu-list">
             <li class="border--bottom">
                 <h1 class="site-info__domain">${this.model.domain}</h1>
-                <div class="site-info__rating site-info__rating--${this.model.siteRating} pull-right"></div>
+                <a class="site-info__rating site-info__rating--${this.model.siteRating} pull-right js-site-rating"></a>
             </li>
             <li class="border--bottom">
                 <h2>
