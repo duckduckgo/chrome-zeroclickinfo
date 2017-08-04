@@ -1,5 +1,5 @@
 var ATB = (() => {
-    var ddgRegex = '/duckduckgo\.com';
+    var ddgRegex = 'https:\/\/duckduckgo\.com/\?.*';
     var ddgAtbURL = 'https://duckduckgo.com/atb.js?';
 
     return {
