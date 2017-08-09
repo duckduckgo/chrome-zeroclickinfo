@@ -103,6 +103,12 @@ chrome.contextMenus.create({
 chrome.webRequest.onBeforeRequest.addListener(
     function (requestData) {
 
+      // skip checking duckduckgo.com/t requests since they're not
+      // trackers and don't need to be checked for atb parameters
+      if (requestData.url && requestData.url.match('duckduckgo.com/t/')) {
+          return;
+      }
+
       let tabId = requestData.tabId;
 
       // Add ATB for DDG URLs
