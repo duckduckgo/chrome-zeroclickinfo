@@ -90,10 +90,12 @@ var ATB = (() => {
                         let atb = res.atb;
                         let set_atb = res.set_atb;
                         let storageAtb = settings.getSetting('atb')
-                        let storageSetAtb = settings.getSetting('set_atb')
 
+                        // don't overwrite an existing atb
                         if (atb && !storageAtb) settings.updateSetting('atb', atb)
-                        if (set_atb && !storageSetAtb) settings.updateSetting('set_atb', set_atb)
+
+                        // set_atb is okay to update
+                        if (set_atb) settings.updateSetting('set_atb', set_atb)
                     }
                 });
             }
