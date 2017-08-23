@@ -77,3 +77,9 @@ var version = (() => {
     }
 })();
 
+chrome.runtime.onMessage.addListener((req,sender,res) => {
+    if (req.firefoxOptionPage) {
+        res(version.firefoxOptionPage)
+    }
+    return true;
+});
