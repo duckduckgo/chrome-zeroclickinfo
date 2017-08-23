@@ -21,25 +21,7 @@ const AutocompleteView = require('./../views/autocomplete.es6.js');
 const AutocompleteModel = require('./../models/autocomplete.es6.js');
 const autocompleteTemplate = require('./../templates/autocomplete.es6.js');
 
-const backgroundPage = chrome.extension.getBackgroundPage();
-
-/*
-* Firefox doesn't let us redirect option page requests. Instead we can
-* open the options page in a new tab (simlar to how chrome does it)
-*
-* LEGACY_V1 remove me later
-*/
-function openOptionsPage() {
-    if (backgroundPage.browser === "moz") {
-        return (() => chrome.tabs.create({url: backgroundPage.version.firefoxOptionPage}));
-    }
-    else {
-        return chrome.runtime.openOptionsPage;
-    }
-}
-
-const FailoverView = require('./../views/failover.es6.js');
-const failoverTemplate = require('./../templates/failover.es6.js');
+const BackgroundMessageModel = require('./../models/backgroundMessage.es6.js');
 
 function Trackers (ops) {
     this.$parent = $('#trackers-container');
@@ -56,11 +38,6 @@ Trackers.prototype = $.extend({},
         ready: function() {
 
             Parent.prototype.ready.call(this);
-
-            // some browsers (Firefox) don't allow access to background
-            // page in private browsing mode
-            // if that's the case, exit here and render failover view
-            if (!backgroundPage) return this.failover();
 
             this.setBrowserClassOnBodyTag();
 
@@ -115,14 +92,8 @@ Trackers.prototype = $.extend({},
                 template: autocompleteTemplate
             });
 
-        },
+            this.message = new BackgroundMessageModel()
 
-        failover: function () {
-            this.views.failover = new FailoverView({
-                appendTo: this.$parent,
-                template: failoverTemplate,
-                message: `We cannot display this info in private browsing mode`
-            })
         }
     }
 );
