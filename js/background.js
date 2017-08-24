@@ -74,12 +74,8 @@ function Background() {
 
 
   chrome.runtime.onInstalled.addListener(function(details) {
-    // only run the following section on install
-    if (details.reason === "install") {
+    if (details.reason.match(/install|update/)) {
         ATB.onInstalled();
-    }
-    else if (details.reason === "upgrade") {
-        ATB.migrate()
     }
   });
 }
