@@ -270,6 +270,20 @@ body {
                 margin-top: 5px;
             }
         }
+
+        .site-info__li--report {
+            height: 24.5px;
+
+            .site-info__report-text {
+                font-weight: bold;
+                margin-top: 3.5px;
+                display: inline-block;
+            }
+
+            .pull-right {
+                margin-top: 5px;
+            }
+        }
     }
 
     .linkable {
@@ -387,7 +401,7 @@ body {
 
 /* Generic toggle button styling */
 @include toggle_button();
-
+@include button();
 
 /* Sliding subviews */
 @include sliding_subview();
