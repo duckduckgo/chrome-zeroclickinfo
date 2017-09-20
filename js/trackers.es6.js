@@ -14,8 +14,6 @@ let entityList,
 load.JSONfromExternalFile(settings.getSetting('entityList'), (list) => entityList = list)
 load.JSONfromExternalFile(settings.getSetting('entityMap'), (list) => entityMap = list)
 
-require.scopes.trackers = (function() {    
-
 function isTracker(urlToCheck, currLocation, tabId, request) {
 
     // TODO: easylist is marking some of our requests as trackers. Whitelist us
@@ -179,13 +177,10 @@ function isRelatedEntity(parentCompany, currLocation) {
  * pull off any subdomains before comparison
  */
 function isFirstPartyRequest(currLocation, urlToCheck) {
-    let hostname1 = utils.extractHostFromURL(currLocation)
-    hostname1 = hostname1.split('.').slice(-2).join('.')
+    let currentLocationParsed = URLParser.parse(currLocation)
+    let urlToCheckParsed = URLParser.parse(urlToCheck)
 
-    let hostname2 = utils.extractHostFromURL(urlToCheck)
-    hostname2 = hostname2.split('.').slice(-2).join('.')
-
-    if (hostname1 === hostname2) {
+    if (currentLocationParsed.domain === urlToCheckParsed.domain) {
         return true
     }
 
@@ -194,5 +189,3 @@ function isFirstPartyRequest(currLocation, urlToCheck) {
 
 var exports = {};
 exports.isTracker = isTracker;
-return exports;
-})();

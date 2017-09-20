@@ -1,12 +1,10 @@
 // url-parse node module. Defined in url-parse.js
 var URLParser;
 
-require.scopes.utils = ( () => {
-
     function extractHostFromURL (url) {
         if (!url) return;
 
-        let urlObj = new URLParser(url);
+        let urlObj = URLParser.parse(url);
         let hostname = urlObj.hostname;
         hostname = hostname.replace(/^www\./,'');
         return hostname;
@@ -75,7 +73,7 @@ require.scopes.utils = ( () => {
         return true;
     })
 
-    return {
+    exports = {
         extractHostFromURL: extractHostFromURL,
         extractSubdomainFromHost: extractSubdomainFromHost,
         parseURL: parseURL,
@@ -85,4 +83,3 @@ require.scopes.utils = ( () => {
         getCurrentURL: getCurrentURL,
         getCurrentTab: getCurrentTab
     }
-})();

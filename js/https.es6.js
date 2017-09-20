@@ -1,5 +1,4 @@
-(function () {
-const db = require('db')
+const db = require('./indexed-db.js')
 const settings = require('settings')
 let knownMixedContentList
 load.JSONfromLocalFile(settings.getSetting('httpsWhitelist'), (wl) => knownMixedContentList = wl)
@@ -28,7 +27,7 @@ class HTTPS {
             reqUrl = reqUrl.toLowerCase()
 
             // Only deal with http calls
-            const protocol = URLParser.extractProtocol(reqUrl).protocol
+            const protocol = utils.parseURL(reqUrl).protocol
             if (!protocol.indexOf('http:') === 0) return resolve(reqUrl)
 
             // Obey global settings (options page)
@@ -181,5 +180,4 @@ class HTTPS {
     }
 }
 
-require.scopes.https = new HTTPS()
-})()
+exports.https = new HTTPS()

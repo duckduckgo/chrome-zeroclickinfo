@@ -1,6 +1,5 @@
 var load = require('load');
 
-require.scopes.settings =(() => {
     var settings = {};
 
     // external settings defines a function that needs to run when a setting is updated
@@ -89,10 +88,9 @@ require.scopes.settings =(() => {
 
     init();
     
-    return {
+    exports.settings = {
         getSetting: getSetting,
         updateSetting: updateSetting,
         logSettings: logSettings
     }
 
-})();

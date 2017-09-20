@@ -1,4 +1,3 @@
-require.scopes.trackerLists = ( function() {
     var settings = require('settings');
     var load = require('load');
     var lists = {};
@@ -26,5 +25,3 @@ require.scopes.trackerLists = ( function() {
     var exports = {
         getLists: getLists,
     }
-    return exports;
-})();

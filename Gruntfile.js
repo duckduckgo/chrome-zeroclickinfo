@@ -31,6 +31,13 @@ module.exports = function(grunt) {
                 files: {
                     '<%= dirs.src.js %>/abp.js': ['<%= dirs.src.js %>/abp-preprocessed.es6.js'],
                     '<%= dirs.src.js %>/url-parse.js': ['<%= dirs.src.js %>/url-parse.es6.js']
+                    '<%= dirs.src.js %>/indexed-db.js': ['<%= dirs.src.js %>/indexed-db.es6.js'],
+                    '<%= dirs.src.js %>/https.js': ['<%= dirs.src.js %>/https.es6.js'],
+                    '<%= dirs.src.js %>/utils.js': ['<%= dirs.src.js %>/utils.es6.js'],
+                    '<%= dirs.src.js %>/load.js': ['<%= dirs.src.js %>/load.es6.js'],
+                    '<%= dirs.src.js %>/settings.js': ['<%= dirs.src.js %>/settings.es6.js'],
+                    '<%= dirs.src.js %>/trackerLists.js': ['<%= dirs.src.js %>/trackerLists.es6.js'],
+                    '<%= dirs.src.js %>/trackers.js': ['<%= dirs.src.js %>/trackers.es6.js']
                 }
             }
         },

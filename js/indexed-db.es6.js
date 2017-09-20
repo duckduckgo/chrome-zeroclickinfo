@@ -1,4 +1,3 @@
-(function () {
 const utils = require('utils')
 
 /**
@@ -254,7 +253,7 @@ function checkServerUpdateSuccess () {
                     window.clearInterval(timer)
                     resolve()
                 } else {
-                    delete _request
+                    //delete _request
                 }
                 timerCount++
                 if (timerCount > maxTimerCount) {
@@ -265,6 +264,4 @@ function checkServerUpdateSuccess () {
         }, intervalMS)
     })
 }
-
-require.scopes.db = new IndexedDBClient({ dbName: 'ddgExtension', dbVersion: '1' })
-})()
+exports.db = new IndexedDBClient({ dbName: 'ddgExtension', dbVersion: '1' })
