@@ -30,7 +30,7 @@ module.exports = function(grunt) {
                 options: { transform: [ 'babelify'] },
                 files: {
                     '<%= dirs.src.js %>/abp.js': ['<%= dirs.src.js %>/abp-preprocessed.es6.js'],
-                    '<%= dirs.src.js %>/url-parse.js': ['<%= dirs.src.js %>/url-parse.es6.js']
+                    '<%= dirs.src.js %>/url-parse.js': ['<%= dirs.src.js %>/url-parse.es6.js'],
                     '<%= dirs.src.js %>/indexed-db.js': ['<%= dirs.src.js %>/indexed-db.es6.js'],
                     '<%= dirs.src.js %>/https.js': ['<%= dirs.src.js %>/https.es6.js'],
                     '<%= dirs.src.js %>/utils.js': ['<%= dirs.src.js %>/utils.es6.js'],
