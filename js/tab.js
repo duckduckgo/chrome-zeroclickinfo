@@ -60,11 +60,11 @@ class Tab {
         chrome.browserAction.setIcon({path: 'img/icon_48.png', tabId: tabData.tabId})
     };
 
-    updateBadgeIcon() {
+    updateBadgeIcon () {
         if (settings.getSetting('version') !== 'beta')
             return;
-
-        if (!this.site.specialDomain() && !this.site.whitelisted && settings.getSetting('trackerBlockingEnabled')) {
+        
+        if (!this.site.specialDomain() ) {
             let scoreIcon = scoreIconLocations[this.site.score.get()];
             chrome.browserAction.setIcon({path: scoreIcon, tabId: this.id});
         }
