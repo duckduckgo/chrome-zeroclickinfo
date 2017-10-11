@@ -45,18 +45,24 @@ var version = (() => {
         startup: () => {
             // call out own update method to make sure all setting 
             // are in the correct state
-            let startupVersion = settings.getSetting('version') || 'v1'
+            let startupVersion = settings.getSetting('version')
+            let atb =  settings.getSetting('atb')
 
-            // check for existing blocking data and set to beta state there is any
-            if (Companies) {
+            // fallback to check for company data or a 'w' variant to know if we need to be in v2 mode
+            if (!startupVersion && (Companies || atb)) {
                 let topBlocked = Companies.getTopBlocked()
-                if (topBlocked.length) {
+                if (topBlocked.length || (atb && atb.match(/v.*w$/))) {
                     startupVersion = 'beta'
+                }
+
+                // save this version so we don't have to fallback again
+                if (startupVersion === 'beta') {
+                    console.warn(`Version: found fallback state, setting version to ${startupVersion}`)
                     settings.updateSetting('version', startupVersion)
                 }
             }
 
-            console.debug('setting version to: ', startupVersion)
+            console.log('Version: startup version is ', startupVersion || 'v1')
 
             version.update(startupVersion);
             
