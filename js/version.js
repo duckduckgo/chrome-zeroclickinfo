@@ -65,17 +65,22 @@ var version = (() => {
                 urls: ['<all_urls>']
             }, ['blocking']);
 
-            // serpVersion.js will will check the serp for an extension version to use
-            chrome.runtime.onMessage.addListener((message) => {
-                if (message && message.versionFlag) {
-                    console.log("Setting version to: ", message.versionFlag);
-                    settings.updateSetting('version', message.versionFlag)
-                    version.update(message.versionFlag)
-                }
-            });
         }
     }
 })();
+
+settings.ready().then(() => version.startup())
+
+// serpVersion.js will will check the serp for an extension version to use
+chrome.runtime.onMessage.addListener((message) => {
+    if (message && message.versionFlag) {
+        settings.ready().then(() => {
+            console.log("Setting version to: ", message.versionFlag);
+            settings.updateSetting('version', message.versionFlag)
+            version.update(message.versionFlag)
+        })
+    }
+});
 
 chrome.runtime.onMessage.addListener((req,sender,res) => {
     if (req.firefoxOptionPage) {
