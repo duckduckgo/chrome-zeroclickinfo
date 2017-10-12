@@ -49,10 +49,17 @@ var version = (() => {
             let atb =  settings.getSetting('atb')
 
             // fallback to check for company data or a 'w' variant to know if we need to be in v2 mode
-            if (!startupVersion && (Companies || atb)) {
-                let topBlocked = Companies.getTopBlocked()
-                if (topBlocked.length || (atb && atb.match(/v.*w$/))) {
+            if (!startupVersion) {
+
+                if (atb && atb.match(/v.*w$/)) {
+                    console.warn('Version: found w atb variant')
                     startupVersion = 'beta'
+                } else if (Companies) {
+                    let topBlocked = Companies.getTopBlocked()
+                    if (topBlocked.length) {
+                        console.warn('Version: found existing blocked company data')
+                        startupVersion = 'beta'
+                    }
                 }
 
                 // save this version so we don't have to fallback again
