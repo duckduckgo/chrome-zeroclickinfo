@@ -76,19 +76,19 @@ var Companies = ( () => {
         },
 
         buildFromStorage: () => {
+
              utils.getFromStorage(storageName, function(storageData){
+                 for(company in storageData){
+                     let newCompany = Companies.add(company);
+                     newCompany.set('count',storageData[company].count || 0);
+                     newCompany.set('pagesSeenOn',storageData[company].pagesSeenOn || 0);
+                 }
 
                  // Remove later. Send a message to version if we have 
                  // stored company data. This means we need to be in v2 mode
                  if(storageData && Object.keys(storageData).length){
                      console.debug("Found blocking data, setting version to beta")
-                     chrome.runtime.sendMessage({versionFlag: 'beta'})
-                 }
-
-                 for(company in storageData){
-                     let newCompany = Companies.add(company);
-                     newCompany.set('count',storageData[company].count || 0);
-                     newCompany.set('pagesSeenOn',storageData[company].pagesSeenOn || 0);
+                     version.startup()
                  }
              });
 

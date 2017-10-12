@@ -45,18 +45,31 @@ var version = (() => {
         startup: () => {
             // call out own update method to make sure all setting 
             // are in the correct state
-            let startupVersion = settings.getSetting('version') || 'v1'
+            let startupVersion = settings.getSetting('version')
+            let atb =  settings.getSetting('atb')
 
-            // check for existing blocking data and set to beta state there is any
-            if (Companies) {
-                let topBlocked = Companies.getTopBlocked()
-                if (topBlocked.length) {
+            // fallback to check for company data or a 'w' variant to know if we need to be in v2 mode
+            if (!startupVersion) {
+
+                if (atb && atb.match(/v.*w$/)) {
+                    console.warn('Version: found w atb variant')
                     startupVersion = 'beta'
+                } else if (Companies) {
+                    let topBlocked = Companies.getTopBlocked()
+                    if (topBlocked.length) {
+                        console.warn('Version: found existing blocked company data')
+                        startupVersion = 'beta'
+                    }
+                }
+
+                // save this version so we don't have to fallback again
+                if (startupVersion === 'beta') {
+                    console.warn(`Version: found fallback state, setting version to ${startupVersion}`)
                     settings.updateSetting('version', startupVersion)
                 }
             }
 
-            console.debug('setting version to: ', startupVersion)
+            console.log('Version: startup version is ', startupVersion || 'v1')
 
             version.update(startupVersion);
             
@@ -65,17 +78,22 @@ var version = (() => {
                 urls: ['<all_urls>']
             }, ['blocking']);
 
-            // serpVersion.js will will check the serp for an extension version to use
-            chrome.runtime.onMessage.addListener((message) => {
-                if (message && message.versionFlag) {
-                    console.log("Setting version to: ", message.versionFlag);
-                    settings.updateSetting('version', message.versionFlag)
-                    version.update(message.versionFlag)
-                }
-            });
         }
     }
 })();
+
+settings.ready().then(() => version.startup())
+
+// serpVersion.js will will check the serp for an extension version to use
+chrome.runtime.onMessage.addListener((message) => {
+    if (message && message.versionFlag) {
+        settings.ready().then(() => {
+            console.log("Setting version to: ", message.versionFlag);
+            settings.updateSetting('version', message.versionFlag)
+            version.update(message.versionFlag)
+        })
+    }
+});
 
 chrome.runtime.onMessage.addListener((req,sender,res) => {
     if (req.firefoxOptionPage) {
