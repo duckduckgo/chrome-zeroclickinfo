@@ -116,16 +116,16 @@ chrome.webRequest.onBeforeRequest.addListener(
     function (requestData) { 
 
         let tabId = requestData.tabId;
-        
-        // Add ATB for DDG URLs
-        let ddgAtbRewrite = ATB.redirectURL(requestData);
-        if(ddgAtbRewrite)
-          return;
-          //return ddgAtbRewrite;
       
         if (version.name !== 'beta') {
             return;
         }
+
+        /* revisit atb module first
+        // Add ATB for DDG URLs
+        let ddgAtbRewrite = ATB.redirectURL(requestData);
+        if (ddgAtbRewrite) return ddgAtbRewrite;
+        */
 
         // Skip requests to background tabs
         if (tabId === -1) { return }
