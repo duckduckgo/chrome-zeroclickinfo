@@ -15,7 +15,6 @@ const defaultSettings = {
     "zeroclick_google_right": false,
     "trackerListLoc": "data/tracker_lists",
     "tosdr": "data/tosdr.json",
-    "trackerWhitelist": "data/trackerWhitelist.txt",
     "blockLists": [
         "trackersWithParentCompany"
     ],
@@ -27,5 +26,6 @@ const defaultSettings = {
     "httpsWhitelist": "data/httpsWhitelist.json",
     "majorTrackingNetworks": {"Google":true, "Facebook":true, "Twitter":true, "Amazon":true, "AppNexus":true, "Oracle":true},
     "version": null,
-    "atb": null
+    "atb": null,
+    "brokenSiteList": "https://duckduckgo.com/contentblocking/trackers-whitelist-temporary.txt"
 }
