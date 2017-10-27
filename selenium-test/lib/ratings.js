@@ -43,12 +43,26 @@ async function _init () {
 
 async function _testUrl(_path) {
     await WD.get(_path);
-    let jsonData = await WD.wait(until.elementLocated(By.id('json-data')));
-    return jsonData.getText();
+    const websitesData = await WD.wait(until.elementLocated(By.id('websites-data')));
+    const websites = await websitesData.getText();
+    const topBlockedData = await WD.wait(until.elementLocated(By.id('top-blocked-data')));
+    const topBlocked = await topBlockedData.getText();
+
+    return {
+        websites,
+        topBlocked
+    };
 }
 
 function _teardown () {
     return WD.quit();
+}
+
+function _printResults(jsonText) {
+    log(chalk.underline('Websites Results:'));
+    log(jsonText.websites);
+    log(chalk.underline('Top Blocked Results:'));
+    log(jsonText.topBlocked);
 }
 
 // TODO:
