@@ -101,7 +101,8 @@ function processTopSites() {
         return;
     }
 
-    let url = "http://" + site + '/';
+    //let url = "http://" + site + '/';
+    let url = site + '/';
 
     newScreenshots = {url};
 
