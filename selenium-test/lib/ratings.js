@@ -96,25 +96,29 @@ function _buildHtmlDoc(htmlTable) {
 
 function _writeToFile (jsonText, opts) {
     const filename = new Date().toJSON();
-    const jsonData = JSON.parse(jsonText);
     const path = opts.output.replace(/\/$/, '');
 
     // JSON File Output
-    const jsonFile = `${path}/${filename}.json`;
-    fs.writeFileSync(jsonFile, jsonText);
-    log(chalk.yellow('JSON Data written to file: ') + chalk.yellow.bold(jsonFile));
+    const websitesFile = `${path}/${filename}.websites.json`;
+    fs.writeFileSync(websitesFile, jsonText.websites);
+    log(chalk.yellow('JSON Data written to file: ') + chalk.yellow.bold(websitesFile));
+
+    const topBlockedFile = `${path}/${filename}.top-blocked.json`;
+    fs.writeFileSync(topBlockedFile, jsonText.topBlocked);
+    log(chalk.yellow('JSON Data written to file: ') + chalk.yellow.bold(topBlockedFile));
 
     // Cleanup data for HTML table
-    Object.keys(jsonData).forEach(function (key) {
-        delete jsonData[key].scoreObj.specialPage;
-        delete jsonData[key].scoreObj.domain;
-        Object.keys(jsonData[key].scoreObj).forEach(function (k) {
-            jsonData[key][k] = jsonData[key].scoreObj[k];
+    const websitesJSON = JSON.parse(jsonText.websites);
+    Object.keys(websitesJSON).forEach(function (key) {
+        delete websitesJSON[key].scoreObj.specialPage;
+        delete websitesJSON[key].scoreObj.domain;
+        Object.keys(websitesJSON[key].scoreObj).forEach(function (k) {
+            websitesJSON[key][k] = websitesJSON[key].scoreObj[k];
         });
-        delete jsonData[key].scoreObj;
+        delete websitesJSON[key].scoreObj;
 
-        if (Object.keys(jsonData[key].tosdr).length && jsonData[key].tosdr.reasons){
-            const reasons = jsonData[key].tosdr.reasons;
+        if (Object.keys(websitesJSON[key].tosdr).length && websitesJSON[key].tosdr.reasons){
+            const reasons = websitesJSON[key].tosdr.reasons;
 
             if (reasons.bad) {
                 reasons.bad = reasons.bad.join(', ');
@@ -126,7 +130,7 @@ function _writeToFile (jsonText, opts) {
     });
 
     // HTML File Output
-    const htmlTable = tabular.html(jsonData, {classes: {table: "dataTable display"} });
+    const htmlTable = tabular.html(websitesJSON, {classes: {table: "dataTable display"} });
     const htmlDoc = _buildHtmlDoc(htmlTable);
     const htmlFile = `${path}/${filename}.html`;
     fs.writeFileSync(htmlFile, htmlDoc);
@@ -145,8 +149,7 @@ exports.testTopSites = async function(num, opts) {
         log(chalk.green.bold(`Running ${num} Tests on Alex Top 500 Sites`));
 
         const jsonText = await _testUrl(url);
-        log(chalk.underline('JSON Data:'));
-        log(jsonText);
+        _printResults(jsonText);
 
         // TODO: Audit Data
         // check for:
@@ -168,9 +171,7 @@ exports.testUrl = function(path, opts) {
         log(chalk.green.bold(`Running Tests on URL: ${url}`));
 
         let jsonText = await _testUrl(url);
-        log(chalk.underline('JSON Data:'));
-        log(jsonText);
-
+        _printResults(jsonText);
         _writeToFile(jsonText, opts);
 
         await _teardown();

@@ -45,8 +45,8 @@ function buildSummary() {
             delete x.on
             delete x.off
         })
-        $('#screenshots').append(`<h2>JSON Output</h2> <p id="json-data">${JSON.stringify(screenshots, null, 4)}</p>`);
-        $('#screenshots').append(`<h2>COMPANIES Output</h2> <p id="companies-data">${JSON.stringify(bkg.Companies.getTopBlocked(20), null, 4)}</p>`);
+        $('#screenshots').append(`<h2>JSON Output</h2><p id="websites-data">${JSON.stringify(screenshots, null, 4)}</p>`);
+        $('#screenshots').append(`<h2>Top Blocked Output</h2><p id="top-blocked-data">${JSON.stringify(bkg.Companies.getTopBlocked(20), null, 4)}</p>`);
     }
 }
 
