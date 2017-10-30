@@ -122,9 +122,17 @@ Site.prototype = $.extend({},
       update: function (ops) {
           // console.log('[model] update()')
           if (this.tab) {
+              const updatedTrackersCount = this._getUniqueTrackersCount()
+              const updatedTrackersBlockedCount = this._getUniqueTrackersBlockedCount()
+                  
+              if (updatedSiteRating && (updatedSiteRating.after !== this.siteRating.after)) {
+                    this.siteRating = updatedSiteRating
+                    rerenderFlag = true
+                }
 
-              if (ops && ops.siteRating && (ops.siteRating !== this.siteRating)) {
-                  this.set('siteRating', ops.siteRating)
+              if (updatedTrackersCount !== this.trackersCount) {
+                  this.trackersCount = updatedTrackersCount
+                  rerenderFlag = true
               }
 
               const newTrackersCount = this.getUniqueTrackersCount()

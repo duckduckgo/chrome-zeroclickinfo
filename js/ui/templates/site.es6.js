@@ -21,6 +21,11 @@ module.exports = function () {
                         Privacy Grade
                     </p>
                 </div>
+        <ul class="menu-list">
+            <li class="border--bottom">
+                <h1 class="site-info__domain">${this.model.domain}</h1>
+                Before <div class="site-info__rating site-info__rating--${this.model.siteRating.before}"></div>
+                After <div class="site-info__rating site-info__rating--${this.model.siteRating.after}"></div>
             </li>
             <li class="site-info__li--toggle padded border--bottom">
                 <h2 class="site-info__protection">Site Privacy Protection</h2>
