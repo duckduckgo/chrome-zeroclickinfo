@@ -45,8 +45,11 @@ function buildSummary() {
             delete x.on
             delete x.off
         })
-        $('#screenshots').append(`<h2>JSON Output</h2> <p id="json-data">${JSON.stringify(screenshots, null, 4)}</p>`);
+        $('#screenshots').append(`<h2>JSON Output</h2><p id="websites-data">${JSON.stringify(screenshots, null, 4)}</p>`);
+        $('#screenshots').append(`<h2>Top Blocked Output</h2><p id="top-blocked-data">${JSON.stringify(bkg.Companies.getTopBlockedByPages(20), null, 4)}</p>`);
+        $('#screenshots').append(`<h2>Top Blocked Output</h2><p id="total-pages-data">${bkg.utils.getFromStorage('totalPages', (n) => console.log(n))}</p>`);
     }
+    bkg.utils.getFromStorage('totalPages', (n) => console.log(n))
 }
 
 /*
@@ -65,14 +68,21 @@ function processSite(url) {
     // run test with tracker blocking and https
     runTest(url).then(() => {
 
-        // turn tracker blocking off
-        resetSettings(false);
+        if (PARAMS.compare) {
+            // turn tracker blocking off
+            resetSettings(false);
 
-        runTest(url).then(() => {
+            runTest(url).then(() => {
+                screenshots.push(newScreenshots);
+                buildSummary();
+                return;
+            });
+        }
+        else {
             screenshots.push(newScreenshots);
             buildSummary();
             return;
-        });
+        }
     });
 }
 
@@ -91,7 +101,8 @@ function processTopSites() {
         return;
     }
 
-    let url = "http://" + site + '/';
+    //let url = "http://" + site + '/';
+    let url = site + '/';
 
     newScreenshots = {url};
 
@@ -101,14 +112,19 @@ function processTopSites() {
     // run test with tracker blocking and https
     runTest(url).then(() => {
 
-        // turn tracker blocking off
-        resetSettings(false);
-
-        runTest(url).then(() => {
-
+        if (PARAMS.compare) {
+            // turn tracker blocking off
+            resetSettings(false);
+            
+            runTest(url).then(() => {
+                screenshots.push(newScreenshots)
+                processTopSites();
+            });
+        }
+        else {
             screenshots.push(newScreenshots)
             processTopSites();
-        });
+        }
     });
 }
 
