@@ -57,6 +57,7 @@ class Tab {
         this.status = tabData.status
         this.site = new Site(utils.extractHostFromURL(tabData.url))
         this.statusCode // statusCode is set when headers are recieved in tabManager.js
+        this.downgraded = false // https downgrade status
 
         // set the new tab icon to the dax logo
         chrome.browserAction.setIcon({path: 'img/icon_48.png', tabId: tabData.tabId})
