@@ -22,6 +22,10 @@ module.exports = function () {
             ${trackersBlockedOrFound(this.model)}
             <ol class="default-list site-info__trackers__company-list">
                 ${renderTrackerDetails(this.model.companyListMap)}
+            ${privacyPratices(this.model.site.siteRating, 'Good')}
+                ${renderTosdrDetails(this.model.site.siteRating, 'Good')}
+            ${privacyPratices(this.model.site.siteRating, 'Bad')}
+                ${renderTosdrDetails(this.model.site.siteRating, 'Bad')}
             </ol>
         </div>`
     }
@@ -32,6 +36,31 @@ function httpsMsg (httpsState) {
         return bel`<span>Connection is secure (HTTPS)</span>`
     }
     return bel`<span>Connection is insecure (HTTP)</span>`
+}
+
+function privacyPratices (siteRating, type) {
+    let msg = ''
+    if (siteRating.tosdr) {
+        let reasons = siteRating.tosdr.reasons[type.toLowerCase()]
+        if (reasons.length) {
+            msg = `${type} Privacy Pratices`
+            return bel`<h3>${msg}</h3>`
+        }
+    }
+}
+
+function renderTosdrDetails(siteRating, type) {
+    if (!siteRating.tosdr || !siteRating.tosdr.reasons[type.toLowerCase()]) {
+        return
+    } else {
+        let typeList = siteRating.tosdr.reasons[type.toLowerCase()]
+        if (typeList.length) {
+            return typeList.map((e) => {
+                console.log(e)
+                return bel`<li><span class="block">${e}</span></li>`
+            })
+        }
+    }
 }
 
 function trackersBlockedOrFound (model) {

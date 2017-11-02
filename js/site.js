@@ -133,7 +133,7 @@ class Score {
         let beforeGrade = siteScores[beforeIndex] || siteScores[siteScores.length - 1]
         let afterGrade = siteScores[afterIndex] || siteScores[siteScores.length - 1]
 
-        return {before: beforeGrade, after: afterGrade}
+        return {before: beforeGrade, after: afterGrade, tosdr: this.tosdr}
     }
 
     /*
