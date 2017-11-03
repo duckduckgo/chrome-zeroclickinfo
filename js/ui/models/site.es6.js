@@ -17,7 +17,7 @@ function Site (attrs) {
     attrs.httpsStatusText = ''
     attrs.isUserPrivacyUpgraded = false
     attrs.trackerCount = 0
-    attrs.trackerNetworks
+    attrs.trackerNetworks = []
     Parent.call(this, attrs)
 
     this.bindEvents([

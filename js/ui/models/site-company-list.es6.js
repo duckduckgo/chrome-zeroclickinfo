@@ -18,12 +18,12 @@ SiteCompanyList.prototype = $.extend({},
               this.fetch({getCurrentTab: true}).then((tab) => {
                   if (tab) {
                       this.fetch({getTab: tab.id}).then((bkgTab) => {
-                        this.tab = bkgTab;
+                        this.tab = bkgTab
                         this._updateCompaniesList()
                         resolve()
                       })
                   } else {
-                      console.debug('SiteDetails model: no tab');
+                      console.debug('SiteDetails model: no tab')
                       resolve()
                   }
               })
@@ -36,7 +36,7 @@ SiteCompanyList.prototype = $.extend({},
           const companyNames = Object.keys(this.trackers)
 
           // find largest number of trackers (by company)
-          let maxCount = 0;
+          let maxCount = 0
           if (this.trackers && companyNames.length > 0) {
               companyNames.map((name) => {
                   // don't sort "unknown" trackers since they will
@@ -44,7 +44,7 @@ SiteCompanyList.prototype = $.extend({},
                   // we don't want "unknown" tracker total as maxCount
                   if (name !== 'unknown') {
                       let compare = this.trackers[name].count
-                      if (compare > maxCount) maxCount = compare;
+                      if (compare > maxCount) maxCount = compare
                   }
               })
           }
@@ -52,7 +52,7 @@ SiteCompanyList.prototype = $.extend({},
           // set trackerlist metadata for list display by company:
           this.companyListMap = companyNames
               .map((companyName) => {
-                  let company = this.trackers[companyName];
+                  let company = this.trackers[companyName]
                   // calc max using pixels instead of % to make margins easier
                   // max width: 300 - (horizontal padding in css) = 260
                   return {

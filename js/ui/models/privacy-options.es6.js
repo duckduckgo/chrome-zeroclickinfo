@@ -16,7 +16,7 @@ PrivacyOptions.prototype = $.extend({},
 
         toggle: function (k) {
             if (this.hasOwnProperty(k)) {
-                this[k] = !this[k];
+                this[k] = !this[k]
                 console.log(`PrivacyOptions model toggle ${k} is now ${this[k]}`)
                 this.fetch({updateSetting: {name: k, value: this[k]}})
             }
@@ -29,7 +29,7 @@ PrivacyOptions.prototype = $.extend({},
                     self.trackerBlockingEnabled = settings['trackerBlockingEnabled']
                     self.httpsEverywhereEnabled = settings['httpsEverywhereEnabled']
                     self.embeddedTweetsEnabled = settings['embeddedTweetsEnabled']
-                    resolve();
+                    resolve()
                 })
             })
         }
@@ -37,4 +37,3 @@ PrivacyOptions.prototype = $.extend({},
 )
 
 module.exports = PrivacyOptions
-
