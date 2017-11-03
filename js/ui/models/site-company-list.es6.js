@@ -64,7 +64,7 @@ SiteCompanyList.prototype = $.extend({},
                   }
               })
               .sort((a, b) => {
-                  return b.count - a.count;
+                  return b.count - a.count
               })
       }
   }

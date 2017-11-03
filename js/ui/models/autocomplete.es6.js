@@ -21,5 +21,4 @@ Autocomplete.prototype = $.extend({},
     }
 )
 
-
 module.exports = Autocomplete

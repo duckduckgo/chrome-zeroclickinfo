@@ -5,14 +5,12 @@ function HamburgerMenu (attrs) {
     Parent.call(this, attrs)
 }
 
-
 HamburgerMenu.prototype = $.extend({},
-  Parent.prototype,
-  {
-      modelName: 'hamburgerMenu'
+    Parent.prototype,
+    {
+        modelName: 'hamburgerMenu'
 
-  }
+    }
 )
 
 module.exports = HamburgerMenu
-
