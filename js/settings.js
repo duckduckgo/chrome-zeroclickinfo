@@ -56,7 +56,8 @@ require.scopes.settings =(() => {
     }
 
     function buildSettingsFromDefaults() {
-        settings = defaultSettings
+        // copy defaultSettings over to settings
+        settings = Object.assign({}, defaultSettings)
     }
 
     function syncSettingTolocalStorage(){
@@ -102,6 +103,10 @@ require.scopes.settings =(() => {
         chrome.runtime.onMessage.addListener(onGetSetting);
     }
 
+    function getDefaults () {
+        return defaultSettings
+    }
+
     var onUpdateSetting = function(req, sender, res) {
         if(req.updateSetting) {
             var name = req.updateSetting['name'];
@@ -122,7 +127,8 @@ require.scopes.settings =(() => {
         getSetting: getSetting,
         updateSetting: updateSetting,
         logSettings: logSettings,
-        ready: ready
+        ready: ready,
+        getDefaults: getDefaults
     }
 
 })();

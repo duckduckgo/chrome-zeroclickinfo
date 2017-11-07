@@ -6,6 +6,13 @@
   </head>
 
 <style>
+    .reload-btn {
+        margin-right: 0.5em;
+    }
+
+    .setting-name {
+        width: 5em;
+    }
 
     .cw {
         display: block;
@@ -87,12 +94,11 @@
     }
 
     </style>
-  <script src="../../data/defaultSettings.js"></script>
-
   <body>
     <div class="cw">
         <div id="settings">
-            <button id="reset" class="primary pull-right">Reset</button>
+            <button id="reset" class="primary pull-right">Reset Settings</button>
+            <button id="reload" class="primary pull-right reload-btn">Reload Extension</button>
         </div>
         <hr>
         <form id="load">
@@ -110,7 +116,6 @@
         <div id="export-settings"></div>
     </div>
   </body>
-    <script src="../lib/jquery/jquery-2.2.4.min.js"></script>
-    <script src="../testUtils.js"></script>
-    <script src="../tests/editSettings.js"></script>
+    <script src="lib/jquery/jquery-2.2.4.min.js"></script>
+    <script src="tests/editSettings.js"></script>
 </html>
