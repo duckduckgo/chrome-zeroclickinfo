@@ -1,3 +1,5 @@
+let bkg = chrome.extension.getBackgroundPage()
+const defaultSettings = bkg.settings.getDefaults()
 
 function buildTable (newSettings) {
     let settings = newSettings || bkg.settings.getSetting()
@@ -41,7 +43,8 @@ function buildTable (newSettings) {
 function resetSettings (data) {
     let settings = data.userSettings || defaultSettings
     for(let setting in settings) {
-        bkg.settings.updateSetting(setting, settings[setting])
+        let value = settings[setting]
+        bkg.settings.updateSetting(setting, value)
     }
     window.location.reload()
 }
