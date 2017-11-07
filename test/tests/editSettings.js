@@ -7,8 +7,8 @@ function buildTable (newSettings) {
     let output = '<h2>Settings</h2><table><th>Name</th><th>Value</th>'
     
     for(let setting in settings) {
-        let value = JSON.stringify(settings[setting])
-        output += `<tr><td>${setting}</td><td><input type='text' id=${setting} value='${value}'></td></tr>`
+        let value = (typeof settings[setting] === 'object') ? JSON.stringify(settings[setting]) : settings[setting]
+        output += `<tr><td class='setting-name'>${setting}</td><td><input type='text' id=${setting} value=${value}></td></tr>`
         elements.push(setting)
     }
     output += '</table>'
@@ -63,5 +63,11 @@ function loadSettingsFromUser () {
 $('#reset').on('click', resetSettings)
 $('#export').on('click', exportSettings)
 $('#load').on('click', loadSettingsFromUser)
+$('#reload').on('click', () => chrome.runtime.reload())
 
 buildTable()
+
+$(document).ready(() => {
+    $("tr:even").css("background-color", "#eeeeee");
+    $("tr:odd").css("background-color", "#ffffff");
+});
