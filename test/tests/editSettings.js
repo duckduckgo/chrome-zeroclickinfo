@@ -1,18 +1,40 @@
 let bkg = chrome.extension.getBackgroundPage()
 const defaultSettings = bkg.settings.getDefaults()
 
+// map setting names to categories so we can build a nice table
+let categories = {
+    'Block Lists and Settings': ['entityMap', 'entityList', 'easylists', 'blocking', 'generalEasylist', 'privacyEasylist' ],
+    'Whitelists': ['trackersWhitelist', 'trackersWhitelistTemporary', 'httpsWhitelist'],
+    "Other": []
+}
+
+// build a regex string of categories to make filtering easier when we build the table
+let defaultCategories = ['Block Lists and Settings', 'Whitelists'].map((category) => categories[category].join('|')).join('|')
+
+function settingsByCategory(settings) {
+    for(let setting in settings) {
+        if(!setting.match(defaultCategories)) {
+            categories.Other.push(setting)
+        }
+    }
+    return categories
+}
+
 function buildTable (newSettings) {
-    let settings = newSettings || bkg.settings.getSetting()
+    let settings = settingsByCategory(newSettings || bkg.settings.getSetting())
     let elements = []
-    
+   
     // generate output table
     let output = '<h2>Settings</h2><table><th>Name</th><th>Value</th>'
-    
-    for(let setting in settings) {
-        let value = (typeof settings[setting] === 'object') ? JSON.stringify(settings[setting]) : settings[setting]
-        output += `<tr><td class='setting-name'>${setting}</td><td><input type='text' id=${setting} value=${value}></td></tr>`
-        elements.push(setting)
+
+    for(let category in categories) {
+        for(let setting in categories[category]) {
+            let value = (typeof settings[setting] === 'object') ? JSON.stringify(settings[setting]) : settings[setting]
+            output += `<tr><td class='setting-name'>${setting}</td><td><input type='text' id=${setting} value=${value}></td></tr>`
+            elements.push(setting)
+        }
     }
+
     output += '</table>'
     $('#settings').append(output)
     
