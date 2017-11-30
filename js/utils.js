@@ -76,7 +76,7 @@ require.scopes.utils = ( () => {
     // Utilizes native window.crypto.subtle api
     // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
     function hashSHA256 (string) {
-        return new Promise( (resolve, reject) => {
+        return new Promise((resolve, reject) => {
 
             function sha256 (str) {
                 // We transform the string into an arraybuffer.

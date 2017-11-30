@@ -241,7 +241,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                     }
                 )
             } else {
-              resolve()
+                resolve()
             }
         })
     },
