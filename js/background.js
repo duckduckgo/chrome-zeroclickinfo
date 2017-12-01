@@ -203,7 +203,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                     }
 
                     // tell Chrome to cancel this webrequest
-                    return {cancel: true};
+                    return {cancel: true}
                 }
             }
         }
@@ -251,6 +251,10 @@ chrome.webRequest.onBeforeRequest.addListener(
                 resolve()
             }
         })
+
+
+
+
     },
     {
         urls: [
