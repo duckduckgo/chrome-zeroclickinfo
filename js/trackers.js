@@ -78,7 +78,6 @@ require.scopes.trackers = (function () {
 
         }
 
-        addToCache(urlToCheck, false)
         return false
     }
 
@@ -107,11 +106,19 @@ require.scopes.trackers = (function () {
                 match = checkABPParsedList(easylists[listName].parsed, url, siteDomain, request)
             }
 
+
+
+
+            // TODO BEFORE PR: CHECK ARE WE REALLY BREAKING LOOP HERE???
             // break loop early if a list matches
             if (match) {
                 toBlock = getTrackerDetails(url, listName)
                 toBlock.block = true
             }
+
+
+
+
         })
 
         return toBlock
@@ -252,8 +259,9 @@ require.scopes.trackers = (function () {
     }
 
     return {
-        isCached: isCached,
-        isTracker: isTracker
+        isTracker: isTracker,
+        addToCache: addToCache,
+        isCached: isCached
     }
 
 })()
