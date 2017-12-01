@@ -8,7 +8,7 @@ var trackerLists = require('trackerLists').getLists()
 let entityList
 let entityMap
 let whitelists
-const cache = new Map()
+const cache = {}
 
 settings.ready().then(() => {
     load.JSONfromExternalFile(constants.entityList, (list) => entityList = list)
@@ -77,9 +77,6 @@ require.scopes.trackers = (function () {
             }
 
         }
-
-        addToCache(urlToCheck, false)
-        return false
     }
 
     function checkWhitelist (url, currLocation, request) {
@@ -107,11 +104,19 @@ require.scopes.trackers = (function () {
                 match = checkABPParsedList(easylists[listName].parsed, url, siteDomain, request)
             }
 
+
+
+            // TODO LAUREN: check are we really breaking out of this loop early?
+
             // break loop early if a list matches
             if (match) {
                 toBlock = getTrackerDetails(url, listName)
                 toBlock.block = true
             }
+
+
+
+
         })
 
         return toBlock
@@ -233,32 +238,32 @@ require.scopes.trackers = (function () {
     // add hashed URLs to the cache
     // remove older entries if the cache is full
     function addToCache (url, cancel) {
-        console.log(`trackers.addToCache() cancel:${cancel} ${url}`)
-        if (cache.size > 10000) {
-            cache.delete(cache.keys().next().value)
-        }
-        utils.hashSHA256(url).then((urlHash) => {
-            cache.set(urlHash, cancel)
-        })
+        console.log(`trackers.addToCache() block:${cancel} ${url}`)
+        // if (cache.size > 10000) {
+        //     cache.delete(cache.keys().next().value)
+        // }
+        // utils.hashSHA256(url).then((urlHash) => {
+        //     cache.set(urlHash, cancel)
+            cache[url] = cancel
+        // })
     }
 
     function isCached (url) {
-        return new Promise((resolve, reject) => {
-            utils.hashSHA256(url).then((urlHash) => {
-                const cachedValue = cache.get(urlHash)
-                if (cachedValue) {
-                    console.log(`trackers.isCached(), SKIP lookup ${url}`)
-                    resolve({cancel: cachedValue})
-                } else {
-                    reject()
-                }
-            })
-        })
+        // return new Promise((resolve, reject) => {
+            // utils.hashSHA256(url).then((urlHash) => {
+            //     const cachedValue = cache.get(urlHash)
+                const cachedValue = cache[url]
+                // resolve({cancel: cachedValue})
+                return {cancel: cachedValue}
+
+            // })
+        // })
     }
 
     return {
-        isCached: isCached,
-        isTracker: isTracker
+        isTracker: isTracker,
+        addToCache: addToCache,
+        isCached: isCached
     }
 
 })()

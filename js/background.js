@@ -15,7 +15,7 @@
  */
 
 var debugRequest = false
-var debugTimer = false
+var debugTimer = true
 var trackers = require('trackers')
 var utils = require('utils')
 var settings = require('settings')
@@ -157,6 +157,17 @@ chrome.webRequest.onBeforeRequest.addListener(
              */
             chrome.runtime.sendMessage({'updateTabData': true})
 
+
+
+            // Check if trackers has a cache entry for this url
+            const isResultCached = trackers.isCached(requestData.url)
+            if (isResultCached.cancel || isResultCached.cancel === false) {
+                        console.log(`FOUND CACHED TRACKER LOOKUP ${JSON.stringify(isResultCached)} for ${requestData.url}`)
+                        return isResultCached
+            }
+
+
+
             var tracker = trackers.isTracker(requestData.url, thisTab, requestData);
 
             // count and block trackers. Skip things that matched in the trackersWhitelist
@@ -202,9 +213,15 @@ chrome.webRequest.onBeforeRequest.addListener(
                         console.log(logOutput)
                     }
 
+                    // cache result
+                    trackers.addToCache(requestData.url, true)
                     // tell Chrome to cancel this webrequest
-                    return {cancel: true}
+                    return ({cancel: true})
                 }
+
+            } else if (!tracker) {
+                // cache result
+                trackers.addToCache(requestData.url, false)
             }
         }
 
