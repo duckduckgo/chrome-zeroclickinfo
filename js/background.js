@@ -159,69 +159,73 @@ chrome.webRequest.onBeforeRequest.addListener(
 
 
 
-            // Check if trackers has a cache entry for this url
+            // Check trackers cache
             const isResultCached = trackers.isCached(requestData.url)
             if (isResultCached.cancel || isResultCached.cancel === false) {
-                        console.log(`FOUND CACHED TRACKER LOOKUP ${JSON.stringify(isResultCached)} for ${requestData.url}`)
-                        return isResultCached
-            }
 
-
-
-            var tracker = trackers.isTracker(requestData.url, thisTab, requestData);
-
-            // count and block trackers. Skip things that matched in the trackersWhitelist
-            if (tracker && !(tracker.type === 'trackersWhitelist')) {
-                // only count trackers on pages with 200 response. Trackers on these sites are still
-                // blocked below but not counted toward company stats
-                if (thisTab.statusCode === 200) {
-                    // record all tracker urls on a site even if we don't block them
-                    thisTab.site.addTracker(tracker)
-
-                    // record potential blocked trackers for this tab
-                    thisTab.addToTrackers(tracker)
+                console.log(`FOUND CACHED TRACKER LOOKUP ${JSON.stringify(isResultCached)} for ${requestData.url}`)
+                if (isResultCached.cancel === true) {
+                    return isResultCached
                 }
 
-                // Block the request if the site is not whitelisted
-                if (!thisTab.site.whitelisted && tracker.block) {
-                    thisTab.addOrUpdateTrackersBlocked(tracker);
-                    chrome.runtime.sendMessage({'updateTabData': true})
+            // Lookup
+            } else {
+                console.log('DO TRACKER LOOKUP')
+                var tracker = trackers.isTracker(requestData.url, thisTab, requestData);
 
-                    // update badge icon for any requests that come in after
-                    // the tab has finished loading
-                    if (thisTab.status === "complete") thisTab.updateBadgeIcon()
+                // count and block trackers. Skip things that matched in the trackersWhitelist
+                if (tracker && !(tracker.type === 'trackersWhitelist')) {
+                    // only count trackers on pages with 200 response. Trackers on these sites are still
+                    // blocked below but not counted toward company stats
+                    if (thisTab.statusCode === 200) {
+                        // record all tracker urls on a site even if we don't block them
+                        thisTab.site.addTracker(tracker)
 
-
-                    if (tracker.parentCompany !== 'unknown' && thisTab.statusCode === 200){
-                        Companies.add(tracker.parentCompany)
+                        // record potential blocked trackers for this tab
+                        thisTab.addToTrackers(tracker)
                     }
 
-                    // for debugging specific requests. see test/tests/debugSite.js
-                    if (debugRequest && debugRequest.length) {
-                        if (debugRequest.includes(tracker.url)) {
-                            console.info('UNBLOCKED: ', tracker.url)
-                            return
+                    // Block the request if the site is not whitelisted
+                    if (!thisTab.site.whitelisted && tracker.block) {
+                        thisTab.addOrUpdateTrackersBlocked(tracker);
+                        chrome.runtime.sendMessage({'updateTabData': true})
+
+                        // update badge icon for any requests that come in after
+                        // the tab has finished loading
+                        if (thisTab.status === "complete") thisTab.updateBadgeIcon()
+
+
+                        if (tracker.parentCompany !== 'unknown' && thisTab.statusCode === 200){
+                            Companies.add(tracker.parentCompany)
                         }
+
+                        // for debugging specific requests. see test/tests/debugSite.js
+                        if (debugRequest && debugRequest.length) {
+                            if (debugRequest.includes(tracker.url)) {
+                                console.info('UNBLOCKED: ', tracker.url)
+                                return
+                            }
+                        }
+
+                        // log output for debugging
+                        let logOutput = `BLOCKED ${utils.extractHostFromURL(thisTab.url)} [${tracker.parentCompany}] ${requestData.url}`
+                        if (debugTimer) {
+                           console.log(`request#${requestData.requestId}: ${logOutput}`)
+                           console.timeEnd(`request#${requestData.requestId}`)
+                        } else {
+                            console.log(logOutput)
+                        }
+
+                        // cache result
+                        trackers.addToCache(requestData.url, true)
+                        // tell Chrome to cancel this webrequest
+                        return ({cancel: true})
                     }
 
-                    // log output for debugging
-                    let logOutput = `BLOCKED ${utils.extractHostFromURL(thisTab.url)} [${tracker.parentCompany}] ${requestData.url}`
-                    if (debugTimer) {
-                       console.log(`request#${requestData.requestId}: ${logOutput}`)
-                       console.timeEnd(`request#${requestData.requestId}`)
-                    } else {
-                        console.log(logOutput)
-                    }
-
+                } else if (!tracker) {
                     // cache result
-                    trackers.addToCache(requestData.url, true)
-                    // tell Chrome to cancel this webrequest
-                    return ({cancel: true})
+                    trackers.addToCache(requestData.url, false)
                 }
-
-            } else if (!tracker) {
-                // cache result
-                trackers.addToCache(requestData.url, false)
             }
         }
 
