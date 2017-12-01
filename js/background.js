@@ -161,10 +161,13 @@ chrome.webRequest.onBeforeRequest.addListener(
 
             // Check trackers cache
             const isResultCached = trackers.isCached(requestData.url)
-            if (isResultCached.cancel || isResultCached.cancel === false) {
+            if (isResultCached.cancel === false || isResultCached.cancel === true) {
 
                 console.log(`FOUND CACHED TRACKER LOOKUP ${JSON.stringify(isResultCached)} for ${requestData.url}`)
+
                 if (isResultCached.cancel === true) {
+                    console.log('BLOCKED CACHED RESULT, timeEnd:')
+                    if (debugTimer) console.timeEnd(`request#${requestData.requestId}`)
                     return isResultCached
                 }
 
@@ -207,6 +210,9 @@ chrome.webRequest.onBeforeRequest.addListener(
                             }
                         }
 
+                        // cache result
+                        trackers.addToCache(requestData.url, true)
+
                         // log output for debugging
                         let logOutput = `BLOCKED ${utils.extractHostFromURL(thisTab.url)} [${tracker.parentCompany}] ${requestData.url}`
                         if (debugTimer) {
@@ -216,13 +222,12 @@ chrome.webRequest.onBeforeRequest.addListener(
                             console.log(logOutput)
                         }
 
-                        // cache result
-                        trackers.addToCache(requestData.url, true)
                         // tell Chrome to cancel this webrequest
                         return ({cancel: true})
                     }
 
                 } else if (!tracker) {
+                    if (debugTimer) console.timeEnd(`request#${requestData.requestId}`)
                     // cache result
                     trackers.addToCache(requestData.url, false)
                 }
