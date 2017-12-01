@@ -15,7 +15,7 @@
  */
 
 var debugRequest = false
-var debugTimer = false
+var debugTimer = true
 var trackers = require('trackers')
 var utils = require('utils')
 var settings = require('settings')
@@ -253,7 +253,10 @@ chrome.webRequest.onBeforeRequest.addListener(
                 // Check if trackers has a cache entry for this url
                 trackers.isCached(requestData.url).then(
                     (cachedResult) => {
-                        if (cachedResult.block === true) return resolve({cancel: true})
+                        if (cachedResult.cancel || cachedResult.cancel === false) {
+                            console.log(`FOUND CACHED TRACKER LOOKUP ${JSON.stringify(cachedResult)} for ${requestData.url}`)
+                            return resolve(cachedResult)
+                        }
                         execTrackersLookup(thisTab, resolve)
                         execHttpsLookup(thisTab, resolve)
                     }
