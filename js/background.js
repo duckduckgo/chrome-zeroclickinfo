@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-
-var debugRequest = false;
-var trackers = require('trackers');
-var utils = require('utils');
-var settings = require('settings');
-var stats = require('stats');
+var debugRequest = false
+var debugTimer = false
+var trackers = require('trackers')
+var utils = require('utils')
+var settings = require('settings')
+var stats = require('stats')
 var db = require('db')
 var https = require('https')
 
@@ -111,6 +111,7 @@ chrome.contextMenus.create({
  */
 chrome.webRequest.onBeforeRequest.addListener(
     function (requestData) {
+        if (debugTimer) console.time(`request#${requestData.requestId}`)
 
         let tabId = requestData.tabId;
 
@@ -187,13 +188,19 @@ chrome.webRequest.onBeforeRequest.addListener(
                     // for debugging specific requests. see test/tests/debugSite.js
                     if (debugRequest && debugRequest.length) {
                         if (debugRequest.includes(tracker.url)) {
-                            console.log("UNBLOCKED: ", tracker.url)
+                            console.info('UNBLOCKED: ', tracker.url)
                             return
                         }
                     }
 
-                    console.info( "blocked " + utils.extractHostFromURL(thisTab.url)
-                                 + " [" + tracker.parentCompany + "] " + requestData.url);
+                    // log output for debugging
+                    let logOutput = `BLOCKED ${utils.extractHostFromURL(thisTab.url)} [${tracker.parentCompany}] ${requestData.url}`
+                    if (debugTimer) {
+                       console.log(`request#${requestData.requestId}: ${logOutput}`)
+                       console.timeEnd(`request#${requestData.requestId}`)
+                    } else {
+                        console.log(logOutput)
+                    }
 
                     // tell Chrome to cancel this webrequest
                     return {cancel: true};

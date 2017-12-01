@@ -2,8 +2,8 @@ var abp
 var easylists
 var trackerWhitelist = {}
 var load = require('load')
-var settings = require('settings'),
-var utils = require('utils'),
+var settings = require('settings')
+var utils = require('utils')
 var trackerLists = require('trackerLists').getLists()
 let entityList
 let entityMap
