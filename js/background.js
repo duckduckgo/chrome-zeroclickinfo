@@ -170,7 +170,7 @@ chrome.webRequest.onBeforeRequest.addListener(
             } else if (!tracker) {
                 // cache result
                 console.log('NOT TRACKER')
-                trackers.addToCache(requestData.url, false)
+                trackers.addToCache(requestData.url, thisTab.url, false)
             }
         }
 
@@ -259,14 +259,17 @@ chrome.webRequest.onBeforeRequest.addListener(
                 chrome.runtime.sendMessage({'updateTabData': true})
 
                 // Check if trackers has a cache entry for this url
-                trackers.isCached(requestData.url).then(
+                trackers.isCached(requestData.url, thisTab.url).then(
                     (cachedResult) => {
-                        if (cachedResult.cancel || cachedResult.cancel === false) {
+                        // if cached result is found...
+                        if (cachedResult.cancel === true || cachedResult.cancel === false) {
                             console.log(`FOUND CACHED TRACKER LOOKUP ${JSON.stringify(cachedResult)} for ${requestData.url}`)
-                            return resolve(cachedResult)
+                            if (cachedResult.cancel === true) return resolve(cachedResult)
+                            if (cachedResult.cancel === false) return execHttpsLookup(thisTab, resolve)
+                        } else {
+                          execTrackersLookup(thisTab, resolve)
+                          execHttpsLookup(thisTab, resolve)
                         }
-                        execTrackersLookup(thisTab, resolve)
-                        execHttpsLookup(thisTab, resolve)
                     }
                 )
 

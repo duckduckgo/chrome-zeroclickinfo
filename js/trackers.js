@@ -239,8 +239,11 @@ require.scopes.trackers = (function () {
 
     // add hashed URLs to the cache
     // remove older entries if the cache is full
-    function addToCache (url, cancel) {
-        console.log(`trackers.addToCache() block:${cancel} ${url}`)
+    function addToCache (url, currLocation, cancel) {
+        if (!settings.getSetting('trackerBlockingEnabled')) return
+        if (isFirstPartyRequest(currLocation, url)) return
+
+        console.log(`trackers.addToCache() cancel:${cancel} ${url}`)
         if (cache.size > 10000) {
             cache.delete(cache.keys().next().value)
         }
@@ -249,8 +252,12 @@ require.scopes.trackers = (function () {
         })
     }
 
-    function isCached (url) {
+    function isCached (url, currLocation) {
         return new Promise((resolve, reject) => {
+            if (!settings.getSetting('trackerBlockingEnabled') ||
+                isFirstPartyRequest(currLocation, url)) {
+                resolve({cancel: undefined})
+            }
             utils.hashSHA256(url).then((urlHash) => {
                 const cachedValue = cache.get(urlHash)
                 resolve({cancel: cachedValue})
