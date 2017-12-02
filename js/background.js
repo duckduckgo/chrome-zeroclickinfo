@@ -161,7 +161,6 @@ chrome.webRequest.onBeforeRequest.addListener(
                     }
 
                     // cache result
-                    console.log('IS TRACKER')
                     trackers.addToCache(requestData.url, true)
                     // tell Chrome to cancel this webrequest
                     return resolve({cancel: true})
@@ -169,7 +168,6 @@ chrome.webRequest.onBeforeRequest.addListener(
 
             } else if (!tracker) {
                 // cache result
-                console.log('NOT TRACKER')
                 trackers.addToCache(requestData.url, thisTab.url, false)
             }
         }
