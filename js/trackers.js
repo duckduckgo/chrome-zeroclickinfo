@@ -106,19 +106,11 @@ require.scopes.trackers = (function () {
                 match = checkABPParsedList(easylists[listName].parsed, url, siteDomain, request)
             }
 
-
-
-
-            // TODO BEFORE PR: CHECK ARE WE REALLY BREAKING LOOP HERE???
             // break loop early if a list matches
             if (match) {
                 toBlock = getTrackerDetails(url, listName)
                 toBlock.block = true
             }
-
-
-
-
         })
 
         return toBlock
