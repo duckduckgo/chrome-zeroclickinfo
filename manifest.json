@@ -98,7 +98,8 @@
         "cookies",
         "storage",
         "<all_urls>",
-        "alarms"
+        "alarms",
+        "system.memory"
     ],
     "web_accessible_resources": [
         "img/*"
