@@ -24,9 +24,9 @@ $(document).ready(function() {
  * side by side screenshots
  */
 function buildSummary() {
-    let table = '<table><tr><td><b>Tracker Blocking ON</b></td><td><b>Tracker Blocking OFF</b></td></tr>'
+    let table = '<table><tr><td class="fixed on"><b>Tracker Blocking ON</b></td><td class="fixed off"><b>Tracker Blocking OFF</b></td></tr>'
     screenshots.forEach((x) => {
-        table += '<tr><td><b><a href="' + x.url + '">' + x.url + '</b></td><td></td></tr>'
+        table += '<tr><td class="padded-top"><b><a href="' + x.url + '">' + x.url + '</b></td><td class="padded-top"></td></tr>'
         table += '<tr><td><b>Site Score:</b> ' + JSON.stringify(x.score) + '</td><td></td></tr>'
         table += '<tr><td>Tab took <b>' + x.enabledOnComplete +'</b> to complete.</td>'
         table += '<td>Tab took <b>' + x.disabledOnComplete +'</b> to complete.</td></tr>'
