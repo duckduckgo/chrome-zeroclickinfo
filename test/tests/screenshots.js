@@ -182,6 +182,9 @@ function buildSitesToTest(amount) {
 
 
 function getMemoryUsageMb (cb) {
+    if (!chrome.system || !chrome.system.memory) {
+        alert('ERROR: To use memory usage features, you must add "system.memory" to the manifest.json file in the "permissions" field.')
+    }
     chrome.system.memory.getInfo((physMemData) => {
         // capacity measured in bytes
         const memCapacity = physMemData.capacity
