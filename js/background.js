@@ -15,7 +15,7 @@
  */
 
 var debugRequest = false
-var debugTimer = true
+var debugTimer = false
 var trackers = require('trackers')
 var utils = require('utils')
 var settings = require('settings')

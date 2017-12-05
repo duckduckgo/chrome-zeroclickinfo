@@ -234,7 +234,7 @@ require.scopes.trackers = (function () {
     function addToCache (reqUrl, currLocation, cancelBoolean) {
         if (!settings.getSetting('trackerBlockingEnabled')) return
         if (isFirstPartyRequest(currLocation, reqUrl)) return
-        console.log(`trackers.addToCache() {cancel:${cancelBoolean}} ${reqUrl}`)
+        // console.log(`trackers.addToCache() {cancel:${cancelBoolean}} ${reqUrl}`)
         if (cache.size > 10000) {
             cache.delete(cache.keys().next().value)
         }
@@ -259,7 +259,7 @@ require.scopes.trackers = (function () {
     function generateCacheKey (reqUrl, currLocation) {
         reqUrl = encodeURIComponent(reqUrl)
         currLocation = encodeURIComponent(currLocation)
-        const key = `${reqUrl},domain=${utils.extractHostFromURL(currLocation)}`
+        const key = `domain=${utils.extractHostFromURL(currLocation)},reqUrl:${reqUrl}`
         return new Promise((resolve, reject) => {
             utils.hashSHA256(key).then((hashedKey) => resolve(hashedKey))
         })
