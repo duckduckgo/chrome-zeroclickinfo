@@ -26,13 +26,13 @@ $(document).ready(function() {
 function buildSummary() {
     let table = '<table><tr><td><b>Tracker Blocking ON</b></td><td><b>Tracker Blocking OFF</b></td></tr>'
     screenshots.forEach((x) => {
-        table += '<tr><td><a href="' + x.url + '">' + x.url + '</td><td></td></tr>'
+        table += '<tr><td><b><a href="' + x.url + '">' + x.url + '</b></td><td></td></tr>'
         table += '<tr><td><b>Site Score:</b> ' + JSON.stringify(x.score) + '</td><td></td></tr>'
         table += '<tr><td>Tab took <b>' + x.enabledOnComplete +'</b> to complete.</td>'
         table += '<td>Tab took <b>' + x.disabledOnComplete +'</b> to complete.</td></tr>'
         if (MEM_USAGE) {
-            table += '<tr><td>Total current memory usage: <b>' + x.onMemUsageMb + ' bytes </b></td>'
-            table += '<td>Total current memory usage: <b>' +  x.offMemUsageMb + ' bytes </b></td></tr>'
+            table += '<tr><td>Total current memory usage: <b>' + x.onMemUsageMb + ' Megabytes </b></td>'
+            table += '<td>Total current memory usage: <b>' +  x.offMemUsageMb + ' Megabytes </b></td></tr>'
         } else {
             table += '<tr><td><img id="on" src="' + x.on + '" /></td>'
             table += '<td><img id="off" src="' + x.off + '" /></td></tr>'
