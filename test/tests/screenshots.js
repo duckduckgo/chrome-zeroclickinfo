@@ -31,8 +31,8 @@ function buildSummary() {
         table += '<tr><td>Tab took <b>' + x.enabledOnComplete +'</b> to complete.</td>'
         table += '<td>Tab took <b>' + x.disabledOnComplete +'</b> to complete.</td></tr>'
         if (MEM_USAGE) {
-            table += '<tr><td>Memory used: <b>' + x.onMemUsageMb + ' bytes </b></td>'
-            table += '<td>Memory used: <b>' +  x.offMemUsageMb + ' bytes </b></td></tr>'
+            table += '<tr><td>Current memory usage: <b>' + x.onMemUsageMb + ' bytes </b></td>'
+            table += '<td>Current memory usage: <b>' +  x.offMemUsageMb + ' bytes </b></td></tr>'
         } else {
             table += '<tr><td><img id="on" src="' + x.on + '" /></td>'
             table += '<td><img id="off" src="' + x.off + '" /></td></tr>'
