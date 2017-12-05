@@ -14,11 +14,11 @@
     { url: 'https://x.y.z.doubleclick.net', block: true},
     { url: 'https://logx.optimizely.com/log/event', block: true}
   ];
-  
+
   QUnit.test("block url", function (assert) {
       // turn social blocking on for this test
       bkg.settings.updateSetting('socialBlockingIsEnabled', true);
-      
+
       basicBlocking.forEach(function(test) {
           bkg.settings.updateSetting('trackerBlockingEnabled', true);
           var toBlock = bkg.trackers.isTracker(test.url, fakeTab, fakeRequest);
@@ -26,8 +26,8 @@
           assert.ok(toBlock === test.block, 'url should be blocked');
       });
   });
- 
-  // These abp blocking tests are based on actual entries from 
+
+  // These abp blocking tests are based on actual entries from
   // the easylist. These tests could fail in the future if the easylist
   // entries are changed or whitelisted.
   var abpBlocking = [
@@ -52,11 +52,11 @@
     { url: 'https://www.facebook.com/rsrc.php/v3/y6/r/69R6jxYtiKN.js', block: true, options: {domain: 'up-4ever.com', type: 'OBJECT'}}, // |https://$third-party,script,domain=up-4ever.com
     //{ url: 'https://v.shopify.com/storefront/page?referrer=https%3A%2F%2Fwww.pinkbike.com&eventType=page', block: true, options: {domain: 'facebook.com', type: 'OBJECT'}}, // from easy privacy ||shopify.com/storefront/page?*&eventtype=
   ];
-  
+
   QUnit.test("abp blocking url", function (assert) {
       // turn social blocking on for this test
       bkg.settings.updateSetting('socialBlockingIsEnabled', true);
-      
+
       abpBlocking.forEach(function(test) {
           bkg.settings.updateSetting('trackerBlockingEnabled', true);
 
@@ -67,7 +67,7 @@
               testTab.site.domain = test.options.domain
           }
 
-          if (test.options.type) 
+          if (test.options.type)
               fakeRequest.type = test.options.type
 
           var toBlock = bkg.trackers.isTracker(test.url, testTab, fakeRequest);
@@ -93,7 +93,7 @@
       { url: 'https://facebook.com', potentialTracker: 'https://reddit.com', block: true, message: 'should block third party request'},
       { url: 'https://facebook.com', potentialTracker: 'https://instagram.com', block: false, message: 'should not block third party requests owned by same parent company'}
   ];
-  
+
   QUnit.test("third party blocking", function (assert) {
       thirdPartyTests.forEach(function(test) {
           bkg.settings.updateSetting('trackerBlockingEnabled', true);
@@ -111,11 +111,36 @@
       });
   });
 
+  QUnit.test('cache trackers block/noblock lookups', function (assert) {
+      var test = thirdPartyTests[1]
+      bkg.settings.updateSetting('trackerBlockingEnabled', true)
+      bkg.settings.updateSetting('socialBlockingIsEnabled', true)
+
+      let testTab = {
+          tabId: 0,
+          url: test.url,
+          site: {domain: utils.extractHostFromURL(test.url)}
+      }
+
+      var toBlock = bkg.trackers.isTracker(test.potentialTracker, testTab, fakeRequest)
+      toBlock = toBlock ? true : false
+      bkg.trackers.addToCache(test.potentialTracker, testTab.url, toBlock)
+      assert.ok(toBlock === test.block, test.message)
+      setTimeout(function () {
+          bkg.trackers
+              .isCached(test.potentialTracker, testTab.url)
+              .then((cachedResult) => {
+                  assert.ok(toBlock === cachedResult.cancel, `cache result of ${test.message}`)
+              })
+      }, 200)
+  })
+
+
   var socialBlocking = [
     { url: 'https://facebook.com/?q=something&param=a', block: true},
     { url: 'http://twitter.com/somescript.js', block: true}
   ];
-  
+
   QUnit.test("social blocking On", function (assert) {
       socialBlocking.forEach(function(test) {
           bkg.settings.updateSetting('trackerBlockingEnabled', true);
@@ -125,7 +150,7 @@
           assert.ok(toBlock === test.block, 'url should be blocked');
       });
   });
-  
+
   QUnit.test("social blocking Off", function (assert) {
       socialBlocking.forEach(function(test) {
           bkg.settings.updateSetting('trackerBlockingEnabled', true);
@@ -138,7 +163,7 @@
 
   // Some basic tests for the abp module. These should be expanded to cover all abp filter options
   QUnit.test("Test abp matching", (assert) => {
-      
+
       // testEasylist is defined in testEasylist.js
       let fakeEasylist = testEasylist.join('\n')
       let fakeRegexList = regexList.join('\n')
@@ -155,7 +180,7 @@
               domain: domain,
               elementTypeMask:abp.elementTypes[type]
           })
-          
+
           assert.ok(match === e.block, `Got correct blocking decision. ${match} === ${e.block}, ${e.url} ${JSON.stringify(e.options)}`)
       })
   })
