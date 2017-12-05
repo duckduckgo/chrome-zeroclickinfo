@@ -31,8 +31,8 @@ function buildSummary() {
         table += '<tr><td>Tab took <b>' + x.enabledOnComplete +'</b> to complete.</td>'
         table += '<td>Tab took <b>' + x.disabledOnComplete +'</b> to complete.</td></tr>'
         if (MEM_USAGE) {
-            table += '<tr><td>Current memory usage: <b>' + x.onMemUsageMb + ' bytes </b></td>'
-            table += '<td>Current memory usage: <b>' +  x.offMemUsageMb + ' bytes </b></td></tr>'
+            table += '<tr><td>Total current memory usage: <b>' + x.onMemUsageMb + ' bytes </b></td>'
+            table += '<td>Total current memory usage: <b>' +  x.offMemUsageMb + ' bytes </b></td></tr>'
         } else {
             table += '<tr><td><img id="on" src="' + x.on + '" /></td>'
             table += '<td><img id="off" src="' + x.off + '" /></td></tr>'
@@ -87,7 +87,7 @@ function processSite(url) {
  * Stop when all sites have been processed. Base case calls the buildSummary funciton
  */
 function processTopSites() {
-    let site = SITES.pop()
+    let site = SITES.shift()
 
     // base case, return and build table
     if (!site) {
@@ -176,6 +176,7 @@ function buildSitesToTest(amount) {
     } else {
         sites = top500Sites.slice(0, amount)
     }
+
     return sites
 }
 
