@@ -161,7 +161,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                     }
 
                     // cache result
-                    trackers.addToCache(requestData.url, true)
+                    trackers.addToCache(requestData.url, thisTab.url, true)
                     // tell Chrome to cancel this webrequest
                     return resolve({cancel: true})
                 }
@@ -261,7 +261,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                     (cachedResult) => {
                         // if cached result is found...
                         if (cachedResult.cancel === true || cachedResult.cancel === false) {
-                            console.log(`FOUND CACHED TRACKER LOOKUP ${JSON.stringify(cachedResult)} for ${requestData.url}`)
+                            console.log(`CACHED TRACKER LOOKUP: ${JSON.stringify(cachedResult)} for ${requestData.url} on page: ${thisTab.url}`)
                             if (cachedResult.cancel === true) return resolve(cachedResult)
                             if (cachedResult.cancel === false) return execHttpsLookup(thisTab, resolve)
                         } else {

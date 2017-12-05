@@ -229,31 +229,39 @@ require.scopes.trackers = (function () {
         return match
     }
 
-    // add hashed URLs to the cache
+    // add block/noblock decisions (per domain) to the trackers cache
     // remove older entries if the cache is full
-    function addToCache (url, currLocation, cancel) {
+    function addToCache (reqUrl, currLocation, cancelBoolean) {
         if (!settings.getSetting('trackerBlockingEnabled')) return
-        if (isFirstPartyRequest(currLocation, url)) return
-
-        console.log(`trackers.addToCache() cancel:${cancel} ${url}`)
+        if (isFirstPartyRequest(currLocation, reqUrl)) return
+        console.log(`trackers.addToCache() {cancel:${cancelBoolean}} ${reqUrl}`)
         if (cache.size > 10000) {
             cache.delete(cache.keys().next().value)
         }
-        utils.hashSHA256(url).then((urlHash) => {
-            cache.set(urlHash, cancel)
+        generateCacheKey(reqUrl, currLocation).then((hashedKey) => {
+            cache.set(hashedKey, cancelBoolean)
         })
     }
 
-    function isCached (url, currLocation) {
+    function isCached (reqUrl, currLocation) {
         return new Promise((resolve, reject) => {
             if (!settings.getSetting('trackerBlockingEnabled') ||
-                isFirstPartyRequest(currLocation, url)) {
+                isFirstPartyRequest(currLocation, reqUrl)) {
                 resolve({cancel: undefined})
             }
-            utils.hashSHA256(url).then((urlHash) => {
-                const cachedValue = cache.get(urlHash)
+            generateCacheKey(reqUrl, currLocation).then((hashedKey) => {
+                const cachedValue = cache.get(hashedKey)
                 resolve({cancel: cachedValue})
             })
+        })
+    }
+
+    function generateCacheKey (reqUrl, currLocation) {
+        reqUrl = encodeURIComponent(reqUrl)
+        currLocation = encodeURIComponent(currLocation)
+        const key = `${reqUrl},domain=${utils.extractHostFromURL(currLocation)}`
+        return new Promise((resolve, reject) => {
+            utils.hashSHA256(key).then((hashedKey) => resolve(hashedKey))
         })
     }
 
