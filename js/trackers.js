@@ -234,7 +234,7 @@ require.scopes.trackers = (function () {
     function addToCache (reqUrl, currLocation, cancelBoolean) {
         if (!settings.getSetting('trackerBlockingEnabled')) return
         if (isFirstPartyRequest(currLocation, reqUrl)) return
-        if (cache.size > 10000) {
+        if (cache.size > 3000) {
             cache.delete(cache.keys().next().value)
         }
         generateCacheKey(reqUrl, currLocation).then((hashedKey) => {
