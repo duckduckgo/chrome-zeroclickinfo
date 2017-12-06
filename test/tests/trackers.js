@@ -135,6 +135,29 @@
       }, 200)
   })
 
+  QUnit.test('do not cache tracker lookups on 1st party requests', function (assert) {
+      var test = thirdPartyTests[0]
+      bkg.settings.updateSetting('trackerBlockingEnabled', true)
+      bkg.settings.updateSetting('socialBlockingIsEnabled', true)
+
+      let testTab = {
+          tabId: 0,
+          url: test.url,
+          site: {domain: utils.extractHostFromURL(test.url)}
+      }
+
+      var toBlock = bkg.trackers.isTracker(test.potentialTracker, testTab, fakeRequest)
+      assert.ok(toBlock === undefined, test.message)
+      bkg.trackers.addToCache(test.potentialTracker, testTab.url)
+      setTimeout(function () {
+          bkg.trackers
+              .isCached(test.potentialTracker, testTab.url)
+              .then((cachedResult) => {
+                  assert.ok(cachedResult.cancel === undefined, `do not cache result of ${test.message}`)
+              })
+      }, 200)
+  })
+
 
   var socialBlocking = [
     { url: 'https://facebook.com/?q=something&param=a', block: true},
