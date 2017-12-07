@@ -233,14 +233,16 @@ require.scopes.trackers = (function () {
 
     // add block/noblock decisions (per domain) to the trackers cache
     // remove older entries if the cache is full
-    function addToCache (reqUrl, currLocation, cancelBoolean) {
+    function addToCache (reqUrl, currLocation, trackerData) {
         if (!settings.getSetting('trackerBlockingEnabled')) return
         if (isFirstPartyRequest(currLocation, reqUrl)) return
         if (cache.size > 3000) {
             cache.delete(cache.keys().next().value)
         }
         generateCacheKey(reqUrl, currLocation).then((hashedKey) => {
-            cache.set(hashedKey, cancelBoolean)
+            if (trackerData) {
+                cache.set(hashedKey, trackerData)
+            }
         })
     }
 
@@ -248,11 +250,11 @@ require.scopes.trackers = (function () {
         return new Promise((resolve, reject) => {
             if (!settings.getSetting('trackerBlockingEnabled') ||
                 isFirstPartyRequest(currLocation, reqUrl)) {
-                resolve({cancel: undefined})
+                resolve({block: false})
             }
             generateCacheKey(reqUrl, currLocation).then((hashedKey) => {
-                const cachedValue = cache.get(hashedKey)
-                resolve({cancel: cachedValue})
+                const cachedData = cache.get(hashedKey)
+                resolve(cachedData)
             })
         })
     }

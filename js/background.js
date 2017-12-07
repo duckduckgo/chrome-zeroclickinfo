@@ -169,7 +169,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                     }
 
                     // Cache result
-                    trackers.addToCache(requestData.url, thisTab.url, true)
+                    trackers.addToCache(requestData.url, thisTab.url, tracker)
 
                     // Tell Chrome to cancel this webrequest
                     return resolve({cancel: true})
@@ -177,11 +177,11 @@ chrome.webRequest.onBeforeRequest.addListener(
 
             } else {
 
-                // log output for debugging
+                // Log output for debugging
                 if (debugTimer) console.timeEnd(`request#${requestData.requestId}`)
 
-                // cache result
-                trackers.addToCache(requestData.url, thisTab.url, false)
+                // Cache result
+                trackers.addToCache(requestData.url, thisTab.url, {block: false})
                 return
             }
         }
@@ -269,7 +269,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                  * Skip any broken sites
                  */
                 if (thisTab.site.isBroken) {
-                    console.log('temporarily skip tracker blocking for site: '
+                    console.log('temporarily skip tracker blocking and https upgrades for site: '
                       + utils.extractHostFromURL(thisTab.url) + '\n'
                       + 'more info: https://github.com/duckduckgo/content-blocking-whitelist')
                     return resolve()
@@ -280,9 +280,10 @@ chrome.webRequest.onBeforeRequest.addListener(
                 // Check if trackers has a cache entry for this url
                 trackers.isCached(requestData.url, thisTab.url).then(
                     (cachedResult) => {
-                        // if cached result is found...
-                        if (cachedResult.cancel === true || cachedResult.cancel === false) {
-                            console.log(`CACHED TRACKER LOOKUP: ${JSON.stringify(cachedResult)} for ${requestData.url} on page: ${thisTab.url}`)
+                        // If cached tracker lookup is found...
+                        if (cachedResult &&
+                           (cachedResult.block === true || cachedResult.block === false)) {
+                            console.log(`CACHED TRACKER LOOKUP: ${JSON.stringify(cachedResult)}\n  for req url: ${requestData.url}\n  on site: ${thisTab.url}`)
 
                             /**
                              * TODO:
@@ -290,8 +291,14 @@ chrome.webRequest.onBeforeRequest.addListener(
                              * - notify popup(!) otherwise it doesn't display cached tracker data
                              */
 
-                            if (cachedResult.cancel === true) return resolve(cachedResult)
-                            if (cachedResult.cancel === false) return execHttpsLookup(thisTab, resolve)
+                            if (cachedResult.block === true) {
+                                return resolve({cancel: true})
+                            }
+                            if (cachedResult.block === false) {
+                                return execHttpsLookup(thisTab, resolve)
+                            }
+
+                        // No cached tracker lookup found, proceed with new lookup
                         } else {
                             execTrackerLookup(thisTab, resolve)
                             execHttpsLookup(thisTab, resolve)
