@@ -167,6 +167,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                 }
 
             } else if (!tracker) {
+                if (debugTimer) console.timeEnd(`request#${requestData.requestId}`)
                 // cache result
                 trackers.addToCache(requestData.url, thisTab.url, false)
             }
