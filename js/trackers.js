@@ -100,6 +100,7 @@ require.scopes.trackers = (function () {
     function checkEasylists(url, siteDomain, request){
         let toBlock = false
         constants.easylists.some((listName) => {
+
             let match
             // lists can take a second or two to load so check that the parsed data exists
             if (easylists[listName].isLoaded) {
@@ -110,6 +111,7 @@ require.scopes.trackers = (function () {
             if (match) {
                 toBlock = getTrackerDetails(url, listName)
                 toBlock.block = true
+                return toBlock
             }
         })
 
