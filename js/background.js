@@ -162,12 +162,16 @@ chrome.webRequest.onBeforeRequest.addListener(
 
                     // cache result
                     trackers.addToCache(requestData.url, thisTab.url, true)
+
                     // tell Chrome to cancel this webrequest
                     return resolve({cancel: true})
                 }
 
             } else if (!tracker) {
+
+                // log output for debugging
                 if (debugTimer) console.timeEnd(`request#${requestData.requestId}`)
+
                 // cache result
                 trackers.addToCache(requestData.url, thisTab.url, false)
             }
@@ -234,7 +238,10 @@ chrome.webRequest.onBeforeRequest.addListener(
 
                 // add atb params only to main_frame
                 let ddgAtbRewrite = ATB.redirectURL(requestData)
-                if (ddgAtbRewrite) return ddgAtbRewrite
+                if (ddgAtbRewrite) resolve(ddgAtbRewrite)
+
+                // check for https upgrades on main_frame
+                execHttpsLookup(thisTab, resolve)
 
             } else {
 
@@ -266,8 +273,8 @@ chrome.webRequest.onBeforeRequest.addListener(
                             if (cachedResult.cancel === true) return resolve(cachedResult)
                             if (cachedResult.cancel === false) return execHttpsLookup(thisTab, resolve)
                         } else {
-                          execTrackersLookup(thisTab, resolve)
-                          execHttpsLookup(thisTab, resolve)
+                            execTrackersLookup(thisTab, resolve)
+                            execHttpsLookup(thisTab, resolve)
                         }
                     }
                 )
