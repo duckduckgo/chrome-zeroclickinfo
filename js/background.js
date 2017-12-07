@@ -107,7 +107,7 @@ chrome.contextMenus.create({
  * Before each request:
  * - Add ATB param
  * - Block tracker requests
- * - Upgrade http -> https per HTTPS Everywhere rules
+ * - Upgrade http -> https requests per HTTPS Everywhere rules
  */
 chrome.webRequest.onBeforeRequest.addListener(
     function (requestData) {
@@ -116,14 +116,21 @@ chrome.webRequest.onBeforeRequest.addListener(
          * Tracker lookup helper
          * Block trackers, cache tracker lookup results
          */
-        function execTrackersLookup (thisTab, resolve) {
+        function execTrackerLookup (thisTab, resolve) {
             if (debugTimer) console.time(`request#${requestData.requestId}`)
+
+            // Lookup
             var tracker = trackers.isTracker(requestData.url, thisTab, requestData)
 
-            // count and block trackers. Skip things that matched in the trackersWhitelist
-            if (tracker && !(tracker.type === 'trackersWhitelist')) {
-                // only count trackers on pages with 200 response. Trackers on these sites are still
-                // blocked below but not counted toward company stats
+            // Skip things that matched in the trackersWhitelist
+            if (tracker && tracker.type === 'trackersWhitelist') return
+
+            // Count and block trackers
+            if (tracker) {
+
+                // Only count trackers on pages with 200 response.
+                // trackers on these sites are still blocked below
+                // but not counted toward cumulative company stats
                 if (thisTab.statusCode === 200) {
                     // record all tracker urls on a site even if we don't block them
                     thisTab.site.addTracker(tracker)
@@ -136,7 +143,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                     thisTab.addOrUpdateTrackersBlocked(tracker);
                     chrome.runtime.sendMessage({'updateTabData': true})
 
-                    // update badge icon for any requests that come in after
+                    // Update badge icon for any requests that come in after
                     // the tab has finished loading
                     if (thisTab.status === 'complete') thisTab.updateBadgeIcon()
 
@@ -144,7 +151,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                         Companies.add(tracker.parentCompany)
                     }
 
-                    // for debugging specific requests. see test/tests/debugSite.js
+                    // For debugging specific requests. see test/tests/debugSite.js
                     if (debugRequest && debugRequest.length) {
                         if (debugRequest.includes(tracker.url)) {
                             console.info('UNBLOCKED: ', tracker.url)
@@ -152,7 +159,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                         }
                     }
 
-                    // log output for debugging
+                    // Log output for debugging
                     let logOutput = `BLOCKED ${utils.extractHostFromURL(thisTab.url)} [${tracker.parentCompany}] ${requestData.url}`
                     if (debugTimer) {
                        console.log(`request#${requestData.requestId}: ${logOutput}`)
@@ -161,14 +168,14 @@ chrome.webRequest.onBeforeRequest.addListener(
                         console.log(logOutput)
                     }
 
-                    // cache result
+                    // Cache result
                     trackers.addToCache(requestData.url, thisTab.url, true)
 
-                    // tell Chrome to cancel this webrequest
+                    // Tell Chrome to cancel this webrequest
                     return resolve({cancel: true})
                 }
 
-            } else if (!tracker) {
+            } else {
 
                 // log output for debugging
                 if (debugTimer) console.timeEnd(`request#${requestData.requestId}`)
@@ -259,7 +266,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                 if (!(thisTab && thisTab.url && thisTab.id)) return resolve()
 
                 /**
-                 * skip any broken sites
+                 * Skip any broken sites
                  */
                 if (thisTab.site.isBroken) {
                     console.log('temporarily skip tracker blocking for site: '
@@ -286,7 +293,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                             if (cachedResult.cancel === true) return resolve(cachedResult)
                             if (cachedResult.cancel === false) return execHttpsLookup(thisTab, resolve)
                         } else {
-                            execTrackersLookup(thisTab, resolve)
+                            execTrackerLookup(thisTab, resolve)
                             execHttpsLookup(thisTab, resolve)
                             return
                         }
