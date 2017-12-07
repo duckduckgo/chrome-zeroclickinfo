@@ -270,6 +270,13 @@ chrome.webRequest.onBeforeRequest.addListener(
                         // if cached result is found...
                         if (cachedResult.cancel === true || cachedResult.cancel === false) {
                             console.log(`CACHED TRACKER LOOKUP: ${JSON.stringify(cachedResult)} for ${requestData.url} on page: ${thisTab.url}`)
+
+                            /**
+                             * TODO:
+                             * - add tracker data to cached lookup and add to tab tracker is found
+                             * - notify popup(!) otherwise it doesn't display cached tracker data
+                             */
+
                             if (cachedResult.cancel === true) return resolve(cachedResult)
                             if (cachedResult.cancel === false) return execHttpsLookup(thisTab, resolve)
                         } else {
