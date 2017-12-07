@@ -114,6 +114,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 
         /**
          * Tracker lookup helper
+         * Block trackers, cache tracker lookup results
          */
         function execTrackersLookup (thisTab, resolve) {
             if (debugTimer) console.time(`request#${requestData.requestId}`)
@@ -174,6 +175,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 
                 // cache result
                 trackers.addToCache(requestData.url, thisTab.url, false)
+                return
             }
         }
 
@@ -219,13 +221,17 @@ chrome.webRequest.onBeforeRequest.addListener(
             }
         }
 
+
+        /**
+         * onBeforeRequest control flow logic
+         */
         return new Promise ((resolve) => {
 
             // First, get tab id
             let tabId = requestData.tabId
 
             // Skip requests to background tabs
-            if (tabId === -1) resolve()
+            if (tabId === -1) return resolve()
 
             let thisTab = tabManager.get(requestData)
 
@@ -238,10 +244,10 @@ chrome.webRequest.onBeforeRequest.addListener(
 
                 // add atb params only to main_frame
                 let ddgAtbRewrite = ATB.redirectURL(requestData)
-                if (ddgAtbRewrite) resolve(ddgAtbRewrite)
+                if (ddgAtbRewrite) return resolve(ddgAtbRewrite)
 
                 // check for https upgrades on main_frame
-                execHttpsLookup(thisTab, resolve)
+                return execHttpsLookup(thisTab, resolve)
 
             } else {
 
@@ -250,7 +256,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                  * there is a chance this tab was closed before
                  * we got the webrequest event
                  */
-                if (!(thisTab && thisTab.url && thisTab.id)) resolve()
+                if (!(thisTab && thisTab.url && thisTab.id)) return resolve()
 
                 /**
                  * skip any broken sites
@@ -259,7 +265,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                     console.log('temporarily skip tracker blocking for site: '
                       + utils.extractHostFromURL(thisTab.url) + '\n'
                       + 'more info: https://github.com/duckduckgo/content-blocking-whitelist')
-                    resolve()
+                    return resolve()
                 }
 
                 chrome.runtime.sendMessage({'updateTabData': true})
@@ -282,6 +288,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                         } else {
                             execTrackersLookup(thisTab, resolve)
                             execHttpsLookup(thisTab, resolve)
+                            return
                         }
                     }
                 )
