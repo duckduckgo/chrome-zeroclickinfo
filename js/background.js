@@ -285,6 +285,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                             console.log(`CACHED TRACKER LOOKUP: ${JSON.stringify(cachedResult)}\n  for req url: ${requestData.url}\n  on site: ${thisTab.url}`)
                             if (cachedResult.block === true) {
                                 return execTrackerLookup(cachedResult, thisTab, resolve)
+                                // TODO/FIXME: execHttpsLookup here when a tracker is not blocked
                             }
                             if (cachedResult.block === false) {
                                 return execHttpsLookup(thisTab, resolve)
