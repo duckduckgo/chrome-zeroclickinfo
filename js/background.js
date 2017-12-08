@@ -15,7 +15,7 @@
  */
 
 var debugRequest = false
-var debugTimer = false
+var debugTrackerTimer = false
 var trackers = require('trackers')
 var utils = require('utils')
 var settings = require('settings')
@@ -113,14 +113,25 @@ chrome.webRequest.onBeforeRequest.addListener(
     function (requestData) {
 
         /**
-         * Tracker lookup helper
-         * Block trackers, cache tracker lookup results
+         * Tracker lookup and control flow helper
          */
-        function execTrackerLookup (thisTab, resolve) {
-            if (debugTimer) console.time(`request#${requestData.requestId}`)
+        function execTrackerLookup (cachedTrackerData, thisTab, resolve) {
+            let tracker
 
-            // Lookup
-            var tracker = trackers.isTracker(requestData.url, thisTab, requestData)
+            if (cachedTrackerData) {
+                tracker = cachedTrackerData
+            } else {
+                // Lookup tracker data
+                if (debugTrackerTimer) console.time(`request#${requestData.requestId}`)
+                tracker = trackers.isTracker(requestData.url, thisTab, requestData)
+                if (debugTrackerTimer) console.timeEnd(`request#${requestData.requestId}`)
+            }
+
+            // Add requests that are not trackers to cache
+            if (!tracker) {
+                trackers.addToCache(requestData.url, thisTab.url, {block: false})
+                return
+            }
 
             // Skip things that matched in the trackersWhitelist
             if (tracker && tracker.type === 'trackersWhitelist') return
@@ -140,7 +151,7 @@ chrome.webRequest.onBeforeRequest.addListener(
 
                 // Block the request if the site is not whitelisted
                 if (!thisTab.site.whitelisted && tracker.block) {
-                    thisTab.addOrUpdateTrackersBlocked(tracker);
+                    thisTab.addOrUpdateTrackersBlocked(tracker)
                     chrome.runtime.sendMessage({'updateTabData': true})
 
                     // Update badge icon for any requests that come in after
@@ -159,32 +170,18 @@ chrome.webRequest.onBeforeRequest.addListener(
                         }
                     }
 
-                    // Log output for debugging
-                    let logOutput = `BLOCKED ${utils.extractHostFromURL(thisTab.url)} [${tracker.parentCompany}] ${requestData.url}`
-                    if (debugTimer) {
-                       console.log(`request#${requestData.requestId}: ${logOutput}`)
-                       console.timeEnd(`request#${requestData.requestId}`)
-                    } else {
-                        console.log(logOutput)
-                    }
-
                     // Cache result
                     trackers.addToCache(requestData.url, thisTab.url, tracker)
+
+                    // Log output for debugging
+                    console.log(`BLOCKED ${utils.extractHostFromURL(thisTab.url)} [${tracker.parentCompany}] ${requestData.url}`)
 
                     // Tell Chrome to cancel this webrequest
                     return resolve({cancel: true})
                 }
-
-            } else {
-
-                // Log output for debugging
-                if (debugTimer) console.timeEnd(`request#${requestData.requestId}`)
-
-                // Cache result
-                trackers.addToCache(requestData.url, thisTab.url, {block: false})
-                return
             }
         }
+
 
         /**
          * HTTPS upgrade lookup helper
@@ -280,19 +277,14 @@ chrome.webRequest.onBeforeRequest.addListener(
                 // Check if trackers has a cache entry for this url
                 trackers.isCached(requestData.url, thisTab.url).then(
                     (cachedResult) => {
+
                         // If cached tracker lookup is found...
                         if (cachedResult &&
                            (cachedResult.block === true || cachedResult.block === false)) {
+
                             console.log(`CACHED TRACKER LOOKUP: ${JSON.stringify(cachedResult)}\n  for req url: ${requestData.url}\n  on site: ${thisTab.url}`)
-
-                            /**
-                             * TODO:
-                             * - add tracker data to cached lookup and add to tab tracker is found
-                             * - notify popup(!) otherwise it doesn't display cached tracker data
-                             */
-
                             if (cachedResult.block === true) {
-                                return resolve({cancel: true})
+                                return execTrackerLookup(cachedResult, thisTab, resolve)
                             }
                             if (cachedResult.block === false) {
                                 return execHttpsLookup(thisTab, resolve)
@@ -300,9 +292,8 @@ chrome.webRequest.onBeforeRequest.addListener(
 
                         // No cached tracker lookup found, proceed with new lookup
                         } else {
-                            execTrackerLookup(thisTab, resolve)
+                            execTrackerLookup(null, thisTab, resolve)
                             execHttpsLookup(thisTab, resolve)
-                            return
                         }
                     }
                 )
