@@ -125,14 +125,13 @@
       }
 
       var toBlock = bkg.trackers.isTracker(test.potentialTracker, testTab, fakeRequest)
-      toBlock = toBlock ? true : false
       bkg.trackers.addToCache(test.potentialTracker, testTab.url, toBlock)
-      assert.ok(toBlock === test.block, test.message)
+      assert.ok(toBlock.block === test.block, test.message)
       setTimeout(function () {
           bkg.trackers
               .isCached(test.potentialTracker, testTab.url)
               .then((cachedResult) => {
-                  assert.ok(toBlock === cachedResult.cancel, `cache result of ${test.message}`)
+                  assert.ok(cachedResult.block === toBlock.block, `cache result of ${test.message}`)
               })
       }, 200)
   })
