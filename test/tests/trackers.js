@@ -137,6 +137,29 @@
       }, 200)
   })
 
+  QUnit.test('do not cache tracker lookups when tracker blocking is disabled', function (assert) {
+      bkg.settings.updateSetting('trackerBlockingEnabled', false)
+      assert.ok(bkg.settings.getSetting('trackerBlockingEnabled') === false, 'tracker blocking is disabled')
+
+      const pageUrl = 'http://foo123.com/foo'
+      const potentialTracker = 'http://bar123.com/bar'
+      let testTab = {
+          tabId: 0,
+          url: pageUrl,
+          site: {domain: utils.extractHostFromURL(pageUrl)}
+      }
+
+      var toBlock = true
+      bkg.trackers.addToCache(potentialTracker, testTab.url, toBlock)
+      setTimeout(function () {
+          bkg.trackers
+              .isCached(potentialTracker, testTab.url)
+              .then((cachedResult) => {
+                  assert.ok(cachedResult === undefined, `do not cache tracker blocking decision when tracker blocking is disabled`)
+              })
+      }, 200)
+  })
+
   QUnit.test('do not cache tracker lookups on 1st party requests', function (assert) {
       var test = thirdPartyTests[0]
       bkg.settings.updateSetting('trackerBlockingEnabled', true)
@@ -159,7 +182,6 @@
               })
       }, 200)
   })
-
 
   var socialBlocking = [
     { url: 'https://facebook.com/?q=something&param=a'},
