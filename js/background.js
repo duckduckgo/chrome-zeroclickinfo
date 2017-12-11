@@ -130,13 +130,14 @@ chrome.webRequest.onBeforeRequest.addListener(
                     if (debugTrackerTimer) console.timeEnd(`request#${requestData.requestId}`)
                 }
 
-                // Add requests that are not trackers to cache
-                if (!tracker) {
+                // Add lookups for non-trackers to cache
+                // NOTE: .addToCache() wont add 1st party reqs to cache
+                if (!tracker && !thisTab.site.whitelisted && thisTab.statusCode === 200) {
                     trackers.addToCache(requestData.url, thisTab.url, {block: false})
                     return
                 }
 
-                // Skip things that matched in the trackersWhitelist
+                // Skip requests that matched in the trackersWhitelist
                 if (tracker && tracker.type === 'trackersWhitelist') return
 
                 // Count and block trackers
@@ -262,9 +263,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                  */
                 if (!(thisTab && thisTab.url && thisTab.id)) return resolve()
 
-                /**
-                 * Skip any broken sites
-                 */
+                // Skip any broken sites
                 if (thisTab.site.isBroken) {
                     console.log('temporarily skip tracker blocking and https upgrades for site: '
                       + utils.extractHostFromURL(thisTab.url) + '\n'
@@ -278,9 +277,10 @@ chrome.webRequest.onBeforeRequest.addListener(
                 trackers.isCached(requestData.url, thisTab.url).then(
                     (cachedResult) => {
 
-                        // If cached tracker lookup is found...
+                        // If .isCached() returns a block decision...
                         if (cachedResult &&
-                           (cachedResult.block === true || cachedResult.block === false)) {
+                           (cachedResult.block === true ||
+                            cachedResult.block === false)) {
 
                             console.log(`CACHED TRACKER LOOKUP: ${JSON.stringify(cachedResult)}\n  for req url: ${requestData.url}\n  on site: ${thisTab.url}`)
                             if (cachedResult.block === true) {
