@@ -282,7 +282,7 @@ chrome.webRequest.onBeforeRequest.addListener(
                            (cachedResult.block === true ||
                             cachedResult.block === false)) {
 
-                            console.log(`CACHED TRACKER LOOKUP: ${JSON.stringify(cachedResult)}\n  for req url: ${requestData.url}\n  on site: ${thisTab.url}`)
+                            console.log(`isCached() tracker lookup: ${JSON.stringify(cachedResult)}\n  for req url: ${requestData.url}\n  on site: ${thisTab.url}`)
                             if (cachedResult.block === true) {
                                 execTrackerLookup(cachedResult, thisTab)
                                 return execTrackerLookup(cachedResult, thisTab)
