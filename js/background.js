@@ -133,6 +133,10 @@ chrome.webRequest.onBeforeRequest.addListener(
                 // Add lookups for non-trackers to cache
                 // NOTE: .addToCache() wont add 1st party reqs to cache
                 if (!tracker && !thisTab.site.whitelisted && thisTab.statusCode === 200) {
+                    let timerOutput = ''
+                    if (debugTrackerTimer) timerOutput = ` request#${requestData.requestId}`
+                    console.log(`addToCache()${timerOutput} {block:false} \n  for req url: ${requestData.url}\n  on site: ${thisTab.url}`)
+
                     trackers.addToCache(requestData.url, thisTab.url, {block: false})
                     return
                 }
@@ -178,7 +182,9 @@ chrome.webRequest.onBeforeRequest.addListener(
                         trackers.addToCache(requestData.url, thisTab.url, tracker)
 
                         // Log output for debugging
-                        console.log(`BLOCKED ${utils.extractHostFromURL(thisTab.url)} [${tracker.parentCompany}] ${requestData.url}`)
+                        let timerOutput = ''
+                        if (debugTrackerTimer) timerOutput = ` request#${requestData.requestId}`
+                        console.log(`BLOCKED${timerOutput} ${utils.extractHostFromURL(thisTab.url)} [${tracker.parentCompany}] ${requestData.url}`)
 
                         // Tell Chrome to cancel this webrequest
                         return resolve({cancel: true})
