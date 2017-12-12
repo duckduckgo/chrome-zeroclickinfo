@@ -5,9 +5,39 @@
     <meta name="viewport" content="width=device-width">
   </head>
 
-<style> 
+<style>
+  body, html, table {
+    margin: 0;
+    padding: 0;
+  }
+  table {
+    width: 100%;
+  }
+  td {
+    width: 50%;
+    border-bottom: 1px solid #eee;
+  }
+  td.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 30px;
+    width: 50%;
+    border-bottom: 2px solid #000;
+  }
+  td.fixed.on {
+    background-color: #b6ff6c;
+  }
+  td.fixed.off {
+    left: 50%;
+    background-color: #ffb2b2;
+  }
+  td.padded-top {
+    padding-top: 30px;
+  }
   img {
-    width:700px;
+    border: 2px solid #000;
+    width: 90%;
     height: auto;
   }
 </style>

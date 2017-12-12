@@ -156,7 +156,7 @@ class Tab {
     endStopwatch () {
         this.stopwatch.end = Date.now()
         this.stopwatch.completeMs = (this.stopwatch.end - this.stopwatch.begin)
-        console.log(`tab.status: complete. site took ${this.stopwatch.completeMs/1000} seconds to load.`)
+        console.info(`--> tab.status: complete. ${this.stopwatch.completeMs/1000}`)
     }
 }
 

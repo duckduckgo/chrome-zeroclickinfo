@@ -54,7 +54,7 @@ require.scopes.utils = ( () => {
         });
     }
 
-    function getCurrentTab(callback){
+    function getCurrentTab () {
         return new Promise( (resolve, reject) => {
             chrome.tabs.query({"active": true, "lastFocusedWindow": true}, function(tabData) {
                 if(tabData.length){
@@ -73,6 +73,39 @@ require.scopes.utils = ( () => {
         return true;
     })
 
+    // Utilizes native window.crypto.subtle api
+    // https://developer.mozilla.org/en-US/docs/Web/API/SubtleCrypto/digest
+    function hashSHA256 (string) {
+        return new Promise((resolve, reject) => {
+
+            function sha256 (str) {
+                // We transform the string into an arraybuffer.
+                var buffer = new TextEncoder('utf-8').encode(str)
+                return crypto.subtle.digest('SHA-256', buffer).then(function (hash) {
+                    return hex(hash)
+                })
+            }
+
+            function hex (buffer) {
+                var hexCodes = []
+                var view = new DataView(buffer)
+                for (var i = 0; i < view.byteLength; i += 4) {
+                    var value = view.getUint32(i)
+                    var stringValue = value.toString(16)
+                    var padding = '00000000'
+                    var paddedValue = (padding + stringValue).slice(-padding.length)
+                    hexCodes.push(paddedValue)
+                }
+                // join all the hex strings into one
+                return hexCodes.join('')
+            }
+
+            sha256(string).then(function (digest) {
+                resolve(digest)
+            })
+        })
+    }
+
     return {
         extractHostFromURL: extractHostFromURL,
         extractTopSubdomainFromHost: extractTopSubdomainFromHost,
@@ -81,6 +114,7 @@ require.scopes.utils = ( () => {
         getFromStorage: getFromStorage,
         getCurrentURL: getCurrentURL,
         getCurrentTab: getCurrentTab,
-        getProtocol: getProtocol
+        getProtocol: getProtocol,
+        hashSHA256: hashSHA256
     }
 })();

@@ -1,42 +1,44 @@
-var PARAMS = getParams();
-var NUMBER_TO_TEST = PARAMS.numberToTest || 10;
-var IS_RANDOM = PARAMS.random || false;
-var SITES = buildSitesToTest(NUMBER_TO_TEST);
-
-
-var screenshots = [];
+var PARAMS = getParams()
+var NUMBER_TO_TEST = PARAMS.numberToTest || 10
+var IS_RANDOM = PARAMS.random || false
+var SITES = buildSitesToTest(NUMBER_TO_TEST)
+var MEM_USAGE = PARAMS.memoryUsage || false
+var screenshots = []
 
 $(document).ready(function() {
-
     /*
      * Get test params from the url and set any defaults
      */
     if (PARAMS.url) {
-        processSite(PARAMS.url);
-        return;
+        processSite(PARAMS.url)
+        return
     }
     else {
-        NUMBER_TO_TEST = Math.min(NUMBER_TO_TEST, top500Sites.length);
-        processTopSites();
+        NUMBER_TO_TEST = Math.min(NUMBER_TO_TEST, top500Sites.length)
+        processTopSites()
     }
 });
-
 
 /*
  * Build a summary table of results with
  * side by side screenshots
  */
 function buildSummary() {
-    let table = '<table><tr><td><b>Tracker Blocking ON</b></td><td><b>Tracker Blocking OFF</b></td></tr>';
-
+    let table = '<table><tr><td class="fixed on"><b>Tracker Blocking ON</b></td><td class="fixed off"><b>Tracker Blocking OFF</b></td></tr>'
     screenshots.forEach((x) => {
-        table += '<tr><td><a href="' + x.url + '">' + x.url + '</a> - <b>Site Score:</b> ' + JSON.stringify(x.score) + '</td><td></td></tr>';
+        table += '<tr><td class="padded-top"><b><a href="' + x.url + '">' + x.url + '</b></td><td class="padded-top"></td></tr>'
+        table += '<tr><td><b>Site Score:</b> ' + JSON.stringify(x.score) + '</td><td></td></tr>'
         table += '<tr><td>Tab took <b>' + x.enabledOnComplete +'</b> to complete.</td>'
         table += '<td>Tab took <b>' + x.disabledOnComplete +'</b> to complete.</td></tr>'
-        table += '<tr><td><img id="on" src="' + x.on + '" /></td>';
-        table += '<td><img id="off" src="' + x.off + '" /></td></tr>';
-    });
-    table += '</table>';
+        if (MEM_USAGE) {
+            table += '<tr><td>Total current memory usage: <b>' + x.onMemUsageMb + ' Megabytes </b></td>'
+            table += '<td>Total current memory usage: <b>' +  x.offMemUsageMb + ' Megabytes </b></td></tr>'
+        } else {
+            table += '<tr><td><img id="on" src="' + x.on + '" /></td>'
+            table += '<td><img id="off" src="' + x.off + '" /></td></tr>'
+        }
+    })
+    table += '</table>'
 
     // add the screenshots to the page
     PARAMS.screenshots ? $('#screenshots').prepend(table) : null
@@ -59,23 +61,23 @@ function buildSummary() {
  */
 function processSite(url) {
 
-    newScreenshots = {url};
+    newScreenshots = {url}
 
     // turn tracker blocking and https on
-    resetSettings(true);
+    resetSettings(true)
 
     // run test with tracker blocking and https
     clearCache().then(runTest(url).then(() => {
 
         // turn tracker blocking off
-        resetSettings(false);
+        resetSettings(false)
 
         clearCache().then(runTest(url).then(() => {
-            screenshots.push(newScreenshots);
-            buildSummary();
-            return;
-        }));
-    }));
+            screenshots.push(newScreenshots)
+            buildSummary()
+            return
+        }))
+    }))
 }
 
 /*
@@ -85,16 +87,15 @@ function processSite(url) {
  * Stop when all sites have been processed. Base case calls the buildSummary funciton
  */
 function processTopSites() {
-    let site = SITES.pop();
+    let site = SITES.shift()
 
     // base case, return and build table
-    if(!site){
-        buildSummary();
-        return;
+    if (!site) {
+        buildSummary()
+        return
     }
 
-    let url = "http://" + site + '/';
-
+    let url = "http://" + site + '/'
     newScreenshots = {url};
 
     // turn tracker blocking and https on
@@ -104,13 +105,13 @@ function processTopSites() {
     runTest(url).then(() => {
 
         // turn tracker blocking off
-        resetSettings(false);
+        resetSettings(false)
 
         runTest(url).then(() => {
             screenshots.push(newScreenshots)
-            processTopSites();
-        });
-    });
+            processTopSites()
+        })
+    })
 }
 
 /*
@@ -135,34 +136,60 @@ function runTest(url) {
                     newScreenshots.disabledOnComplete = tabObj.stopwatch.completeMs/1000 + ' seconds'
                 }
 
-                takeScreenshot().then((image) => {
-                    blocking ? newScreenshots.on = image : newScreenshots.off = image
-                    chrome.tabs.remove(tab.id);
-                    resolve();
-                })
+                if (MEM_USAGE) {
+                    getMemoryUsageMb((megabytes) => {
+                        if (blocking) {
+                            newScreenshots.onMemUsageMb = megabytes
+                        } else {
+                            newScreenshots.offMemUsageMb = megabytes
+                        }
+                        chrome.tabs.remove(tab.id)
+                        resolve()
+                    })
+                } else {
+                    takeScreenshot().then((image) => {
+                        blocking ? newScreenshots.on = image : newScreenshots.off = image
+                        chrome.tabs.remove(tab.id);
+                        resolve()
+                    })
+                }
             })
-        });
-    });
+        })
+    })
 }
 
 /* Build list of sites to test */
 function buildSitesToTest(amount) {
     // build array of sites to test. Either random or in order
-    let sites = [];
+    let sites = []
     if (IS_RANDOM) {
-        sites = [];
+        sites = []
 
         while (sites.length < amount) {
-            let site = top500Sites[Math.floor(Math.random()*top500Sites.length)];
+            let site = top500Sites[Math.floor(Math.random()*top500Sites.length)]
 
             // don't add duplicate sites to test
             if (sites.indexOf(site) === -1) {
-                sites.push(site);
+                sites.push(site)
             }
         }
+    } else {
+        sites = top500Sites.slice(0, amount)
     }
-    else {
-        sites = top500Sites.slice(0, amount);
+
+    return sites
+}
+
+
+function getMemoryUsageMb (cb) {
+    if (!chrome.system || !chrome.system.memory) {
+        alert('ERROR: To use memory usage features, you must add "system.memory" to the manifest.json file in the "permissions" field.')
     }
-    return sites;
+    chrome.system.memory.getInfo((physMemData) => {
+        // capacity measured in bytes
+        const memCapacity = physMemData.capacity
+        const memAvailable = physMemData.availableCapacity
+        const memUsageMegabytes = (memCapacity - memAvailable) / 1000000
+        cb(memUsageMegabytes)
+    })
 }

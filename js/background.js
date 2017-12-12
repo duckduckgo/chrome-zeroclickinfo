@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-
-var debugRequest = false;
-var trackers = require('trackers');
-var utils = require('utils');
-var settings = require('settings');
-var stats = require('stats');
+var debugRequest = false
+var debugTrackerTimer = false
+var trackers = require('trackers')
+var utils = require('utils')
+var settings = require('settings')
+var stats = require('stats')
 var db = require('db')
 var https = require('https')
 
@@ -96,170 +96,232 @@ chrome.contextMenus.create({
   title: 'Search DuckDuckGo for "%s"',
   contexts: ["selection"],
   onclick: function(info) {
-    var queryText = info.selectionText;
+    var queryText = info.selectionText
     chrome.tabs.create({
       url: "https://duckduckgo.com/?q=" + queryText + "&bext=" + localStorage['os'] + "cr"
-    });
+    })
   }
-});
+})
 
 /**
  * Before each request:
  * - Add ATB param
  * - Block tracker requests
- * - Upgrade http -> https per HTTPS Everywhere rules
+ * - Upgrade http -> https requests per HTTPS Everywhere rules
  */
 chrome.webRequest.onBeforeRequest.addListener(
     function (requestData) {
 
-        let tabId = requestData.tabId;
-
-        // Skip requests to background tabs
-        if (tabId === -1) { return }
-
-        let thisTab = tabManager.get(requestData);
-
-        // For main_frame requests: create a new tab instance whenever we either
-        // don't have a tab instance for this tabId or this is a new requestId.
-        if (requestData.type === "main_frame") {
-            if (!thisTab || (thisTab.requestId !== requestData.requestId)) {
-                thisTab = tabManager.create(requestData);
-            }
-
-            // add atb params only to main_frame
-            let ddgAtbRewrite = ATB.redirectURL(requestData);
-            if (ddgAtbRewrite) return ddgAtbRewrite;
-
-        }
-        else {
-
-            /**
-             * Check that we have a valid tab
-             * there is a chance this tab was closed before
-             * we got the webrequest event
-             */
-            if (!(thisTab && thisTab.url && thisTab.id)) return
-
-            /**
-             * skip any broken sites
-             */
-            if (thisTab.site.isBroken) {
-                console.log('temporarily skip tracker blocking for site: '
-                  + utils.extractHostFromURL(thisTab.url) + '\n'
-                  + 'more info: https://github.com/duckduckgo/content-blocking-whitelist')
-                return
-            }
-
-            /**
-             * Tracker blocking
-             * If request is a tracker, cancel the request
-             */
-            chrome.runtime.sendMessage({'updateTabData': true})
-
-            var tracker = trackers.isTracker(requestData.url, thisTab, requestData);
-
-            // count and block trackers. Skip things that matched in the trackersWhitelist
-            if (tracker && !(tracker.type === 'trackersWhitelist')) {
-                // only count trackers on pages with 200 response. Trackers on these sites are still
-                // blocked below but not counted toward company stats
-                if (thisTab.statusCode === 200) {
-                    // record all tracker urls on a site even if we don't block them
-                    thisTab.site.addTracker(tracker)
-
-                    // record potential blocked trackers for this tab
-                    thisTab.addToTrackers(tracker)
-                }
-
-                // Block the request if the site is not whitelisted
-                if (!thisTab.site.whitelisted && tracker.block) {
-                    thisTab.addOrUpdateTrackersBlocked(tracker);
-                    chrome.runtime.sendMessage({'updateTabData': true})
-
-                    // update badge icon for any requests that come in after
-                    // the tab has finished loading
-                    if (thisTab.status === "complete") thisTab.updateBadgeIcon()
-
-
-                    if (tracker.parentCompany !== 'unknown' && thisTab.statusCode === 200){
-                        Companies.add(tracker.parentCompany)
-                    }
-
-                    // for debugging specific requests. see test/tests/debugSite.js
-                    if (debugRequest && debugRequest.length) {
-                        if (debugRequest.includes(tracker.url)) {
-                            console.log("UNBLOCKED: ", tracker.url)
-                            return
-                        }
-                    }
-
-                    console.info( "blocked " + utils.extractHostFromURL(thisTab.url)
-                                 + " [" + tracker.parentCompany + "] " + requestData.url);
-
-                    // tell Chrome to cancel this webrequest
-                    return {cancel: true};
-                }
-            }
-        }
-
-        /**
-         * HTTPS Everywhere rules
-         * If an upgrade rule is found, request is upgraded from http to https
-         */
-
-         if (!thisTab.site) return
-
-         /**
-          * Skip https upgrade on broken sites
-          */
-        if (thisTab.site.isBroken) {
-            console.log('temporarily skip https upgrades for site: '
-                  + utils.extractHostFromURL(thisTab.url) + '\n'
-                  + 'more info: https://github.com/duckduckgo/content-blocking-whitelist')
-            return
-        }
-
-        // Avoid redirect loops
-        if (thisTab.httpsRedirects[requestData.requestId] >= 7) {
-            console.log('HTTPS: cancel https upgrade. redirect limit exceeded for url: \n' + requestData.url)
-            return {redirectUrl: thisTab.downgradeHttpsUpgradeRequest(requestData)}
-        }
-
-        // Fetch upgrade rule from db
+        // TODO: all-synchronous version for Chrome
         return new Promise ((resolve) => {
-            const isMainFrame = requestData.type === 'main_frame' ? true : false
 
-            if (https.isReady) {
-                https.pipeRequestUrl(requestData.url, thisTab, isMainFrame).then(
-                    (url) => {
-                        if (url.toLowerCase() !== requestData.url.toLowerCase()) {
-                            console.log('HTTPS: upgrade request url to ' + url)
-                            if (isMainFrame) thisTab.upgradedHttps = true
-                            thisTab.addHttpsUpgradeRequest(url)
-                            resolve({redirectUrl: url})
+            /**
+             * Tracker lookup and control flow helper
+             */
+            function execTrackerLookup (cachedTrackerData, thisTab) {
+                let tracker
+
+                if (cachedTrackerData) {
+                    tracker = cachedTrackerData
+                } else {
+                    // Lookup tracker data
+                    if (debugTrackerTimer) console.time(`request#${requestData.requestId}`)
+                    tracker = trackers.isTracker(requestData.url, thisTab, requestData)
+                    if (debugTrackerTimer) console.timeEnd(`request#${requestData.requestId}`)
+                }
+
+                // Add lookups for non-trackers to cache
+                // NOTE: .addToCache() wont add 1st party reqs to cache
+                if (!tracker && !thisTab.site.whitelisted && thisTab.statusCode === 200) {
+                    let timerOutput = ''
+                    if (debugTrackerTimer) timerOutput = ` request#${requestData.requestId}`
+                    console.log(`addToCache()${timerOutput} {block:false} \n  for req url: ${requestData.url}\n  on site: ${thisTab.url}`)
+
+                    trackers.addToCache(requestData.url, thisTab.url, {block: false})
+                    return
+                }
+
+                // Skip requests that matched in the trackersWhitelist
+                if (tracker && tracker.type === 'trackersWhitelist') return
+
+                // Count and block trackers
+                if (tracker) {
+
+                    // Only count trackers on pages with 200 response.
+                    // trackers on these sites are still blocked below
+                    // but not counted toward cumulative company stats
+                    if (thisTab.statusCode === 200) {
+                        // record all tracker urls on a site even if we don't block them
+                        thisTab.site.addTracker(tracker)
+                        // record potential blocked trackers for this tab
+                        thisTab.addToTrackers(tracker)
+                    }
+
+                    // Block the request if the site is not whitelisted
+                    if (!thisTab.site.whitelisted && tracker.block) {
+                        thisTab.addOrUpdateTrackersBlocked(tracker)
+                        chrome.runtime.sendMessage({'updateTabData': true})
+
+                        // Update badge icon for any requests that come in after
+                        // the tab has finished loading
+                        if (thisTab.status === 'complete') thisTab.updateBadgeIcon()
+
+                        if (tracker.parentCompany !== 'unknown' && thisTab.statusCode === 200){
+                            Companies.add(tracker.parentCompany)
                         }
-                        resolve()
+
+                        // For debugging specific requests. see test/tests/debugSite.js
+                        if (debugRequest && debugRequest.length) {
+                            if (debugRequest.includes(tracker.url)) {
+                                console.info('UNBLOCKED: ', tracker.url)
+                                return resolve({cancel: false})
+                            }
+                        }
+
+                        // Cache result
+                        trackers.addToCache(requestData.url, thisTab.url, tracker)
+
+                        // Log output for debugging
+                        let timerOutput = ''
+                        if (debugTrackerTimer) timerOutput = ` request#${requestData.requestId}`
+                        console.log(`BLOCKED${timerOutput} ${utils.extractHostFromURL(thisTab.url)} [${tracker.parentCompany}] ${requestData.url}`)
+
+                        // Tell Chrome to cancel this webrequest
+                        return resolve({cancel: true})
+                    }
+                }
+            }
+
+            /**
+             * HTTPS upgrade lookup helper
+             * If rule is found, request is upgraded from http to https
+             */
+            function execHttpsLookup (thisTab) {
+                if (!thisTab.site) return resolve()
+
+                /**
+                 * Skip https upgrade on broken sites
+                 */
+                if (thisTab.site.isBroken) {
+                    console.log('temporarily skip https upgrades for site: '
+                          + utils.extractHostFromURL(thisTab.url) + '\n'
+                          + 'more info: https://github.com/duckduckgo/content-blocking-whitelist')
+                    return resolve()
+                }
+
+                // Avoid redirect loops
+                if (thisTab.httpsRedirects[requestData.requestId] >= 7) {
+                    console.log('HTTPS: cancel https upgrade. redirect limit exceeded for url: \n' + requestData.url)
+                    return resolve({redirectUrl: thisTab.downgradeHttpsUpgradeRequest(requestData)})
+                }
+
+                // Fetch upgrade rule from indexed db
+                if (https.isReady) {
+                    const isMainFrame = requestData.type === 'main_frame' ? true : false
+                    https.pipeRequestUrl(requestData.url, thisTab, isMainFrame).then(
+                        (url) => {
+                            if (url.toLowerCase() !== requestData.url.toLowerCase()) {
+                                console.log('HTTPS: upgrade request url to ' + url)
+                                if (isMainFrame) thisTab.upgradedHttps = true
+                                thisTab.addHttpsUpgradeRequest(url)
+                                return resolve({redirectUrl: url})
+                            }
+                            return resolve()
+                        }
+                    )
+                } else {
+                    return resolve()
+                }
+            }
+
+            /**
+             * onBeforeRequest control flow logic
+             */
+
+            // First, get tab id
+            let tabId = requestData.tabId
+
+            // Skip requests to background tabs
+            if (tabId === -1) return resolve()
+
+            let thisTab = tabManager.get(requestData)
+
+            // For main_frame requests: create a new tab instance whenever we either
+            // don't have a tab instance for this tabId or this is a new requestId.
+            if (requestData.type === 'main_frame') {
+                if (!thisTab || (thisTab.requestId !== requestData.requestId)) {
+                    thisTab = tabManager.create(requestData)
+                }
+
+                // add atb params only to main_frame
+                let ddgAtbRewrite = ATB.redirectURL(requestData)
+                if (ddgAtbRewrite) return resolve(ddgAtbRewrite)
+
+                // check for https upgrades on main_frame
+                return execHttpsLookup(thisTab, resolve)
+
+            } else {
+
+                /**
+                 * Check that we have a valid tab
+                 * there is a chance this tab was closed before
+                 * we got the webrequest event
+                 */
+                if (!(thisTab && thisTab.url && thisTab.id)) return resolve()
+
+                // Skip any broken sites
+                if (thisTab.site.isBroken) {
+                    console.log('temporarily skip tracker blocking and https upgrades for site: '
+                      + utils.extractHostFromURL(thisTab.url) + '\n'
+                      + 'more info: https://github.com/duckduckgo/content-blocking-whitelist')
+                    return resolve()
+                }
+
+                chrome.runtime.sendMessage({'updateTabData': true})
+
+                // Check if trackers has a cache entry for this url
+                trackers.isCached(requestData.url, thisTab.url).then(
+                    (cachedResult) => {
+
+                        // If .isCached() returns a block decision...
+                        if (cachedResult &&
+                           (cachedResult.block === true ||
+                            cachedResult.block === false)) {
+
+                            console.log(`isCached() tracker lookup: ${JSON.stringify(cachedResult)}\n  for req url: ${requestData.url}\n  on site: ${thisTab.url}`)
+                            if (cachedResult.block === true) {
+                                execTrackerLookup(cachedResult, thisTab)
+                                return execTrackerLookup(cachedResult, thisTab)
+                            }
+                            if (cachedResult.block === false) {
+                                return execHttpsLookup(thisTab)
+                            }
+
+                        // No cached tracker lookup found, proceed with new lookup
+                        } else {
+                            execTrackerLookup(null, thisTab)
+                            return execHttpsLookup(thisTab)
+                        }
                     }
                 )
-            } else {
-              resolve()
+
             }
         })
-    },
-    {
+    },{
         urls: [
             "<all_urls>",
         ],
         types: constants.requestListenerTypes
     },
     ["blocking"]
-);
+)
 
 chrome.webRequest.onHeadersReceived.addListener(
-        ATB.updateSetAtb,
+    ATB.updateSetAtb,
     {
         urls: [
             "*://duckduckgo.com/?*",
             "*://*.duckduckgo.com/?*"
         ]
     }
-);
+)

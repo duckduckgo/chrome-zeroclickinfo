@@ -1,29 +1,26 @@
-
-// these are defined in abp.js
-var abp,
-    easylists,
-    trackerWhitelist = {}
-
-var load = require('load'),
-    settings = require('settings'),
-    utils = require('utils'),
-    trackerLists = require('trackerLists').getLists()
-
+var abp
+var easylists
+var trackerWhitelist = {}
+var load = require('load')
+var settings = require('settings')
+var utils = require('utils')
+var trackerLists = require('trackerLists').getLists()
 let entityList
 let entityMap
 let whitelists
+const cache = new Map()
 
 settings.ready().then(() => {
     load.JSONfromExternalFile(constants.entityList, (list) => entityList = list)
     load.JSONfromExternalFile(constants.entityMap, (list) => entityMap = list)
 })
 
-require.scopes.trackers = (function() {
+require.scopes.trackers = (function () {
 
     function isTracker(urlToCheck, thisTab, request) {
         let currLocation = thisTab.url || ''
         let siteDomain = thisTab.site ? thisTab.site.domain : ''
-        if(!siteDomain) return
+        if (!siteDomain) return
 
         // TODO: easylist is marking some of our requests as trackers. Whitelist us
         // by default for now until we can figure out why.
@@ -80,10 +77,11 @@ require.scopes.trackers = (function() {
             }
 
         }
+
         return false
     }
 
-    function checkWhitelist(url, currLocation, request) {
+    function checkWhitelist (url, currLocation, request) {
         let result = false
         let match
 
@@ -169,7 +167,7 @@ require.scopes.trackers = (function() {
     /* Check to see if this tracker is related to the current page through their parent companies
     * Only block request to 3rd parties
     */
-    function isRelatedEntity(parentCompany, currLocation) {
+    function isRelatedEntity (parentCompany, currLocation) {
         var parentEntity = entityList[parentCompany]
         var host = utils.extractHostFromURL(currLocation)
 
@@ -191,7 +189,7 @@ require.scopes.trackers = (function() {
     /* Compare two urls to determine if they came from the same hostname
     * pull off any subdomains before comparison
     */
-    function isFirstPartyRequest(currLocation, urlToCheck) {
+    function isFirstPartyRequest (currLocation, urlToCheck) {
         let currentLocationParsed = tldjs.parse(currLocation)
         let urlToCheckParsed = tldjs.parse(urlToCheck)
 
@@ -233,8 +231,48 @@ require.scopes.trackers = (function() {
         return match
     }
 
+    // add block/noblock decisions (per domain) to the trackers cache
+    // remove older entries if the cache is full
+    function addToCache (reqUrl, currLocation, trackerData) {
+        if (!settings.getSetting('trackerBlockingEnabled')) return
+        if (isFirstPartyRequest(currLocation, reqUrl)) return
+        if (cache.size > 3000) {
+            cache.delete(cache.keys().next().value)
+        }
+        generateCacheKey(reqUrl, currLocation).then((hashedKey) => {
+            if (trackerData) {
+                cache.set(hashedKey, trackerData)
+            }
+        })
+    }
+
+    function isCached (reqUrl, currLocation) {
+        return new Promise((resolve, reject) => {
+            if (!settings.getSetting('trackerBlockingEnabled') ||
+                isFirstPartyRequest(currLocation, reqUrl)) {
+                resolve({block: false})
+            }
+            generateCacheKey(reqUrl, currLocation).then((hashedKey) => {
+                const cachedData = cache.get(hashedKey)
+                resolve(cachedData)
+            })
+        })
+    }
+
+    function generateCacheKey (reqUrl, currLocation) {
+        reqUrl = encodeURIComponent(reqUrl)
+        currLocation = encodeURIComponent(currLocation)
+        // cached trackers lookups are scoped to a domain
+        const key = `domain=${utils.extractHostFromURL(currLocation)},reqUrl:${reqUrl}`
+        return new Promise((resolve, reject) => {
+            utils.hashSHA256(key).then((hashedKey) => resolve(hashedKey))
+        })
+    }
+
     return {
-        isTracker: isTracker
+        isTracker: isTracker,
+        addToCache: addToCache,
+        isCached: isCached
     }
 
 })()
