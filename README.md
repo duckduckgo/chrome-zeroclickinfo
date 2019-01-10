@@ -1,6 +1,8 @@
 # DuckDuckGo for Chrome
 
-This is the official Chrome Extension for DuckDuckGo.
+~~This is the official Chrome Extension for DuckDuckGo.~~
+
+**This repository has been deprecated. Our current Chrome extension can be found at: https://github.com/duckduckgo/duckduckgo-privacy-extension.**
 
 You can install this extension directly from the [Chrome web store](https://chrome.google.com/webstore/detail/duckduckgo-for-chrome/bpphkkgodbfncbcpgopijlfakfgmclao?hl=en).
 
