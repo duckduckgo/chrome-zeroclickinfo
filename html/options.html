@@ -18,27 +18,77 @@
 <html>
 <head><title>DuckDuckGo for Chrome - Options</title></head>
 <script type="text/javascript" src="../js/options.js"></script>
-
+<style type="text/css">
+  h1 {
+    color: black;
+    font-size: 1.5em;
+    margin: 10px 10px 10px 10px;
+    font-family: DejaVu Sans, Arial, sans-serif;
+  }
+  label {
+    display: block;
+    padding: 7px; 
+  }
+  input[type='checkbox'] {
+    padding: 7px;
+    height: 13px;
+    width: 13px;
+    vertical-align: middle;
+  }
+  span {
+    padding: 7px;
+  }
+  button {
+    min-height: 2em;
+    min-width: 4em;
+    border: 1px solid rgba(0, 0, 0, 0.25);
+    border-radius: 2px;
+    margin: 10px 1px 0 10px;
+    padding: 1px 6px;
+    background-color: #dfdfdf;
+    background-image: none;
+    color: #444;
+  }
+  button:hover {
+    -webkit-appearance: none;
+    background-image: -webkit-linear-gradient(#e7e7e7, #e7e7e7 38%, #d7d7d7);
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    color: #222;
+  }
+  #content {
+    margin-left: 10px;
+  }
+  #status {
+    margin: 10px;
+  }
+</style>
 <body>
 
-  Show Answers in right panel on Google
-  <input type="checkbox" id="zeroclick_google_right" ></input>
-<br>
-  Remember last search in the popup
-  <input type="checkbox" id="lastsearch_enabled" checked="yes"></input>
-<br>
-  Use POST requests where possible
-  <input type="checkbox" id="use_post" ></input>
-<br>
-  Show debug information:
-  <input type="checkbox" id="dev" ></input>
-<br>
-  Safe Search:
-  <input type="checkbox" id="safesearch" checked="yes" ></input>
-<br>
+  <h1>Options</h1>
+  <div id="content">
+    <label>
+      <input type="checkbox" id="zeroclick_google_right"></input>
+      Show Answers in right panel on Google
+    </label>
+    <label>
+      <input type="checkbox" id="lastsearch_enabled" checked="yes"></input>
+      Remember last search in the popup
+    </label>
+    <label>
+      <input type="checkbox" id="use_post"></input>
+      Use POST requests where possible
+    </label>
+    <label>
+      <input type="checkbox" id="dev"></input>
+      Show debug information:
+    </label>
+    <label>
+      <input type="checkbox" id="safesearch" checked="yes"></input>
+      Safe Search:
+    </label>
 
-
-<button>Save</button>
-  <div id="status"> </div>
+    <button>Save</button>
+    <div id="status"> </div>
+  </div>
 </body>
 </html>
