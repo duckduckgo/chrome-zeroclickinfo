@@ -27,3 +27,4 @@ build: zip
 
 clean:
 	rm $(CWD)/*.zip
+	
